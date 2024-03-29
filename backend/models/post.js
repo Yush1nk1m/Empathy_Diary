@@ -1,22 +1,16 @@
 /**
  * [일기 테이블]
- * @postId      ID
  * @content     내용
  * @image       첨부 이미지 저장 경로
+ * @createdAt   작성 일시
  */
 const Sequelize = require("sequelize");
 
 class Post extends Sequelize.Model {
     static initiate(sequelize) {
         Post.init({
-            postId: {
-                type: Sequelize.STRING(40),     // 최대 길이 40
-                allowNull: false,               // 값은 null을 허용하지 않는다.
-                unique: true,                   // Primary Key
-            },
-
             content: {
-                type: Sequelize.STRING(2000),   // 최대 길이 2000
+                type: Sequelize.STRING(1000),   // 최대 길이 1000
                 allowNull: false,               // null을 허용하지 않는다.
             },
 
@@ -37,9 +31,9 @@ class Post extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Post.belongsTo(db.User, { foreignKey: "writer", targetKey: "userId" });
+        db.Post.belongsTo(db.User, { foreignKey: "writer", targetKey: "id" });
         db.Post.belongsToMany(db.Emotion, { through: "PostEmotion" });
-        db.Post.hasOne(db.Sentiment, { foreignKey: "postId", sourceKey: "postId", onDelete: "cascade" });
+        db.Post.hasOne(db.Sentiment, { foreignKey: "postId", sourceKey: "id", onDelete: "cascade" });
     }
 }
 

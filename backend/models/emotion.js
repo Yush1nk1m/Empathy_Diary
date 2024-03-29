@@ -1,12 +1,13 @@
 /**
  * [감정 테이블]
+ * @id          로우 고유의 ID
  * @typeName    감정의 종류
  */
 const Sequelize = require("sequelize");
 
 class Emotion extends Sequelize.Model {
     static initiate(sequelize) {
-        Emotion.initiate({
+        Emotion.init({
             typeName: {
                 type: Sequelize.STRING(10),     // 최대 길이 10
                 allowNull: false,               // 값은 null일 수 없다.

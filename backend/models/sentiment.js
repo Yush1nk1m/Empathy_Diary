@@ -1,15 +1,17 @@
 /**
  * [감성 테이블]
- * @positive        긍정 감성 확률
- * @negative        부정 감성 확률
- * @neutral         중립 감성 확률
+ * @id          로우 고유의 ID
+ * @positive    긍정 감성 확률
+ * @negative    부정 감성 확률
+ * @neutral     중립 감성 확률
+ * @postId      일기의 고유한 ID
  */
 
 const Sequelize = require("sequelize");
 
-class Emotion extends Sequelize.Model {
+class Sentiment extends Sequelize.Model {
     static initiate(sequelize) {
-        Emotion.initiate({
+        Sentiment.init({
             positive: {
                 type: Sequelize.FLOAT,          // 부동 소수점
                 allowNull: false,               // 값은 null일 수 없다.
@@ -37,8 +39,8 @@ class Emotion extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Sentiment.belongsTo(db.Post, { foreignKey: "postId", targetKey: "postId" });
+        db.Sentiment.belongsTo(db.Post, { foreignKey: "postId", targetKey: "id" });
     }
 };
 
-module.exports = Emotion;
+module.exports = Sentiment;
