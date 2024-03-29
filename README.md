@@ -7,3 +7,7 @@
 - **Runtime Environment**: node.js v20.9.0
 - **Framework**: express.js
 - **Database**: MySQL
+
+## 데이터베이스 구조
+
+## RESTful API
