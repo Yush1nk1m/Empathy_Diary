@@ -36,7 +36,9 @@ class Emotion extends Sequelize.Model {
         });
     }
 
-    static associate(db) {}
+    static associate(db) {
+        db.Sentiment.belongsTo(db.Post, { foreignKey: "postId", targetKey: "postId" });
+    }
 };
 
 module.exports = Emotion;

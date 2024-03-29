@@ -1,6 +1,6 @@
 /**
  * [사용자 테이블]
- * @id          ID
+ * @userId      ID
  * @email       이메일
  * @nickname    닉네임
  * @password    비밀번호
@@ -10,7 +10,7 @@ const Sequelize = require("sequelize");
 class User extends Sequelize.Model {
     static initiate(sequelize) {
         User.init({
-            id: {
+            userId: {
                 type: Sequelize.STRING(20),     // 최대 길이 20
                 allowNull: false,               // null을 허용하지 않는다.
                 unique: true,                   // Primary Key
@@ -43,7 +43,9 @@ class User extends Sequelize.Model {
         });
     }
 
-    static associate(db) {}
+    static associate(db) {
+        db.User.hasMany(db.Post, { foreignKey: "writer", sourceKey: "userId", onDelete: "cascade" });
+    }
 };
 
 module.exports = User;

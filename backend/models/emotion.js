@@ -24,7 +24,9 @@ class Emotion extends Sequelize.Model {
         });
     }
 
-    static associate(db) {}
+    static associate(db) {
+        db.Emotion.belongsToMany(db.Post, { through: "PostEmotion" });
+    }
 };
 
 module.exports = Emotion;
