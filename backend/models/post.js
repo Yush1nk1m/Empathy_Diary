@@ -10,7 +10,7 @@ class Post extends Sequelize.Model {
     static initiate(sequelize) {
         Post.init({
             content: {
-                type: Sequelize.STRING(1000),   // 최대 길이 1000
+                type: Sequelize.STRING(2000),   // 최대 길이 2000(한글 1000자)
                 allowNull: false,               // null을 허용하지 않는다.
             },
 
