@@ -6,6 +6,7 @@
  * @content     메시지 내용
  * @createdAt   대화 전송 일시
  * @updatedAt   로우 수정 일시
+ * @deletedAt   로우 삭제 일시
  */
 const Sequelize = require("sequelize");
 
@@ -30,6 +31,7 @@ class Chat extends Sequelize.Model {
             underscored: false,
             modelName: "Chat",
             tableName: "chats",
+            paranoid: true,
             charset: "utf8",
             collate: "utf8_general_ci",
         });
