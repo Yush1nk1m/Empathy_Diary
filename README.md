@@ -154,3 +154,12 @@
 | :--: | :-- | :--: | :-- |
 | GET | /sentiments?{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
 | GET | /sentiments?{year}&{month}&{day} | e-02 | 특정 날짜의 감성 점수 조회 |
+
+### 대화방
+
+| HTTP method | URI | API ID | role |
+| :--: | :-- | :--: | :-- |
+| POST | /chatrooms | cr-01 | AI 챗봇과의 대화방 생성 |
+| POST | /chatrooms/posts | cr-02 | AI 챗봇과의 대화 제출(요약 생성) |
+| GET | /chatrooms | cr-03 | 최근 대화방 내용 다시 불러오기 |
+| POST | /chatrooms/chats | cr-04 | AI 챗봇에게 메시지 전송 |
