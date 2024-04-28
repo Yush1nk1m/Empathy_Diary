@@ -154,7 +154,7 @@
 
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
-| GET | /sentiments?{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
+| GET | /sentiments/{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
 | GET | /sentiments/duration?{startDate}&{endDate} | e-02 | 특정 기간 동안의 감성 점수 조회 |
 
 ### 대화방
