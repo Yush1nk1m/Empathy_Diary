@@ -13,6 +13,10 @@
 | POST | /users/logout | u-06 | 로그아웃 |
 */
 const express = require("express");
+const passport = require("passport");
+
+const { isLoggedIn, isNotLoggedIn } = require("../middlewares");
+const { join, login, logout } = require("../controllers/auth");
 
 const router = express.Router();
 
@@ -20,10 +24,10 @@ const router = express.Router();
 router.get("/",);
 
 // [u-02] POST /users
-router.post("/",);
+router.post("/", isNotLoggedIn, join);
 
 // [u-03] POST /users/login
-router.post("/login",);
+router.post("/login", isNotLoggedIn, login);
 
 // [u-04] PATCH /users
 router.patch("/",);
@@ -32,6 +36,6 @@ router.patch("/",);
 router.delete("/",);
 
 // [u-06] POST /users/logout
-router.post("/logout",);
+router.post("/logout", isLoggedIn, logout);
 
 module.exports = router;
