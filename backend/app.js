@@ -5,11 +5,14 @@ const path = require("path");
 const session = require("express-session");
 const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
+const passport = require("passport");
 
 dotenv.config();
 const { sequelize } = require("./models");
+const passportConfig = require("./passport");
 
 const app = express();
+passportConfig();
 app.set("port", process.env.PORT || 8080);
 app.set("view engine", "html");
 nunjucks.configure("views", {
@@ -38,6 +41,8 @@ app.use(session({
         secure: false,
     },
 }));
+app.use(passport.initialize());     // 1. req 객체에 passport 설정을 저장한다.
+app.use(passport.session());        // 2. req.session 객체에 passport 정보를 저장한다.
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
