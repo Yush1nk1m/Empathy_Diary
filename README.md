@@ -124,6 +124,7 @@
 | POST | /posts | p-03 | 일기 등록 |
 | PATCH | /posts | p-04 | 일기 내용 수정 |
 | DELETE | /posts/{postId} | p-05 | 일기 삭제 |
+| GET | /posts/duration?{startDate}&{endDate} | p-06 | 특정 기간 동안 작성한 모든 일기 조회 |
 
 ### 조언
 
@@ -143,8 +144,9 @@
 
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
-| GET | /emotions?{postId} | e-01 | 특정 일기장에 매핑된 감정 모두 조회 |
-| GET | /emotions?{year}&{month}&{day} | e-02 | 특정 날짜에 매핑된 감정 모두 조회 |
+| GET | /emotions | e-01 | 사용자의 누적된 모든 감정 조회 |
+| GET | /emotions/{postId} | e-02 | 특정 일기장에 매핑된 감정 모두 조회 |
+| GET | /emotions/duration?{startDate}&{endDate} | e-03 | 특정 기간 동안 매핑된 감정 모두 조회 |
 
 ### 감성
 
@@ -153,7 +155,7 @@
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
 | GET | /sentiments?{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
-| GET | /sentiments?{year}&{month}&{day} | e-02 | 특정 날짜의 감성 점수 조회 |
+| GET | /sentiments/duration?{startDate}&{endDate} | e-02 | 특정 기간 동안의 감성 점수 조회 |
 
 ### 대화방
 
