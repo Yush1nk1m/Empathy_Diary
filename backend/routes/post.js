@@ -16,18 +16,18 @@ const express = require("express");
 const router = express.Router();
 
 // [p-01] GET /posts
-router.get("/posts",);
+router.get("/",);
 
 // [p-02] GET /posts/{postId}
-router.get("/posts/:postId",);
+router.get("/:postId",);
 
 // [p-03] POST /posts
-router.post("/posts",);
+router.post("/",);
 
 // [p-04] PATCH /posts
-router.patch("/posts",);
+router.patch("/",);
 
 // [p-05] DELETE /posts/{postId}
-router.delete("/posts/:postId",);
+router.delete("/:postId",);
 
 module.exports = router;

@@ -16,18 +16,18 @@ const express = require("express");
 const router = express.Router();
 
 // [u-01] GET /users
-router.get("/users",);
+router.get("/",);
 
 // [u-02] POST /users
-router.post("/users",);
+router.post("/",);
 
 // [u-03] POST /users/login
-router.post("/users/login",);
+router.post("/login",);
 
 // [u-04] PATCH /users
-router.patch("/users",);
+router.patch("/",);
 
 // [u-05] DELETE /users
-router.delete("/users",);
+router.delete("/",);
 
 module.exports = router;
