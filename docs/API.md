@@ -24,6 +24,7 @@
 | POST | /users/login | u-03 | 로그인 |
 | PATCH | /users | u-04 | 회원 정보 수정 |
 | DELETE | /users | u-05 | 회원 탈퇴 |
+| POST | /users/logout | u-06 | 로그아웃 |
 
 ### u-01
 
