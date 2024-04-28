@@ -11,7 +11,7 @@ module.exports = () => {
         passReqToCallback: false,
     }, async (userId, password, done) => {
         try {
-            const exUser = await User.findOne({ where: { email } });
+            const exUser = await User.findOne({ where: { userId } });
             if (exUser) {
                 const isPasswordCorrect = await bcrypt.compare(password, exUser.password);
                 if (isPasswordCorrect) {

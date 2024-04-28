@@ -14,5 +14,7 @@ module.exports = () => {
         User.findOne({ where: { userId } })
             .then(user => done(null, user))
             .catch(err => done(err));
-    })
+    });
+
+    local();
 }

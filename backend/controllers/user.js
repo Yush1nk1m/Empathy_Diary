@@ -12,7 +12,7 @@ exports.join = async (req, res, next) => {
             return res.status(409).send("이미 존재하는 회원 ID입니다.");
         }
 
-        const hashedPassword = await bcrypt.hash(password, 50);
+        const hashedPassword = await bcrypt.hash(password, 12);
         await User.create({
             userId,
             email,
@@ -46,12 +46,12 @@ exports.login = (req, res, next) => {
             }
 
             return res.status(200).send("로그인 성공");
-        })
+        });
     })(req, res, next);     // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙인다.
 };
 
 exports.logout = (req, res) => {
     req.logout(() => {
         return res.status(200).send("로그아웃에 성공하였습니다.");
-    })
+    });
 };

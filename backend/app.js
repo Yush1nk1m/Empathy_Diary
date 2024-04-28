@@ -56,8 +56,7 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
-    res.status(err.status || 500);
-    res.render("error");
+    res.status(err.status || 500).send("서버 에러가 발생했습니다.");
 });
 
 app.listen(app.get("port"), () => {
