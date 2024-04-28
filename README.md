@@ -135,7 +135,7 @@
 | GET | /advices/me | a-02 | 작성한 모든 조언 조회 |
 | POST | /advices | a-03 | 조언 작성 |
 | PATCH | /advices | a-04 | 조언 내용 수정 |
-| DELETE | /advices?{adviceId} | a-05 | 조언 삭제 |
+| DELETE | /advices/{adviceId} | a-05 | 조언 삭제 |
 
 ### 감정
 
