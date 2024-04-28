@@ -14,7 +14,7 @@ const passportConfig = require("./passport");
 
 const app = express();
 passportConfig();
-app.set("port", process.env.PORT || 80);
+app.set("port", process.env.PORT || 8080);
 app.set("view engine", "html");
 nunjucks.configure("views", {
     express: app,
