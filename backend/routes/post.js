@@ -30,4 +30,7 @@ router.patch("/",);
 // [p-05] DELETE /posts/{postId}
 router.delete("/:postId",);
 
+// [p-06] GET /posts/duration?{startDate}&{endDate}
+router.get("/duration",);
+
 module.exports = router;
