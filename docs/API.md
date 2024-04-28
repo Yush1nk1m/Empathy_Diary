@@ -10,6 +10,7 @@
 | 401 | Unauthorized | 인증 실패 |
 | 403 | Forbidden | 권한 없음 |
 | 404 | Not Found | 리소스 찾을 수 없음 |
+| 409 | Conflict | 서버의 현재 상태와 충돌함 |
 | 500 | Internal Server Error | 서버 에러 |
 
 ## 회원
