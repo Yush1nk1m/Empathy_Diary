@@ -31,7 +31,8 @@ exports.join = async (req, res, next) => {
 exports.login = (req, res, next) => {
     passport.authenticate("local", (authError, user, info) => {
         if (authError) {
-            return res.status(401).send("인증에 실패하였습니다.");
+            console.error(authError);
+            return next(authError);
         }
 
         if (!user) {
