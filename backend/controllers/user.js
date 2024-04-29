@@ -37,7 +37,7 @@ exports.join = async (req, res, next) => {
         console.error(error);
         return next(error);
     }
-}
+};
 
 // [u-03] 로그인
 exports.login = (req, res, next) => {
@@ -99,7 +99,31 @@ exports.modifyUserInfo = async (req, res, next) => {
         console.log(error);
         next(error);
     }
-}
+};
+
+// [u-05] 회원 탈퇴
+exports.deleteUserInfo = async (req, res, next) => {
+    const { confirmMessage } = req.body;
+
+    try {
+        if (confirmMessage !== "회원 탈퇴를 희망합니다.") {
+            return res.status(400).send("확인 메시지가 잘못되었습니다.");
+        }
+
+        await User.destroy({
+            where: {
+                userId: req.user.userId,
+            },
+        });
+
+        req.logout(() => {
+            return res.status(200).send("회원 탈퇴가 완료되었습니다.");
+        });
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
 
 // [u-06] 로그아웃
 exports.logout = (req, res) => {

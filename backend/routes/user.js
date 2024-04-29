@@ -13,10 +13,9 @@
 | POST | /users/logout | u-06 | 로그아웃 |
 */
 const express = require("express");
-const passport = require("passport");
 
 const { isLoggedIn, isNotLoggedIn } = require("../middlewares");
-const { join, login, logout, getUserInfo, modifyUserInfo } = require("../controllers/user");
+const { join, login, logout, getUserInfo, modifyUserInfo, deleteUserInfo } = require("../controllers/user");
 
 const router = express.Router();
 
@@ -33,7 +32,7 @@ router.post("/login", isNotLoggedIn, login);
 router.patch("/", isLoggedIn, modifyUserInfo);
 
 // [u-05] DELETE /users
-router.delete("/",);
+router.delete("/", isLoggedIn, deleteUserInfo);
 
 // [u-06] POST /users/logout
 router.post("/logout", isLoggedIn, logout);
