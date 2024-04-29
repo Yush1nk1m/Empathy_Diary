@@ -96,7 +96,7 @@ exports.modifyUserInfo = async (req, res, next) => {
         return res.status(200).send("회원 정보가 수정되었습니다.");
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         next(error);
     }
 };
@@ -109,13 +109,15 @@ exports.deleteUserInfo = async (req, res, next) => {
         if (confirmMessage !== "회원 탈퇴를 희망합니다.") {
             return res.status(400).send("확인 메시지가 잘못되었습니다.");
         }
-
+        
         await User.destroy({
             where: {
                 userId: req.user.userId,
             },
         });
 
+        console.log("TEST");
+        
         req.logout(() => {
             return res.status(200).send("회원 탈퇴가 완료되었습니다.");
         });

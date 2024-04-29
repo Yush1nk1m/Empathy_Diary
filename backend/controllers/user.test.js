@@ -6,7 +6,7 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
-const { getUserInfo, join, login, modifyUserInfo, logout } = require("./user");
+const { getUserInfo, join, login, modifyUserInfo, logout, deleteUserInfo } = require("./user");
 
 // [u-01] 회원 정보 조회
 describe("[u-01] getUserInfo", () => {
@@ -80,12 +80,12 @@ describe("[u-02] join", () => {
     });
 
     test("데이터베이스 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
-        const message = "데이터베이스 에러가 발생하였습니다.";
-        User.findOne.mockReturnValue(Promise.reject(message));
+        const error = new Error("데이터베이스 에러가 발생하였습니다.");
+        User.findOne.mockReturnValue(Promise.reject(error));
 
         await join(req, res, next);
 
-        expect(next).toBeCalledWith(message);
+        expect(next).toBeCalledWith(error);
     });
 });
 
@@ -162,26 +162,52 @@ describe("[u-03] login", () => {
 
 // [u-04] 회원 정보 수정
 describe("[u-04] modifyUserInfo", () => {
-    let req = {
-        user: {
-            userId: "kys",
-            nickname: "yushin",
-            password: "12345",
-        },
-        body: {
-            newNickname: "newYushin",
-            newPassword: "54321",
-            newConfirmPassword: "54321",
-            password: "12345",
-        },
-    };
     const res = {
         status: jest.fn(() => res),
         send: jest.fn(),
     };
     const next = jest.fn();
 
+    test("오류가 발생하지 않고, 비밀번호가 일치하며 변경될 정보가 있으면 회원 정보를 수정한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
+        User.findOne.mockReturnValue({
+            save: jest.fn(() => Promise.resolve()),
+        });
+
+        await modifyUserInfo(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.send).toBeCalledWith("회원 정보가 수정되었습니다.");
+    });
+
     test("현재 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
         bcrypt.compare.mockReturnValue(Promise.resolve(false));
 
         await modifyUserInfo(req, res, next);
@@ -191,49 +217,187 @@ describe("[u-04] modifyUserInfo", () => {
     });
 
     test("변경될 정보가 존재하지 않으면 에러가 발생한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "yushin",
+                newPassword: "",
+                newConfirmPassword: "",
+                password: "12345",
+            },
+        };
+
         bcrypt.compare.mockReturnValue(Promise.resolve(true));
         
-        const originalReq = req;
-        req.body.newPassword = '';
-        req.body.newNickname = req.user.nickname;
-
         await modifyUserInfo(req, res, next);
-
-        req = originalReq;
 
         expect(res.status).toBeCalledWith(400);
         expect(res.send).toBeCalledWith("변경될 정보가 존재하지 않습니다.");
     });
 
     test("변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "newPassword1",
+                newConfirmPassword: "newPassword2",
+                password: "12345",
+            },
+        };
+
         bcrypt.compare.mockReturnValue(Promise.resolve(true));
 
-        const originalReq = req;
-        req.body.newPassword = "newPassword1";
-        req.body.newConfirmPassword = "newPassword2";
-
         await modifyUserInfo(req, res, next);
-
-        req = originalReq;
 
         expect(res.status).toBeCalledWith(400);
         expect(res.send).toBeCalledWith("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
     test("변경할 비밀번호와 원래의 비밀번호가 일치하면 에러가 발생한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "12345",
+                newConfirmPassword: "12345",
+                password: "12345",
+            },
+        };
+
         bcrypt.compare.mockReturnValue(Promise.resolve(true));
 
-        const originalReq = req;
-        req.body.newPassword = req.body.newConfirmPassword = req.body.password;
-
         await modifyUserInfo(req, res, next);
-
-        req = originalReq;
 
         expect(res.status).toBeCalledWith(400);
         expect(res.send).toBeCalledWith("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
     });
+
+    test("데이터베이스 탐색 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const error = new Error("데이터베이스 탐색 중 에러가 발생했습니다.");
+        User.findOne.mockReturnValue(Promise.reject(error));
+
+        await modifyUserInfo(req, res, next);
+        
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 저장 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
+        User.findOne.mockReturnValue({
+            save: jest.fn(() => Promise.reject(error)),
+        });
+
+        await modifyUserInfo(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
 });
+
+// [u-05] 회원 탈퇴
+describe("[u-05] deleteUserInfo", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("확인 메시지가 일치하고 데이터베이스에서 삭제된 경우 회원 탈퇴한다.", async () => {
+        const req = {
+            user: {
+                userId: "yushin",
+            },
+            body: {
+                confirmMessage: "회원 탈퇴를 희망합니다.",
+            },
+            logout: jest.fn((callback) => {
+                callback();
+            }),
+        };
+
+        await deleteUserInfo(req, res, next);
+        
+        expect(res.status).toBeCalledWith(200);
+        expect(res.send).toBeCalledWith("회원 탈퇴가 완료되었습니다.");
+    });
+    
+    test("확인 메시지가 일치하지 않을 경우 에러가 발생한다.", async () => {
+        const req = {
+            user: {
+                userId: "yushin",
+            },
+            body: {
+                confirmMessage: "회원 탈퇴를 희망합니다?",
+            },
+            logout: jest.fn((callback) => {
+                callback();
+            }),
+        };
+        await deleteUserInfo(req, res, next);
+        
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("확인 메시지가 잘못되었습니다.");
+    });
+
+    test("데이터베이스 에러 발생 시 next(error)를 호출한다.", async () => {
+        const req = {
+            user: {
+                userId: "yushin",
+            },
+            body: {
+                confirmMessage: "회원 탈퇴를 희망합니다.",
+            },
+            logout: jest.fn((callback) => {
+                callback();
+            }),
+        };
+
+        const error = new Error("데이터베이스 삭제 작업 중 에러가 발생했습니다.");
+        User.destroy.mockReturnValue(Promise.reject(error));
+
+        await deleteUserInfo(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+})
 
 // [u-06] 로그아웃
 describe("[u-06] logout", () => {
