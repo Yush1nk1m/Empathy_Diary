@@ -16,12 +16,12 @@ const express = require("express");
 const passport = require("passport");
 
 const { isLoggedIn, isNotLoggedIn } = require("../middlewares");
-const { join, login, logout, userInfo } = require("../controllers/user");
+const { join, login, logout, getUserInfo, modifyUserInfo } = require("../controllers/user");
 
 const router = express.Router();
 
 // [u-01] GET /users
-router.get("/", isLoggedIn, userInfo);
+router.get("/", isLoggedIn, getUserInfo);
 
 // [u-02] POST /users
 router.post("/", isNotLoggedIn, join);
@@ -30,7 +30,7 @@ router.post("/", isNotLoggedIn, join);
 router.post("/login", isNotLoggedIn, login);
 
 // [u-04] PATCH /users
-router.patch("/",);
+router.patch("/", isLoggedIn, modifyUserInfo);
 
 // [u-05] DELETE /users
 router.delete("/",);

@@ -64,7 +64,42 @@ exports.login = (req, res, next) => {
 
 // [u-04] 회원 정보 수정
 exports.modifyUserInfo = async (req, res, next) => {
+    const { userId, nickname } = req.user;
+    let { newNickname, newPassword, newConfirmPassword, password } = req.body;
 
+    try {
+        const isPasswordCorrect = await bcrypt.compare(password, req.user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).send("비밀번호가 일치하지 않습니다.");
+        }
+
+        if (newPassword === '' && newNickname === nickname) {
+            return res.status(400).send("변경될 정보가 존재하지 않습니다.");
+        }
+
+        if (newPassword !== '' && newPassword !== newConfirmPassword) {
+            return res.status(400).send("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+        }
+
+        const isPasswordSame = await bcrypt.compare(newPassword, req.user.password);
+        if (isPasswordSame) {
+            return res.status(400).send("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
+        }
+
+        let user = await User.findOne({ where: { userId } });
+        if (newNickname !== nickname)
+            user.nickname = newNickname;
+        if (newPassword !== '')
+            user.password = await bcrypt.hash(newPassword, 12);
+
+        await user.save();
+
+        return res.status(200).send("회원 정보가 수정되었습니다.");
+
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 }
 
 // [u-06] 로그아웃

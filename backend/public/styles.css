@@ -39,7 +39,8 @@ h1 {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="confirmPassword"] {
     width: 100%; /* 전체 너비 사용 */
     padding: 8px;
     margin: 8px 0;

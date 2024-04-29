@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보 수정</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>회원 정보 수정</h1>
+        <form id="editForm">
+            <input type="text" id="userId" name="userId" placeholder="사용자 ID" readonly>
+            <input type="email" id="email" name="email" placeholder="이메일" readonly>
+            <input type="text" id="nickname" name="nickname" placeholder="닉네임" required>
+            <input type="password" id="newPassword" name="newPassword" placeholder="새 비밀번호">
+            <input type="password" id="newConfirmPassword" name="newConfirmPassword" placeholder="새 비밀번호 확인">
+            <input type="password" id="password" name="password" placeholder="현재 비밀번호" required>
+            <button type="submit">변경</button>
+            <button type="button" onclick="window.location.href='/'">뒤로가기</button>
+        </form>
+    </div>
+    <script src="userEdit.js"></script>
+</body>
+</html>
