@@ -45,7 +45,7 @@ exports.login = (req, res, next) => {
                 return next(loginError);
             }
 
-            return res.status(200).send("로그인 성공");
+            return res.status(200).send("로그인에 성공했습니다.");
         });
     })(req, res, next);     // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙인다.
 };
