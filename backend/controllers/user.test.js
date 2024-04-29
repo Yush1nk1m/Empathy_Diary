@@ -1,8 +1,12 @@
 jest.mock("passport");
+jest.mock("bcrypt");
 jest.mock("../models/user");
+
 const passport = require("passport");
+const bcrypt = require("bcrypt");
+
 const User = require("../models/user");
-const { getUserInfo, join, login, logout } = require("./user");
+const { getUserInfo, join, login, modifyUserInfo, logout } = require("./user");
 
 // [u-01] 회원 정보 조회
 describe("[u-01] getUserInfo", () => {
@@ -153,6 +157,81 @@ describe("[u-03] login", () => {
 
         expect(next).toBeCalledWith(authError);
         expect(req.login).toBeCalledTimes(0);
+    });
+});
+
+// [u-04] 회원 정보 수정
+describe("[u-04] modifyUserInfo", () => {
+    let req = {
+        user: {
+            userId: "kys",
+            nickname: "yushin",
+            password: "12345",
+        },
+        body: {
+            newNickname: "newYushin",
+            newPassword: "54321",
+            newConfirmPassword: "54321",
+            password: "12345",
+        },
+    };
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("현재 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+        bcrypt.compare.mockReturnValue(Promise.resolve(false));
+
+        await modifyUserInfo(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("비밀번호가 일치하지 않습니다.");
+    });
+
+    test("변경될 정보가 존재하지 않으면 에러가 발생한다.", async () => {
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+        
+        const originalReq = req;
+        req.body.newPassword = '';
+        req.body.newNickname = req.user.nickname;
+
+        await modifyUserInfo(req, res, next);
+
+        req = originalReq;
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("변경될 정보가 존재하지 않습니다.");
+    });
+
+    test("변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const originalReq = req;
+        req.body.newPassword = "newPassword1";
+        req.body.newConfirmPassword = "newPassword2";
+
+        await modifyUserInfo(req, res, next);
+
+        req = originalReq;
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+    });
+
+    test("변경할 비밀번호와 원래의 비밀번호가 일치하면 에러가 발생한다.", async () => {
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const originalReq = req;
+        req.body.newPassword = req.body.newConfirmPassword = req.body.password;
+
+        await modifyUserInfo(req, res, next);
+
+        req = originalReq;
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
     });
 });
 
