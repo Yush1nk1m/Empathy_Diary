@@ -2,16 +2,39 @@ jest.mock("passport");
 jest.mock("../models/user");
 const passport = require("passport");
 const User = require("../models/user");
-const { join, login, logout } = require("./user");
+const { userInfo, join, login, logout } = require("./user");
+
+// [u-01] 회원 정보 조회
+describe("[u-01] userInfo", () => {
+    const user = {
+        userId: "yush1nk1m",
+        email: "yush1nk1m@github.com",
+        nickname: "유신",
+    };
+    const req = {
+        user,
+    };
+    const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(),
+    };
+
+    test("회원 정보를 조회하면 사용자의 ID, 이메일, 닉네임을 응답한다.", () => {
+        userInfo(req, res);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith(user);
+    });
+});
 
 // [u-02] 회원 가입
-describe("join", () => {
+describe("[u-02] join", () => {
     const req = {
         body: {
-            "userId": "yush1nk1m",
-            "email": "yush1nk1m@github.com",
-            "nickname": "유신",
-            "password": "12345",
+            userId: "yush1nk1m",
+            email: "yush1nk1m@github.com",
+            nickname: "유신",
+            password: "12345",
         }
     };
     const res = {
@@ -51,7 +74,7 @@ describe("join", () => {
 });
 
 // [u-03] 로그인
-describe("login", () => {
+describe("[u-03] login", () => {
     const res = {
         status: jest.fn(() => res),
         send: jest.fn(),
@@ -122,7 +145,7 @@ describe("login", () => {
 });
 
 // [u-06] 로그아웃
-describe("logout", () => {
+describe("[u-06] logout", () => {
     const req = {
         logout: jest.fn(callback => callback()),
     };

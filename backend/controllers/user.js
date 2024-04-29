@@ -3,14 +3,10 @@ const passport = require("passport");
 const User = require("../models/user");
 
 // [u-01] 회원 정보 조회
-exports.userInfo = (req, res, next) => {
-    try {
-        const { userId, email, nickname } = req.user;
+exports.userInfo = (req, res) => {
+    const { userId, email, nickname } = req.user;
 
-        return res.status(200).json({ userId, email, nickname });
-    } catch (error) {
-        next(error);
-    }
+    return res.status(200).json({ userId, email, nickname });
 };
 
 // [u-02] 회원 가입
