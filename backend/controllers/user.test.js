@@ -4,6 +4,7 @@ const passport = require("passport");
 const User = require("../models/user");
 const { join, login, logout } = require("./user");
 
+// [u-02] 회원 가입
 describe("join", () => {
     const req = {
         body: {
@@ -49,6 +50,7 @@ describe("join", () => {
     });
 });
 
+// [u-03] 로그인
 describe("login", () => {
     const res = {
         status: jest.fn(() => res),
@@ -119,6 +121,7 @@ describe("login", () => {
     });
 });
 
+// [u-06] 로그아웃
 describe("logout", () => {
     const req = {
         logout: jest.fn(callback => callback()),

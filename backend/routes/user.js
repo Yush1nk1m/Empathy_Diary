@@ -16,12 +16,12 @@ const express = require("express");
 const passport = require("passport");
 
 const { isLoggedIn, isNotLoggedIn } = require("../middlewares");
-const { join, login, logout } = require("../controllers/user");
+const { join, login, logout, userInfo } = require("../controllers/user");
 
 const router = express.Router();
 
 // [u-01] GET /users
-router.get("/",);
+router.get("/", isLoggedIn, userInfo);
 
 // [u-02] POST /users
 router.post("/", isNotLoggedIn, join);

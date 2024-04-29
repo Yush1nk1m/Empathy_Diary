@@ -2,7 +2,18 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const User = require("../models/user");
 
-// 회원 가입 컨트롤러
+// [u-01] 회원 정보 조회
+exports.userInfo = (req, res, next) => {
+    try {
+        const { userId, email, nickname } = req.user;
+
+        return res.status(200).json({ userId, email, nickname });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// [u-02] 회원 가입
 exports.join = async (req, res, next) => {
     const { userId, email, nickname, password } = req.body;
 
@@ -28,6 +39,7 @@ exports.join = async (req, res, next) => {
     }
 }
 
+// [u-03] 로그인
 exports.login = (req, res, next) => {
     passport.authenticate("local", (authError, user, info) => {
         if (authError) {
@@ -50,6 +62,7 @@ exports.login = (req, res, next) => {
     })(req, res, next);     // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙인다.
 };
 
+// [u-06] 로그아웃
 exports.logout = (req, res) => {
     req.logout(() => {
         return res.status(200).send("로그아웃에 성공하였습니다.");
