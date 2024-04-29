@@ -3,7 +3,7 @@ const passport = require("passport");
 const User = require("../models/user");
 
 // [u-01] 회원 정보 조회
-exports.userInfo = (req, res) => {
+exports.getUserInfo = (req, res) => {
     const { userId, email, nickname } = req.user;
 
     return res.status(200).json({ userId, email, nickname });
@@ -11,9 +11,13 @@ exports.userInfo = (req, res) => {
 
 // [u-02] 회원 가입
 exports.join = async (req, res, next) => {
-    const { userId, email, nickname, password } = req.body;
+    const { userId, email, nickname, password, confirmPassword } = req.body;
 
     try {
+        if (password !== confirmPassword) {
+            return res.status(400).send("비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+        }
+        
         const exUser = await User.findOne({ where: { userId } });
         if (exUser) {
             return res.status(409).send("이미 존재하는 회원 ID입니다.");
@@ -57,6 +61,11 @@ exports.login = (req, res, next) => {
         });
     })(req, res, next);     // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙인다.
 };
+
+// [u-04] 회원 정보 수정
+exports.modifyUserInfo = async (req, res, next) => {
+
+}
 
 // [u-06] 로그아웃
 exports.logout = (req, res) => {

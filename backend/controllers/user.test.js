@@ -2,10 +2,10 @@ jest.mock("passport");
 jest.mock("../models/user");
 const passport = require("passport");
 const User = require("../models/user");
-const { userInfo, join, login, logout } = require("./user");
+const { getUserInfo, join, login, logout } = require("./user");
 
 // [u-01] 회원 정보 조회
-describe("[u-01] userInfo", () => {
+describe("[u-01] getUserInfo", () => {
     const user = {
         userId: "yush1nk1m",
         email: "yush1nk1m@github.com",
@@ -20,7 +20,7 @@ describe("[u-01] userInfo", () => {
     };
 
     test("회원 정보를 조회하면 사용자의 ID, 이메일, 닉네임을 응답한다.", () => {
-        userInfo(req, res);
+        getUserInfo(req, res);
 
         expect(res.status).toBeCalledWith(200);
         expect(res.json).toBeCalledWith(user);
@@ -29,12 +29,13 @@ describe("[u-01] userInfo", () => {
 
 // [u-02] 회원 가입
 describe("[u-02] join", () => {
-    const req = {
+    let req = {
         body: {
             userId: "yush1nk1m",
             email: "yush1nk1m@github.com",
             nickname: "유신",
             password: "12345",
+            confirmPassword: "12345",
         }
     };
     const res = {
@@ -52,6 +53,17 @@ describe("[u-02] join", () => {
 
         expect(res.status).toBeCalledWith(200);
         expect(res.send).toBeCalledWith("회원 가입에 성공했습니다.");
+    });
+
+    test("비밀번호와 확인 비밀번호가 일치하지 않을 경우 회원 가입에 실패한다.", async () => {
+        req.body.confirmPassword = "54321";
+
+        await join(req, res, next);
+
+        req.body.confirmPassword = "12345";
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
     test("같은 ID를 가진 사용자가 존재할 경우 회원 가입에 실패한다.", async () => {
