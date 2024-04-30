@@ -2,7 +2,90 @@ jest.mock("../models/post");
 
 const Post = require("../models/post");
 
-const { postDiary } = require("./post");
+const { postDiary, getAllDiaries } = require("./post");
+
+// [p-01] 모든 일기 조회
+describe("[p-01] getAllDiaries", () => {
+    const req = {
+        user: {
+            id: 1,
+        },
+    };
+    const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("사용자가 작성한 일기가 없으면 빈 리스트를 반환한다.", async () => {
+        Post.findAll.mockReturnValue([]);
+
+        await getAllDiaries(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ diaries: [] });
+    });
+
+    test("사용자가 작성한 일기가 있으면 모든 일기 정보를 반환한다.", async () => {
+        const result = [
+            {
+                dataValues: {
+                    content: '일기 1',
+                    createdAt: new Date("2024-04-28T00:00:26.000Z"),
+                },
+            },
+            {
+                dataValues: {
+                    content: '일기 2',
+                    createdAt: new Date("2024-04-29T00:30:26.000Z"),
+                },
+            },
+            {
+                dataValues: {
+                    content: '일기 3',
+                    createdAt: new Date("2024-04-30T01:00:26.000Z"),
+                },
+            },
+        ];
+        
+        let diaries = [];
+
+        const dateOptions = {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+        };
+        const timeOptions = {
+            hour: '2-digit', minute: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+            hour12: false // 24시간 표기법 사용
+        }
+        
+        result.forEach((diary) => {
+
+            diaries.push({
+                content: diary.dataValues.content,
+                writeDate: (diary.dataValues.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (diary.dataValues.createdAt).toLocaleString("ko-KR", timeOptions),
+            });
+        });
+
+        Post.findAll.mockReturnValue(result);
+
+        await getAllDiaries(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ diaries });
+    });
+
+    test("데이터베이스 에러 발생 시 next(error)를 호출한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Post.findAll.mockReturnValue(Promise.reject(error));
+
+        await getAllDiaries(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+});
 
 // [p-03] 일기 등록
 describe("[p-03] postDiary", () => {
