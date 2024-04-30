@@ -2,7 +2,7 @@ jest.mock("../models/post");
 
 const Post = require("../models/post");
 
-const { postDiary, getAllDiaries } = require("./post");
+const { postDiary, getAllDiaries, getDiaryById } = require("./post");
 
 // [p-01] 모든 일기 조회
 describe("[p-01] getAllDiaries", () => {
@@ -18,7 +18,7 @@ describe("[p-01] getAllDiaries", () => {
     const next = jest.fn();
 
     test("사용자가 작성한 일기가 없으면 빈 리스트를 반환한다.", async () => {
-        Post.findAll.mockReturnValue([]);
+        Post.findAll.mockReturnValue(Promise.resolve([]));
 
         await getAllDiaries(req, res, next);
 
@@ -73,7 +73,7 @@ describe("[p-01] getAllDiaries", () => {
             });
         });
 
-        Post.findAll.mockReturnValue(result);
+        Post.findAll.mockReturnValue(Promise.resolve(result));
 
         await getAllDiaries(req, res, next);
 
@@ -88,6 +88,76 @@ describe("[p-01] getAllDiaries", () => {
         await getAllDiaries(req, res, next);
 
         expect(next).toBeCalledWith(error);
+    });
+});
+
+// [p-02] 특정 일기 조회
+describe("[p-02] getDiaryById", () => {
+    const req = {
+        params: {
+            postId: 1,
+        },
+        user: {
+            id: 1,
+        },
+    };
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("일기가 조회되고, 작성자와 사용자의 ID가 일치한다면 일기 조회에 성공한다.", async () => {
+        const result = {
+            id: 1,
+            content: "일기",
+            createdAt: new Date("2024-04-28T00:00:26.000Z"),
+            writer: 1,      // req.params.id === 1
+        };
+        Post.findOne.mockReturnValue(Promise.resolve(result));
+
+        await getDiaryById(req, res, next);
+
+        const dateOptions = {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+        };
+        const timeOptions = {
+            hour: '2-digit', minute: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+            hour12: false // 24시간 표기법 사용
+        };
+
+        const diary = {
+            id: result.id,
+            content: result.content,
+            writeDate: (result.createdAt).toLocaleString("ko-KR", dateOptions),
+            writeTime: (result.createdAt).toLocaleString("ko-KR", timeOptions),
+        };
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ diary });
+    });
+
+    test("데이터베이스에서 일기가 조회되지 않으면 일기 조회에 실패한다.", async () => {
+        Post.findOne.mockReturnValue(Promise.resolve(null));
+
+        await getDiaryById(req, res, next);
+
+        expect(res.status).toBeCalledWith(404);
+        expect(res.send).toBeCalledWith(`[id: ${req.params.postId}] 일기가 존재하지 않습니다.`);
+    });
+
+    test("일기 작성자와 사용자의 ID가 일치하지 않으면 일기 조회에 실패한다.", async () => {
+        Post.findOne.mockReturnValue(Promise.resolve({
+            writer: 2,      // req.params.id === 1
+        }));
+
+        await getDiaryById(req, res, next);
+
+        expect(res.status).toBeCalledWith(403);
+        expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 });
 

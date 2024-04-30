@@ -8,7 +8,7 @@ const timeOptions = {
     hour: '2-digit', minute: '2-digit',
     timeZone: 'Asia/Seoul', // 한국 시간대 설정
     hour12: false // 24시간 표기법 사용
-}
+};
 
 // 추후 감정, 감성 정보도 함께 반환하도록 로직 추가
 // [p-01] 모든 일기 조회
@@ -43,9 +43,6 @@ exports.getAllDiaries = async (req, res, next) => {
 exports.getDiaryById = async (req, res, next) => {
     try {
         const postId = req.params.postId;
-        if (!postId) {
-            return res.status(400).send("일기의 ID가 전달되지 않았습니다.");
-        }
 
         const post = await Post.findOne({
             where: {
@@ -53,11 +50,11 @@ exports.getDiaryById = async (req, res, next) => {
             },
         });
         if (!post) {
-            return res.status(404).send(`]id: ${postId}] 일기가 존재하지 않습니다.`);
+            return res.status(404).send(`[id: ${postId}] 일기가 존재하지 않습니다.`);
         }
 
         if (post.writer !== req.user.id) {
-            return res.status(403).send("접근 권한이 존재하지 않습니다.");
+            return res.status(403).send("접근 권한이 없습니다.");
         }
 
         const diary = {
