@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>특정 일기 조회</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+#diaryDetails h2, #diaryDetails h4 {
+    color: #333;
+    font-family: 'Arial', sans-serif;
+}
+
+#diaryDetails p {
+    font-size: 1.2em;
+    color: #666;
+    font-family: 'Arial', sans-serif;
+}
+
+input[type="text"] {
+    width: 300px;
+    padding: 8px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+</style>
+<body>
+    <div class="container">
+        <h1>특정 일기 조회</h1>
+        <input type="text" id="diaryId" placeholder="일기 ID 입력">
+        <button onclick="fetchDiary()">조회</button>
+        <div id="diaryDetails"></div>
+        <button onclick="window.location.href='/'">메인 페이지로 돌아가기</button>
+    </div>
+    <script src="viewSpecificDiary.js"></script>
+</body>
+</html>

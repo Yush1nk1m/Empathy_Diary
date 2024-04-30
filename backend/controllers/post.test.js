@@ -30,18 +30,21 @@ describe("[p-01] getAllDiaries", () => {
         const result = [
             {
                 dataValues: {
+                    id: 1,
                     content: '일기 1',
                     createdAt: new Date("2024-04-28T00:00:26.000Z"),
                 },
             },
             {
                 dataValues: {
+                    id: 2,
                     content: '일기 2',
                     createdAt: new Date("2024-04-29T00:30:26.000Z"),
                 },
             },
             {
                 dataValues: {
+                    id: 3,
                     content: '일기 3',
                     createdAt: new Date("2024-04-30T01:00:26.000Z"),
                 },
@@ -63,6 +66,7 @@ describe("[p-01] getAllDiaries", () => {
         result.forEach((diary) => {
 
             diaries.push({
+                id: diary.dataValues.id,
                 content: diary.dataValues.content,
                 writeDate: (diary.dataValues.createdAt).toLocaleString("ko-KR", dateOptions),
                 writeTime: (diary.dataValues.createdAt).toLocaleString("ko-KR", timeOptions),

@@ -14,7 +14,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { postDiary, getAllDiaries } = require("../controllers/post");
+const { postDiary, getAllDiaries, getDiaryById } = require("../controllers/post");
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ const router = express.Router();
 router.get("/", isLoggedIn, getAllDiaries);
 
 // [p-02] GET /posts/{postId}
-router.get("/:postId");
+router.get("/:postId", isLoggedIn, getDiaryById);
 
 // [p-03] POST /posts
 router.post("/", isLoggedIn, postDiary);
