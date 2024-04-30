@@ -129,7 +129,7 @@ describe("[u-03] login", () => {
         expect(next).toBeCalledWith(loginError);
     });
 
-    test("사용자 정보가 존재하지 않으면 로그인에 실패한다.", () => {
+    test("사용자 정보가 일치하지 않으면 로그인에 실패한다.", () => {
         const req = {
             login: jest.fn(),
         };
@@ -139,8 +139,8 @@ describe("[u-03] login", () => {
 
         login(req, res, next);
 
-        expect(res.status).toBeCalledWith(404);
-        expect(res.send).toBeCalledWith("사용자 정보가 존재하지 않습니다.");
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("사용자 정보가 일치하지 않습니다.");
         expect(req.login).toBeCalledTimes(0);
     });
 

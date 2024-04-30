@@ -5,13 +5,16 @@
 
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
-| GET | /posts | p-01 | 사용자의 모든 일기 조회 |
-| GET | /posts/{postId} | p-02 | 사용자의 특정 일기 조회 |
+| GET | /posts | p-01 | 모든 일기 조회 |
+| GET | /posts/{postId} | p-02 | 특정 일기 조회 |
 | POST | /posts | p-03 | 일기 등록 |
 | PATCH | /posts | p-04 | 일기 내용 수정 |
 | DELETE | /posts/{postId} | p-05 | 일기 삭제 |
 */
 const express = require("express");
+
+const { isLoggedIn } = require("../middlewares");
+const { postDiary } = require("../controllers/post");
 
 const router = express.Router();
 
@@ -22,7 +25,7 @@ router.get("/",);
 router.get("/:postId",);
 
 // [p-03] POST /posts
-router.post("/",);
+router.post("/", isLoggedIn, postDiary);
 
 // [p-04] PATCH /posts
 router.patch("/",);

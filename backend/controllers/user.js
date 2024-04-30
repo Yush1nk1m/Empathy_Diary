@@ -48,7 +48,7 @@ exports.login = (req, res, next) => {
         }
 
         if (!user) {
-            return res.status(404).send("사용자 정보가 존재하지 않습니다.");
+            return res.status(400).send("사용자 정보가 일치하지 않습니다.");
         }
 
         return req.login(user, (loginError) => {
