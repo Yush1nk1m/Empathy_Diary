@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일기 조회</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+.diary-entry {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2em; /* 텍스트 크기를 조금 더 크게 설정 */
+}
+
+h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+p {
+    color: #666;
+}
+
+button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a;
+}
+</style>
+<body>
+    <div class="container">
+        <h1>내 일기 모두 조회</h1>
+        <div id="diariesContainer">
+            <!-- 일기 목록이 여기에 표시됩니다 -->
+        </div>
+        <button onclick="window.location.href='/'">뒤로가기</button>
+    </div>
+    <script src="viewDiaries.js"></script>
+</body>
+</html>

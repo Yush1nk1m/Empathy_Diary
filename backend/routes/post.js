@@ -14,15 +14,15 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { postDiary } = require("../controllers/post");
+const { postDiary, getAllDiaries } = require("../controllers/post");
 
 const router = express.Router();
 
 // [p-01] GET /posts
-router.get("/",);
+router.get("/", isLoggedIn, getAllDiaries);
 
 // [p-02] GET /posts/{postId}
-router.get("/:postId",);
+router.get("/:postId");
 
 // [p-03] POST /posts
 router.post("/", isLoggedIn, postDiary);
