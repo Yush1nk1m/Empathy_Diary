@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
             data.diaries.forEach(diary => {
                 const diaryEntry = document.createElement('div');
                 diaryEntry.className = 'diary-entry';
+                diaryEntry.setAttribute('data-id', diary.id);  // 일기 ID 임베딩
                 diaryEntry.innerHTML = `
                     <h3>${diary.writeDate} ${diary.writeTime}</h3>
-                    <p>${diary.content}</p>
+                    <p id="content-${diary.id}">${diary.content}</p>
+                    <button onclick="editDiary(${diary.id})">수정</button>
                 `;
                 container.appendChild(diaryEntry);
             });
@@ -18,3 +20,38 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("일기 조회 중 에러가 발생했습니다.");
         });
 });
+
+function editDiary(diaryId) {
+    const contentPara = document.getElementById(`content-${diaryId}`);
+    const currentContent = contentPara.innerText;
+    contentPara.innerHTML = `<input type="text" value="${currentContent}" id="edit-content-${diaryId}">`;
+    const button = contentPara.nextElementSibling;
+    button.innerText = '수정 완료';
+    button.onclick = () => submitDiaryEdit(diaryId);
+}
+
+function submitDiaryEdit(diaryId) {
+    const editedContent = document.getElementById(`edit-content-${diaryId}`).value;
+    fetch(`http://localhost:8080/posts`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ postId: diaryId, newContent: editedContent })
+    })
+    .then(response => {
+        if (response.ok) {
+            document.getElementById(`content-${diaryId}`).innerText = editedContent;
+            const button = document.getElementById(`content-${diaryId}`).nextElementSibling;
+            button.innerText = '수정';
+            button.onclick = () => editDiary(diaryId); // 버튼 기능을 원래대로 복구
+        } else {
+            return response.text().then(text => {
+                throw new Error(text);
+            });
+        }
+    })
+    .catch(error => {
+        alert('일기 수정 실패: ' + error.message);
+    });
+}

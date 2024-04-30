@@ -93,3 +93,40 @@ exports.postDiary = async (req, res, next) => {
         next(error);
     }
 };
+
+// 추후 chatGPT API를 연결하여 일기를 새로 작성하는 것처럼 감정, 감성 분석을 다시 수행하는 로직을 추가한다.
+// [p-04] 일기 내용 수정
+exports.modifyDiaryContent = async (req, res, next) => {
+    try {
+        const { postId, newContent } = req.body;
+        if (newContent === '' || newContent === null) {
+            return res.status(400).send("일기 내용이 존재하지 않습니다.");
+        }
+
+        let post = await Post.findOne({
+            where: {
+                id: postId,
+            },
+        });
+        if (!post) {
+            return res.status(404).send(`[id: ${postId}] 일기가 존재하지 않습니다.`);
+        }
+
+        if (post.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        if (post.content === newContent) {
+            return res.status(400).send("수정될 내용이 없습니다.");
+        }
+
+        post.content = newContent;
+
+        await post.save();
+
+        return res.status(200).send("일기 내용을 수정했습니다.");
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+}
