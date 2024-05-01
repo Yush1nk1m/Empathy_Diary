@@ -183,10 +183,11 @@ describe("[u-04] modifyUserInfo", () => {
         };
 
         bcrypt.compare.mockReturnValue(Promise.resolve(true));
-        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         User.findOne.mockReturnValue({
             save: jest.fn(() => Promise.resolve()),
         });
+        bcrypt.hash.mockReturnValue(Promise.resolve(true));
+
 
         await modifyUserInfo(req, res, next);
 
@@ -194,7 +195,34 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("회원 정보가 수정되었습니다.");
     });
 
-    test("현재 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+    test("새로운 비밀번호 해싱 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+        User.findOne.mockReturnValue({
+            save: jest.fn(() => Promise.resolve()),
+        });
+
+        const error = new Error("비밀번호 해싱 중 에러가 발생하였습니다.");
+        bcrypt.hash.mockReturnValue(Promise.reject(error));
+
+        await modifyUserInfo(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("현재 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -216,7 +244,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("비밀번호가 일치하지 않습니다.");
     });
 
-    test("변경될 정보가 존재하지 않으면 에러가 발생한다.", async () => {
+    test("변경될 정보가 존재하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -238,7 +266,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("변경될 정보가 존재하지 않습니다.");
     });
 
-    test("변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 에러가 발생한다.", async () => {
+    test("변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -260,7 +288,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
-    test("변경할 비밀번호와 원래의 비밀번호가 일치하면 에러가 발생한다.", async () => {
+    test("변경할 비밀번호와 원래의 비밀번호가 일치하면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -325,6 +353,7 @@ describe("[u-04] modifyUserInfo", () => {
         User.findOne.mockReturnValue({
             save: jest.fn(() => Promise.reject(error)),
         });
+        bcrypt.hash.mockReturnValue(Promise.resolve(true));
 
         await modifyUserInfo(req, res, next);
 
@@ -359,7 +388,7 @@ describe("[u-05] deleteUserInfo", () => {
         expect(res.send).toBeCalledWith("회원 탈퇴가 완료되었습니다.");
     });
     
-    test("확인 메시지가 일치하지 않을 경우 에러가 발생한다.", async () => {
+    test("확인 메시지가 일치하지 않을 경우 회원 탈퇴에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "yushin",

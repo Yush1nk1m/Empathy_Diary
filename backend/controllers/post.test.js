@@ -159,6 +159,15 @@ describe("[p-02] getDiaryById", () => {
         expect(res.status).toBeCalledWith(403);
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
+
+    test("데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생하였습니다.");
+        Post.findOne.mockReturnValue(Promise.reject(error));
+
+        await getDiaryById(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    })
 });
 
 // [p-03] 일기 등록
