@@ -2,7 +2,7 @@ jest.mock("../models/post");
 
 const Post = require("../models/post");
 
-const { postDiary, getAllDiaries, getDiaryById } = require("./post");
+const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent } = require("./post");
 
 // [p-01] 모든 일기 조회
 describe("[p-01] getAllDiaries", () => {
@@ -227,5 +227,164 @@ describe("[p-03] postDiary", () => {
         await postDiary(req, res, next);
 
         expect(next).toBeCalledWith(error);
+    });
+});
+
+// [p-04] 일기 내용 수정
+describe("[p-04] modifyDiaryContent", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("요청 바디에 속성이 존재하지 않으면 서버 에러가 발생한다.", async () => {
+        const req = {
+            body: {
+            },
+        };
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledTimes(1);
+    });
+
+    test("새로운 일기의 내용이 빈 문자열이면 일기 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: '',
+            },
+        };
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+        };
+        
+        const error = new Error("데이터베이스 조회 작업 중 에러가 발생하였습니다.");
+        Post.findOne.mockReturnValue(Promise.reject(error));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스에서 조회된 일기가 없으면 일기 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+        };
+
+        Post.findOne.mockReturnValue(Promise.resolve(null));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(404);
+        expect(res.send).toBeCalledWith(`[id: ${req.body.postId}] 일기가 존재하지 않습니다.`);
+    });
+
+    test("일기의 작성자가 일치하지 않으면 일기 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 2,      // req.user.id === 1
+        };
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(403);
+        expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
+    });
+
+    test("수정될 내용이 없으면 일기 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: req.body.newContent,
+        };
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("수정될 내용이 없습니다.");
+    });
+
+    test("데이터베이스 저장 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const error = new Error("데이터베이스 저장 작업 중 에러가 발생하였습니다.");
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.reject(error)),
+        };
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 작업 중 에러가 발생하지 않고 같은 사용자의 일기 내용에 수정 사항이 있으면 일기 내용 수정에 성공한다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.send).toBeCalledWith("일기 내용을 수정했습니다.");
     });
 });

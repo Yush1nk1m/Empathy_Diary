@@ -77,7 +77,7 @@ exports.getDiaryById = async (req, res, next) => {
 exports.postDiary = async (req, res, next) => {
     const { content } = req.body;
     try {
-        if (content === '' || content === null) {
+        if (content === '') {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }
         
@@ -99,7 +99,7 @@ exports.postDiary = async (req, res, next) => {
 exports.modifyDiaryContent = async (req, res, next) => {
     try {
         const { postId, newContent } = req.body;
-        if (newContent === '' || newContent === null) {
+        if (newContent === '') {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }
 

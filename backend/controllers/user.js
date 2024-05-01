@@ -115,14 +115,12 @@ exports.deleteUserInfo = async (req, res, next) => {
                 userId: req.user.userId,
             },
         });
-
-        console.log("TEST");
         
         req.logout(() => {
             return res.status(200).send("회원 탈퇴가 완료되었습니다.");
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         next(error);
     }
 };
