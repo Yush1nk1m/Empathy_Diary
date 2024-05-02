@@ -1,5 +1,7 @@
 const Op = require("sequelize").Op;
-const Post = require("../models/post");
+const { Post, Sentiment } = require("../models");
+const db = require("../models");
+const PostEmotions = db.sequelize.models.PostEmotions;
 
 const dateOptions = {
     year: 'numeric', month: '2-digit', day: '2-digit',
@@ -86,13 +88,32 @@ exports.postDiary = async (req, res, next) => {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }
         
-        await Post.create({
+        const post = await Post.create({
             content,
             image: null,
             writer: req.user.id,
         });
 
-        return res.status(200).send("일기가 작성되었습니다.");        
+        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+        let emotions = ["기쁨", "사랑", "뿌듯함"];
+        for (const emotion of emotions) {
+            await PostEmotions.create({
+                PostId: post.id,
+                EmotionType: emotion,
+            });
+        }
+
+        const positiveScore = 50;
+        const negativeScore = 50;
+
+        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+
+        return res.status(200).json({
+            postId: post.id,
+            emotions,
+            positiveScore,
+            negativeScore,
+        });
     } catch (error) {
         console.error(error);
         next(error);

@@ -26,7 +26,7 @@ class Chatroom extends Sequelize.Model {
 
     static associate(db) {
         db.Chatroom.belongsTo(db.User, { foreignKey: "userId", targetKey: "id" });
-        db.Chatroom.hasMany(db.Chat, { foreignKey: "roomId", sourceKey: "id", onDelete: "cascade" });
+        db.Chatroom.hasMany(db.Chat, { foreignKey: "roomId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     }
 };
 

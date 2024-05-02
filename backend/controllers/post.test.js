@@ -1,7 +1,8 @@
-jest.mock("../models/post");
+jest.mock("../models");
 
-const Post = require("../models/post");
-
+const db = require("../models");
+const { Post } = require("../models");
+const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
 
 // [p-01] 모든 일기 조회
@@ -187,6 +188,7 @@ describe("[p-03] postDiary", () => {
     const res = {
         status: jest.fn(() => res),
         send: jest.fn(),
+        json: jest.fn(),
     };
     const next = jest.fn();
 
@@ -199,12 +201,27 @@ describe("[p-03] postDiary", () => {
                 id: 1,
             },
         };
-        Post.create.mockReturnValue(Promise.resolve(true));
+
+        const post = {
+            id: 1,
+        };
+        Post.create.mockReturnValueOnce(Promise.resolve(post));
+        const emotions = ["기쁨", "사랑", "뿌듯함"];
+        
+        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+
+        const positiveScore = 50;
+        const negativeScore = 50;
 
         await postDiary(req, res, next);
-
+        
         expect(res.status).toBeCalledWith(200);
-        expect(res.send).toBeCalledWith("일기가 작성되었습니다.");
+        expect(res.json).toBeCalledWith({
+            postId: post.id,
+            emotions,
+            positiveScore,
+            negativeScore,
+        });
     });
 
     test("일기 내용이 존재하지 않으면 일기 등록에 실패한다.", async () => {
@@ -223,7 +240,7 @@ describe("[p-03] postDiary", () => {
         expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
     });
 
-    test("데이터베이스 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("Post 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             body: {
                 content: "일기의 내용입니다.",
@@ -233,11 +250,34 @@ describe("[p-03] postDiary", () => {
             },
         };
 
-        const error = new Error("데이터베이스 생성 작업 중 오류가 발생했습니다.");
+        const error = new Error("데이터베이스 생성 중 에러가 발생했습니다.");
         Post.create.mockReturnValue(Promise.reject(error));
 
         await postDiary(req, res, next);
 
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("PostEmotion 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
+        const req = {
+            body: {
+                content: "일기의 내용입니다.",
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const post = {
+            id: 1,
+        };
+        Post.create.mockReturnValueOnce(Promise.resolve(post));
+        
+        const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.")
+        PostEmotions.create.mockReturnValue(Promise.reject(error));
+
+        await postDiary(req, res, next);
+        
         expect(next).toBeCalledWith(error);
     });
 });

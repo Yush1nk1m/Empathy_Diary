@@ -21,11 +21,6 @@ class Sentiment extends Sequelize.Model {
                 type: Sequelize.FLOAT,          // 부동 소수점
                 allowNull: false,               // 값은 null일 수 없다.
             },
-
-            neutral: {
-                type: Sequelize.FLOAT,          // 부동 소수점
-                allowNull: false,               // 값은 null일 수 없다.
-            },
         }, {
             sequelize,
             timestamps: false,

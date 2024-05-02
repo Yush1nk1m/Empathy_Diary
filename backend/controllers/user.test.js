@@ -1,11 +1,11 @@
 jest.mock("passport");
 jest.mock("bcrypt");
-jest.mock("../models/user");
+jest.mock("../models");
 
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 
-const User = require("../models/user");
+const { User } = require("../models");
 const { getUserInfo, join, login, modifyUserInfo, logout, deleteUserInfo } = require("./user");
 
 // [u-01] 회원 정보 조회

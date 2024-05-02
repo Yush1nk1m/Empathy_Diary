@@ -67,11 +67,9 @@
 ### sentiments: 감성 테이블
 | column | meaning |
 | :-- | :-- |
-| id | 로우 고유의 ID |
+| postId | 일기의 고유한 ID |
 | positive | 긍정 확률 |
 | negative | 부정 확률 |
-| neutral | 중립 확률 |
-| postId | 일기의 고유한 ID |
 
 일기의 내용으로 감성 분석을 수행하면 긍정적일 확률, 부정적일 확률, 중립적일 확률이 추출된다. 이 정보는 일기마다 고유하게 매핑된다.
 

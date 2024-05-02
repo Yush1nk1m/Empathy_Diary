@@ -27,8 +27,8 @@ class Emotion extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Emotion.belongsToMany(db.Post, { through: "PostEmotion", onDelete: "cascade" });
-        db.Emotion.belongsToMany(db.Advice, { through: "AdviceEmotion", onDelete: "cascade" });
+        db.Emotion.belongsToMany(db.Post, { through: "PostEmotions", onDelete: "CASCADE", hooks: true });
+        db.Emotion.belongsToMany(db.Advice, { through: "AdviceEmotions", onDelete: "CASCADE", hooks: true });
     }
 };
 

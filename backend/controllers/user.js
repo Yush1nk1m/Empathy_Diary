@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const User = require("../models/user");
+const { User } = require("../models");
 
 // [u-01] 회원 정보 조회
 exports.getUserInfo = (req, res) => {

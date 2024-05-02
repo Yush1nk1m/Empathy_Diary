@@ -29,7 +29,7 @@ class Advice extends Sequelize.Model {
 
     static associate(db) {
         db.Advice.belongsTo(db.User, { foreignKey: "writer", targetKey: "id" });
-        db.Advice.belongsToMany(db.Emotion, { through: "AdviceEmotion", onDelete: "cascade" });
+        db.Advice.belongsToMany(db.Emotion, { through: "AdviceEmotions" });
     }
 }
 
