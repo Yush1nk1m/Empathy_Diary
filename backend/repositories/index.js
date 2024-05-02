@@ -5,8 +5,8 @@ exports.setEmotion = async () => {
 
     for (const emotion of emotions) {
         await Emotion.findOrCreate({
-            where: { typeName: emotion },
-            defaults: { typeName: emotion },
+            where: { type: emotion },
+            defaults: { type: emotion },
         });
         console.log(`[EMOTION: ${emotion}] FOUND OR CREATED.`);
     }

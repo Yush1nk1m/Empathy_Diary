@@ -8,10 +8,11 @@ const Sequelize = require("sequelize");
 class Emotion extends Sequelize.Model {
     static initiate(sequelize) {
         Emotion.init({
-            typeName: {
+            type: {
                 type: Sequelize.STRING(10),     // 최대 길이 10
                 allowNull: false,               // 값은 null일 수 없다.
                 unique: true,                   // 값은 유일해야 한다.
+                primaryKey: true,               // 데이터베이스의 주 키로 설정한다.
             },
         }, {
             sequelize,

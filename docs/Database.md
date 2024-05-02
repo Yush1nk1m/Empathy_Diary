@@ -40,8 +40,7 @@
 ### emotions: 감정 테이블
 | column | meaning |
 | :-- | :-- |
-| id | 로우 고유의 ID |
-| typeName | 감정 명칭 |
+| type | 감정 명칭 |
 
 일기에는 행복, 슬픔 등 여러 가지 감정이 매핑될 수 있다.
 
@@ -49,7 +48,7 @@
 | column | meaning |
 | :-- | :-- |
 | PostId | 일기의 고유한 ID |
-| EmotionId | 감정의 고유한 ID |
+| EmotionType | 감정 명칭 |
 | createdAt | 로우 생성 일시 |
 | updatedAt | 로우 업데이트 일시 |
 
@@ -59,7 +58,7 @@
 | column | meaning |
 | :-- | :-- |
 | AdviceId | 조언의 고유한 ID |
-| EmotionId | 감정의 고유한 ID |
+| EmotionType | 감정 명칭 |
 | createdAt | 로우 생성 일시 |
 | updatedAt | 로우 업데이트 일시 |
 
