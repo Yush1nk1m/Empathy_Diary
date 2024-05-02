@@ -11,6 +11,7 @@ dotenv.config();
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
+const { setEmotion } = require("./repositories");
 
 const app = express();
 passportConfig();
@@ -59,6 +60,7 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).send("서버 에러가 발생했습니다.");
 });
 
-app.listen(app.get("port"), () => {
+app.listen(app.get("port"), async () => {
+    await setEmotion();
     console.log(app.get("port"), "번 포트에서 대기 중");
 })
