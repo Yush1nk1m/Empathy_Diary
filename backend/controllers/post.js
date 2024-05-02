@@ -58,9 +58,9 @@ exports.getAllDiaries = async (req, res, next) => {
 exports.getDiaryById = async (req, res, next) => {
     try {
         const postId = req.params.postId;
-        
+
         // URL의 해당 위치에 정수 값이 온 것이 아니라면 다른 경로에 대한 요청이다.
-        if (!Number.isInteger(postId))
+        if (isNaN(postId))
             return next();
 
         const post = await Post.findOne({
@@ -76,11 +76,22 @@ exports.getDiaryById = async (req, res, next) => {
             return res.status(403).send("접근 권한이 없습니다.");
         }
 
+        let emotions = [];
+        const result = await post.getEmotions();
+        for (const emotion of result) {
+            emotions.push(emotion.type);
+        }
+
+        const sentiment = await post.getSentiment();
+
         const diary = {
             id: post.id,
             content: post.content,
             writeDate: (post.createdAt).toLocaleString("ko-KR", dateOptions),
             writeTime: (post.createdAt).toLocaleString("ko-KR", timeOptions),
+            emotions,
+            positiveScore: sentiment.positive,
+            negativeScore: sentiment.negative,
         };
 
         return res.status(200).json({ diary });

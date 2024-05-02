@@ -124,6 +124,16 @@ describe("[p-01] getAllDiaries", () => {
 
 // [p-02] 특정 일기 조회
 describe("[p-02] getDiaryById", () => {
+    const dateOptions = {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        timeZone: 'Asia/Seoul', // 한국 시간대 설정
+    };
+    const timeOptions = {
+        hour: '2-digit', minute: '2-digit',
+        timeZone: 'Asia/Seoul', // 한국 시간대 설정
+        hour12: false // 24시간 표기법 사용
+    }
+
     const req = {
         params: {
             postId: 1,
@@ -139,38 +149,6 @@ describe("[p-02] getDiaryById", () => {
     };
     const next = jest.fn();
 
-    test("일기가 조회되고, 작성자와 사용자의 ID가 일치한다면 일기 조회에 성공한다.", async () => {
-        const result = {
-            id: 1,
-            content: "일기",
-            createdAt: new Date("2024-04-28T00:00:26.000Z"),
-            writer: 1,      // req.params.id === 1
-        };
-        Post.findOne.mockReturnValue(Promise.resolve(result));
-
-        await getDiaryById(req, res, next);
-
-        const dateOptions = {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            timeZone: 'Asia/Seoul', // 한국 시간대 설정
-        };
-        const timeOptions = {
-            hour: '2-digit', minute: '2-digit',
-            timeZone: 'Asia/Seoul', // 한국 시간대 설정
-            hour12: false // 24시간 표기법 사용
-        };
-
-        const diary = {
-            id: result.id,
-            content: result.content,
-            writeDate: (result.createdAt).toLocaleString("ko-KR", dateOptions),
-            writeTime: (result.createdAt).toLocaleString("ko-KR", timeOptions),
-        };
-
-        expect(res.status).toBeCalledWith(200);
-        expect(res.json).toBeCalledWith({ diary });
-    });
-
     test("URL 경로에 전달된 것이 쿼리 파라미터가 아닌 다른 값이라면 next()를 반환한다.", async () => {
         const req = {
             params: {
@@ -181,6 +159,7 @@ describe("[p-02] getDiaryById", () => {
         await getDiaryById(req, res, next);
 
         expect(next).toBeCalledTimes(1);
+        expect(next).toBeCalledWith();
     });
 
     test("데이터베이스에서 일기가 조회되지 않으면 일기 조회에 실패한다.", async () => {
@@ -210,7 +189,105 @@ describe("[p-02] getDiaryById", () => {
         await getDiaryById(req, res, next);
 
         expect(next).toBeCalledWith(error);
-    })
+    });
+
+    test("getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,       //GET /posts/period 
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        const post = {
+            writer: 1,
+            getEmotions: jest.fn(async () => Promise.reject(error)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        await getDiaryById(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,       //GET /posts/period 
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        const emotions = ["기쁨", "사랑", "뿌듯함"];
+        const post = {
+            writer: 1,
+            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
+            getSentiment: jest.fn(async () => Promise.reject(error)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        await getDiaryById(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 작업 중 에러가 발생하지 않고 사용자가 작성한 일기에 대한 요청이라면 일기 조회에 성공한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,       //GET /posts/period 
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const result = [{
+            type: "기쁨",
+        }, {
+            type: "사랑",
+        }, {
+            type: "뿌듯함",
+        }];
+        const sentiment = {
+            positive: 50,
+            negative: 50,
+        };
+        const post = {
+            id: 1,
+            writer: 1,
+            content: "내용",
+            createdAt: new Date("2024-05-02"),
+            getEmotions: jest.fn(async () => Promise.resolve(result)),
+            getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        await getDiaryById(req, res, next);
+
+        let emotions = [];
+        for (const emotion of result) {
+            emotions.push(emotion.type);
+        }
+
+        const diary = {
+            id: post.id,
+            content: post.content,
+            writeDate: (post.createdAt).toLocaleString("ko-KR", dateOptions),
+            writeTime: (post.createdAt).toLocaleString("ko-KR", timeOptions),
+            emotions,
+            positiveScore: sentiment.positive,
+            negativeScore: sentiment.negative,
+        };
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ diary });
+    });
 });
 
 // [p-03] 일기 등록

@@ -156,8 +156,8 @@
      - 200: 성공
      - 403: 로그인되지 않음
      - 500: 서버 에러
-   - **응답 형태**: JSON
-   - **응답 예시**: { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]" }, ...] }
+   - **응답 형태**: JSON()
+   - **응답 예시**: { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" }, ...] }
 
 ### [p-02] 특정 일기 조회
 
@@ -175,7 +175,7 @@
      - 500: 서버 에러
    - **응답 형태**: JSON(성공 시), TEST(실패 시)
    - **응답 예시**
-     - { "diary": { "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]" } }
+     - { "diary": { "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" } }
      - 접근 권한이 없습니다.
 
 ### [p-03] 일기 등록
