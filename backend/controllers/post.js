@@ -18,7 +18,7 @@ const timeOptions = {
 // [p-01] 모든 일기 조회
 exports.getAllDiaries = async (req, res, next) => {
     try {
-        const result = await Post.findAll({
+        const posts = await Post.findAll({
             where: {
                 writer: req.user.id,
             },
@@ -26,7 +26,7 @@ exports.getAllDiaries = async (req, res, next) => {
 
         let diaries = [];
 
-        for (const diary of result) {
+        for (const diary of posts) {
             let emotions = [];
             const result = await diary.getEmotions();
             for (const emotion of result) {
@@ -257,7 +257,7 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
             return res.status(400).send("쿼리 파라미터의 값이 유효하지 않습니다.");
         }
 
-        const result = await Post.findAll({
+        const posts = await Post.findAll({
             where: {
                 writer: req.user.id,
                 createdAt: {
@@ -268,7 +268,7 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
 
         let diaries = [];
 
-        for (const diary of result) {
+        for (const diary of posts) {
             let emotions = [];
             const result = await diary.getEmotions();
             for (const emotion of result) {
