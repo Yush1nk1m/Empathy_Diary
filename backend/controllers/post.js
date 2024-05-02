@@ -80,8 +80,8 @@ exports.getDiaryById = async (req, res, next) => {
 // 추후 chatGPT API 연동 및 감정 정보 연결 로직 추가
 // [p-03] 일기 등록
 exports.postDiary = async (req, res, next) => {
-    const { content } = req.body;
     try {
+        const { content } = req.body;
         if (content === '') {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }

@@ -55,6 +55,16 @@
 
 행복, 슬픔 등의 특정한 감정은 어떤 일기에도 매핑될 수 있다.
 
+### AdviceEmotion: 감정과 조언의 다대다 매핑 테이블
+| column | meaning |
+| :-- | :-- |
+| AdviceId | 조언의 고유한 ID |
+| EmotionId | 감정의 고유한 ID |
+| createdAt | 로우 생성 일시 |
+| updatedAt | 로우 업데이트 일시 |
+
+행복, 슬픔 등의 특정한 감정은 어떤 조언에도 매핑될 수 있다.
+
 ### sentiments: 감성 테이블
 | column | meaning |
 | :-- | :-- |
