@@ -1,4 +1,5 @@
 const Op = require("sequelize").Op;
+const { where } = require("sequelize");
 const { Post, Sentiment } = require("../models");
 const db = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
@@ -95,7 +96,7 @@ exports.postDiary = async (req, res, next) => {
         });
 
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
-        let emotions = ["기쁨", "사랑", "뿌듯함"];
+        const emotions = ["기쁨", "사랑", "뿌듯함"];
         for (const emotion of emotions) {
             await PostEmotions.create({
                 PostId: post.id,
@@ -156,7 +157,46 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
         await post.save();
 
-        return res.status(200).send("일기 내용을 수정했습니다.");
+        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+        // 기존 정보 삭제
+        await PostEmotions.destroy({
+            where: {
+                PostId: post.id,
+            },
+        });
+
+        await Sentiment.destroy({
+            where: {
+                postId: post.id,
+            },
+        });
+
+        // 수정된 정보에 맞춰 다시 추가
+        const emotions = ["기쁨", "사랑", "뿌듯함"];
+        for (const emotion of emotions) {
+            await PostEmotions.create({
+                PostId: post.id,
+                EmotionType: emotion,
+            });
+        }
+
+        const positiveScore = 50;
+        const negativeScore = 50;
+
+        await Sentiment.create({
+            positive: positiveScore,
+            negative: negativeScore,
+            postId: post.id,
+        });
+
+        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+
+        return res.status(200).json({
+            postId: post.id,
+            emotions,
+            positiveScore,
+            negativeScore,
+        });
     } catch (error) {
         console.error(error);
         next(error);

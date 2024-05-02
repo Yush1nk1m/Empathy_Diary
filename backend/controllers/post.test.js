@@ -312,6 +312,7 @@ describe("[p-04] modifyDiaryContent", () => {
     const res = {
         status: jest.fn(() => res),
         send: jest.fn(),
+        json: jest.fn(),
     };
     const next = jest.fn();
 
@@ -441,7 +442,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않고 같은 사용자의 일기 내용에 수정 사항이 있으면 일기 내용 수정에 성공한다.", async () => {
+    test("PostEmotions 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -457,12 +458,146 @@ describe("[p-04] modifyDiaryContent", () => {
             content: "기존의 내용입니다.",
             save: jest.fn(() => Promise.resolve(true)),
         };
-        Post.findOne.mockReturnValue(Promise.resolve(post));
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        const error = new Error("데이터베이스 삭제 중 에러가 발생하였습니다.");
+        PostEmotions.destroy.mockReturnValueOnce(Promise.reject(error));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("Sentiment 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        const error = new Error("데이터베이스 삭제 중 에러가 발생하였습니다.");
+        Sentiment.destroy.mockReturnValueOnce(Promise.reject(error));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("PostEmotions 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.");
+        PostEmotions.create.mockReturnValue(Promise.reject(error));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("Sentiment 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        
+        const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.");
+        Sentiment.create.mockReturnValueOnce(Promise.reject(error));
+
+        await modifyDiaryContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 작업 중 에러가 발생하지 않고 같은 사용자의 일기 내용에 수정 사항이 있으면 일기 내용 수정에 성공한다.", async () => {
+        const emotions = ["기쁨", "사랑", "뿌듯함"];
+        const positiveScore = 50;
+        const negativeScore = 50;
+        
+        const req = {
+            body: {
+                postId: 1,
+                newContent: "새로운 내용입니다.",
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const post = {
+            id: 1,
+            writer: 1,      // req.user.id === 1
+            content: "기존의 내용입니다.",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
+        
+        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        
+        Sentiment.create.mockReturnValueOnce(Promise.resolve(true));
 
         await modifyDiaryContent(req, res, next);
 
         expect(res.status).toBeCalledWith(200);
-        expect(res.send).toBeCalledWith("일기 내용을 수정했습니다.");
+        expect(res.json).toBeCalledWith({
+            postId: post.id,
+            emotions,
+            positiveScore,
+            negativeScore,
+        });
     });
 });
 
