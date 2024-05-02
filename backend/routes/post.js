@@ -10,11 +10,12 @@
 | POST | /posts | p-03 | 일기 등록 |
 | PATCH | /posts | p-04 | 일기 내용 수정 |
 | DELETE | /posts/{postId} | p-05 | 일기 삭제 |
+| GET | /posts/period?{startDate}&{endDate} | p-06 | 특정 기간 동안 작성한 모든 일기 조회 |
 */
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary } = require("../controllers/post");
+const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("../controllers/post");
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.patch("/", isLoggedIn, modifyDiaryContent);
 // [p-05] DELETE /posts/{postId}
 router.delete("/:postId", isLoggedIn, deleteDiary);
 
-// [p-06] GET /posts/duration?{startDate}&{endDate}
-router.get("/duration",);
+// [p-06] GET /posts/period?{startDate}&{endDate}
+router.get("/period", isLoggedIn, getDiariesForSpecificPeriod);
 
 module.exports = router;

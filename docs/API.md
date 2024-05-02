@@ -137,7 +137,7 @@
 | POST | /posts | p-03 | 일기 등록 |
 | PATCH | /posts | p-04 | 일기 내용 수정 |
 | DELETE | /posts/{postId} | p-05 | 일기 삭제 |
-| GET | /posts/duration?{startDate}&{endDate} | p-06 | 특정 기간 동안 작성한 모든 일기 조회 |
+| GET | /posts/period?{startDate}&{endDate} | p-06 | 특정 기간 동안 작성한 모든 일기 조회 |
 
 ## 조언
 

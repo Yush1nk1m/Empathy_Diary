@@ -1,3 +1,4 @@
+const Op = require("sequelize").Op;
 const Post = require("../models/post");
 
 const dateOptions = {
@@ -43,6 +44,10 @@ exports.getAllDiaries = async (req, res, next) => {
 exports.getDiaryById = async (req, res, next) => {
     try {
         const postId = req.params.postId;
+        
+        // URL의 해당 위치에 정수 값이 온 것이 아니라면 다른 경로에 대한 요청이다.
+        if (!Number.isInteger(postId))
+            return next();
 
         const post = await Post.findOne({
             where: {
@@ -131,7 +136,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
     }
 };
 
-// 추후 chatGPT API를 연결하여 일기 
 // [p-05] 일기 삭제
 exports.deleteDiary = async (req, res, next) => {
     try {
@@ -154,6 +158,44 @@ exports.deleteDiary = async (req, res, next) => {
         await post.destroy();
 
         return res.status(200).send("일기가 삭제되었습니다.");
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
+// 추후 chatGPT API 연결 이후 감정, 감성 점수 반환 로직 추가
+// [p-06] 특정 기간 일기 조회
+exports.getDiariesForSpecificPeriod = async (req, res, next) => {
+    try {
+        if (req.query.startDate === undefined || req.query.endDate === undefined) {
+            return res.status(400).send("충분한 쿼리 파라미터가 제공되지 않았습니다.");
+        }
+        
+        const startDate = new Date(req.query.startDate);
+        const endDate = new Date(req.query.endDate);
+
+        const result = await Post.findAll({
+            where: {
+                writer: req.user.id,
+                createdAt: {
+                    [Op.between]: [startDate, endDate],
+                },
+            },
+        });
+
+        let diaries = [];
+
+        result.forEach((diary) => {
+            diaries.push({
+                id: diary.dataValues.id,
+                content: diary.dataValues.content,
+                writeDate: (diary.dataValues.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (diary.dataValues.createdAt).toLocaleString("ko-KR", timeOptions),
+            });
+        });
+
+        return res.status(200).json({ diaries });
     } catch (error) {
         console.error(error);
         next(error);
