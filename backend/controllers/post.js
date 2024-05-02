@@ -257,14 +257,25 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
 
         let diaries = [];
 
-        result.forEach((diary) => {
+        for (const diary of result) {
+            let emotions = [];
+            const result = await diary.getEmotions();
+            for (const emotion of result) {
+                emotions.push(emotion.type);
+            }
+
+            const sentiment = await diary.getSentiment();
+
             diaries.push({
-                id: diary.dataValues.id,
-                content: diary.dataValues.content,
-                writeDate: (diary.dataValues.createdAt).toLocaleString("ko-KR", dateOptions),
-                writeTime: (diary.dataValues.createdAt).toLocaleString("ko-KR", timeOptions),
+                id: diary.id,
+                content: diary.content,
+                writeDate: (diary.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (diary.createdAt).toLocaleString("ko-KR", timeOptions),
+                emotions,
+                positiveScore: sentiment.positive,
+                negativeScore: sentiment.negative,
             });
-        });
+        }
 
         return res.status(200).json({ diaries });
     } catch (error) {
