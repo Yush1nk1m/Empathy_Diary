@@ -6,11 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
             data.diaries.forEach(diary => {
                 const diaryEntry = document.createElement('div');
                 diaryEntry.className = 'diary-entry';
-                diaryEntry.setAttribute('data-id', diary.id);  // 일기 ID 임베딩
+                diaryEntry.setAttribute('data-id', diary.id);
                 diaryEntry.innerHTML = `
                     <h3>${diary.writeDate} ${diary.writeTime}</h3>
                     <p id="content-${diary.id}">${diary.content}</p>
                     <button onclick="editDiary(${diary.id})">수정</button>
+                    <button onclick="deleteDiary(${diary.id})">삭제</button>
                 `;
                 container.appendChild(diaryEntry);
             });
@@ -20,6 +21,21 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("일기 조회 중 에러가 발생했습니다.");
         });
 });
+
+function deleteDiary(postId) {
+    if (confirm("정말로 삭제하시겠습니까?")) {
+        fetch(`http://localhost:8080/posts/${postId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(text => {
+            alert(text);
+        })
+        .catch(error => {
+            alert('일기 삭제 실패: ' + error.message);
+        });
+    }
+}
 
 function editDiary(diaryId) {
     const contentPara = document.getElementById(`content-${diaryId}`);

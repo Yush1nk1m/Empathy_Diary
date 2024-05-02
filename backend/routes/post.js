@@ -14,7 +14,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent } = require("../controllers/post");
+const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary } = require("../controllers/post");
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.post("/", isLoggedIn, postDiary);
 router.patch("/", isLoggedIn, modifyDiaryContent);
 
 // [p-05] DELETE /posts/{postId}
-router.delete("/:postId",);
+router.delete("/:postId", isLoggedIn, deleteDiary);
 
 // [p-06] GET /posts/duration?{startDate}&{endDate}
 router.get("/duration",);
