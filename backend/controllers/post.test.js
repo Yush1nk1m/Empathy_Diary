@@ -714,71 +714,6 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
     };
     const next = jest.fn();
 
-    test("해당 기간 동안 작성한 게시글이 존재하면 일기 조회에 성공한다.", async () => {
-        const req = {
-            query: {
-                startDate: new Date("2024-04-28"),
-                endDate: new Date("2024-05-01"),
-            },
-            user: {
-                id: 1,
-            },
-        };
-
-        const result = [
-            {
-                dataValues: {
-                    id: 1,
-                    content: '일기 1',
-                    createdAt: new Date("2024-04-28T00:00:26.000Z"),
-                },
-            },
-            {
-                dataValues: {
-                    id: 2,
-                    content: '일기 2',
-                    createdAt: new Date("2024-04-29T00:30:26.000Z"),
-                },
-            },
-            {
-                dataValues: {
-                    id: 3,
-                    content: '일기 3',
-                    createdAt: new Date("2024-04-30T01:00:26.000Z"),
-                },
-            },
-        ];
-
-        Post.findAll.mockReturnValue(Promise.resolve(result));
-
-        await getDiariesForSpecificPeriod(req, res, next);
-        
-        let diaries = [];
-
-        const dateOptions = {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            timeZone: 'Asia/Seoul', // 한국 시간대 설정
-        };
-        const timeOptions = {
-            hour: '2-digit', minute: '2-digit',
-            timeZone: 'Asia/Seoul', // 한국 시간대 설정
-            hour12: false // 24시간 표기법 사용
-        }
-        
-        result.forEach((diary) => {
-
-            diaries.push({
-                id: diary.dataValues.id,
-                content: diary.dataValues.content,
-                writeDate: (diary.dataValues.createdAt).toLocaleString("ko-KR", dateOptions),
-                writeTime: (diary.dataValues.createdAt).toLocaleString("ko-KR", timeOptions),
-            });
-        });
-
-        expect(res.status).toBeCalledWith(200);
-        expect(res.json).toBeCalledWith({ diaries });
-    });
-
     test("해당 기간 동안 작성한 게시글이 존재하지 않으면 빈 리스트를 반환하고 일기 조회에 성공한다.", async () => {
         const req = {
             query: {
@@ -835,10 +770,112 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         };
 
         const error = new Error("데이터베이스 조회 중 에러가 발생하였습니다.");
-        Post.findAll.mockReturnValue(Promise.reject(error));
+        Post.findAll.mockReturnValueOnce(Promise.reject(error));
 
         await getDiariesForSpecificPeriod(req, res, next);
 
         expect(next).toBeCalledWith(error);
+    });
+
+    test("getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            query: {
+                startDate: new Date(),
+                endDate: new Date(),
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const error = new Error("getEmotion() 수행 중 에러가 발생했습니다.");
+        const result = [{
+            getEmotions: jest.fn(async () => Promise.reject(error)),
+        }]
+        Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+
+        await getDiariesForSpecificPeriod(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            query: {
+                startDate: new Date(),
+                endDate: new Date(),
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const error = new Error("getSentiment() 수행 중 에러가 발생했습니다.");
+        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
+        const result = [{
+            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
+            getSentiment: jest.fn(async () => Promise.reject(error)),
+        }]
+        Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+
+        await getDiariesForSpecificPeriod(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("쿼리 파라미터에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
+        const req = {
+            query: {
+                startDate: new Date(),
+                endDate: new Date(),
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const sentiment = { positive: 50, negative: 50 };
+        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
+        const result = [{
+            id: 1,
+            content: "내용 1",
+            createdAt: new Date("2024-05-02"),
+            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
+            getSentiment: jest.fn(async () => Promise.reject(sentiment)),
+        }, {
+            id: 2,
+            content: "내용 2",
+            createdAt: new Date("2024-05-02"),
+            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
+            getSentiment: jest.fn(async () => Promise.reject(sentiment)),
+        }]
+        Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+
+        await getDiariesForSpecificPeriod(req, res, next);
+
+        let diaries = [];
+
+        for (const diary of result) {
+            let emotions = [];
+            const result = await diary.getEmotions();
+            for (const emotion of result) {
+                emotions.push(emotion.type);
+            }
+
+            const sentiment = await diary.getSentiment();
+
+            diaries.push({
+                id: diary.id,
+                content: diary.content,
+                writeDate: (diary.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (diary.createdAt).toLocaleString("ko-KR", timeOptions),
+                emotions,
+                positiveScore: sentiment.positive,
+                negativeScore: sentiment.negative,
+            });
+        }
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ diaries });
     });
 });
