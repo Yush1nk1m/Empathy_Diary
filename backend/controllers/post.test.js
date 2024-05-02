@@ -2,7 +2,7 @@ jest.mock("../models/post");
 
 const Post = require("../models/post");
 
-const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent } = require("./post");
+const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary } = require("./post");
 
 // [p-01] 모든 일기 조회
 describe("[p-01] getAllDiaries", () => {
@@ -386,5 +386,109 @@ describe("[p-04] modifyDiaryContent", () => {
 
         expect(res.status).toBeCalledWith(200);
         expect(res.send).toBeCalledWith("일기 내용을 수정했습니다.");
+    });
+});
+
+// [p-05] 일기 삭제
+describe("[p-05] deleteDiary", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("데이터베이스 작업 중 문제가 없고, 같은 사용자의 일기에 대한 삭제 요청이 들어오면 일기 삭제에 성공한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const post = {
+            writer: 1,      // req.user.id === 1
+            destroy: jest.fn(() => Promise.resolve(true)),
+        }
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await deleteDiary(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.send).toBeCalledWith("일기가 삭제되었습니다.");
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,
+            },
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생하였습니다.");
+        Post.findOne.mockReturnValue(Promise.reject(error));
+
+        await deleteDiary(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 조회 결과가 존재하지 않으면 일기 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,
+            },
+        };
+
+        Post.findOne.mockReturnValue(Promise.resolve(null));
+
+        await deleteDiary(req, res, next);
+
+        expect(res.status).toBeCalledWith(404);
+        expect(res.send).toBeCalledWith(`[ID: ${req.params.postId}] 일기가 존재하지 않습니다.`);
+    });
+
+    test("일기 작성자와 삭제를 요청한 사용자가 일치하지 않으면 일기 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const post = {
+            writer: 2,      // req.user.id === 1
+        }
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await deleteDiary(req, res, next);
+
+        expect(res.status).toBeCalledWith(403);
+        expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
+    });
+
+    test("데이터베이스 삭제 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+        const req = {
+            params: {
+                postId: 1,
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const error = new Error("데이터베이스 삭제 중 에러가 발생했습니다.");
+        const post = {
+            writer: 1,      // req.user.id === 1
+            destroy: jest.fn(() => Promise.reject(error)),
+        }
+        Post.findOne.mockReturnValue(Promise.resolve(post));
+
+        await deleteDiary(req, res, next);
+
+        expect(next).toBeCalledWith(error);
     });
 });
