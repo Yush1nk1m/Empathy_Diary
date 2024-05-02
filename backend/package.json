@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon app",
     "test": "jest --silent",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage --silent"
   },
   "repository": {
     "type": "git",
