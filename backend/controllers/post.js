@@ -129,4 +129,33 @@ exports.modifyDiaryContent = async (req, res, next) => {
         console.error(error);
         next(error);
     }
-}
+};
+
+// 추후 chatGPT API를 연결하여 일기 
+// [p-05] 일기 삭제
+exports.deleteDiary = async (req, res, next) => {
+    try {
+        const postId = req.params.postId;
+
+        const post = await Post.findOne({
+            where: {
+                id: postId,
+            },
+        });
+
+        if (!post) {
+            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
+        }
+
+        if (post.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        await post.destroy();
+
+        return res.status(200).send("일기가 삭제되었습니다.");
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
