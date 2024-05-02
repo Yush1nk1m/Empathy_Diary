@@ -1,7 +1,7 @@
 jest.mock("../models");
 
 const db = require("../models");
-const { Post } = require("../models");
+const { Post, Sentiment } = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
 
@@ -275,6 +275,31 @@ describe("[p-03] postDiary", () => {
         
         const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.")
         PostEmotions.create.mockReturnValue(Promise.reject(error));
+
+        await postDiary(req, res, next);
+        
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("Sentiment 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
+        const req = {
+            body: {
+                content: "일기의 내용입니다.",
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const post = {
+            id: 1,
+        };
+        Post.create.mockReturnValueOnce(Promise.resolve(post));
+        
+        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        
+        const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.")
+        Sentiment.create.mockReturnValueOnce(Promise.reject(error));
 
         await postDiary(req, res, next);
         

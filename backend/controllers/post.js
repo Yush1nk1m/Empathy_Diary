@@ -106,6 +106,12 @@ exports.postDiary = async (req, res, next) => {
         const positiveScore = 50;
         const negativeScore = 50;
 
+        await Sentiment.create({
+            positive: positiveScore,
+            negative: negativeScore,
+            postId: post.id,
+        });
+
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
 
         return res.status(200).json({
