@@ -841,19 +841,29 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
             content: "내용 1",
             createdAt: new Date("2024-05-02"),
             getEmotions: jest.fn(async () => Promise.resolve(emotions)),
-            getSentiment: jest.fn(async () => Promise.reject(sentiment)),
+            getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }, {
             id: 2,
             content: "내용 2",
             createdAt: new Date("2024-05-02"),
             getEmotions: jest.fn(async () => Promise.resolve(emotions)),
-            getSentiment: jest.fn(async () => Promise.reject(sentiment)),
+            getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }]
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
 
         await getDiariesForSpecificPeriod(req, res, next);
 
         let diaries = [];
+
+        const dateOptions = {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+        };
+        const timeOptions = {
+            hour: '2-digit', minute: '2-digit',
+            timeZone: 'Asia/Seoul', // 한국 시간대 설정
+            hour12: false // 24시간 표기법 사용
+        }
 
         for (const diary of result) {
             let emotions = [];
