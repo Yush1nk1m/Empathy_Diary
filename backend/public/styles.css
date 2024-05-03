@@ -102,3 +102,33 @@ button {
 button:hover {
     background-color: #45a049;
 }
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.advice-entry {
+    background: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.advice-entry p {
+    font-size: 16px;
+    color: #333;
+}
+
+.advice-entry small {
+    display: block;
+    margin-top: 10px;
+    color: #666;
+    font-size: 12px;
+}

@@ -14,12 +14,12 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { writeAdvice } = require("../controllers/advice");
+const { writeAdvice, getDailyAdvices } = require("../controllers/advice");
 
 const router = express.Router();
 
 // [a-01] GET /advices/today
-router.get("/today",);
+router.get("/today", isLoggedIn, getDailyAdvices);
 
 // [a-02] GET /advices/me
 router.get("/me",);

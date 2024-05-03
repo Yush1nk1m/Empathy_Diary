@@ -1,9 +1,73 @@
 const Op = require("sequelize").Op;
-const { sequelize, Advice } = require("../models");
+const { sequelize, Advice, Emotion } = require("../models");
+
+const dateOptions = {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: 'Asia/Seoul', // 한국 시간대 설정
+};
+const timeOptions = {
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Seoul', // 한국 시간대 설정
+    hour12: false // 24시간 표기법 사용
+};
 
 // [a-01] 오늘 자신에게 온 조언 조회
 exports.getDailyAdvices = async (req, res, next) => {
+    try {
+        const user = req.user;
 
+        // 오늘 사용자가 느낀 감정 조회
+        let emotions = new Set();
+        const posts = await user.getPosts();
+        for (const post of posts) {
+            const postEmotions = await post.getEmotions();
+            for (const emotion of postEmotions) {
+                emotions.add(emotion);
+            }
+        }
+
+        const today = new Date(new Date().setHours(0, 0, 0, 0));
+        const tomorrow = new Date(new Date().setHours(24, 0, 0, 0));
+
+        // 감정별로 사용자에게 온 조언 조회
+        let advices = new Map();
+        for (const emotion of emotions) {
+            const adviceEmotions = await Advice.findAll({
+                include: [{
+                    model: Emotion,
+                    where: {
+                        type: emotion.type,
+                    },
+                }],
+                where: {
+                    writer: {
+                        [Op.ne]: user.id,                   // 자신이 작성한 조언은 제외한다.
+                    },
+                    createdAt: {
+                        [Op.between]: [today, tomorrow],    // 오늘 작성된 조언만 포함한다.
+                    },
+                },
+            });
+
+            for (const advice of adviceEmotions) {
+                advices.set(advice.id, advice);
+            }
+        }
+
+        advices = advices.values();
+        advices = [...advices].map((advice) => {
+            return {
+                content: advice.content,
+                writeDate: (advice.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (advice.createdAt).toLocaleString("ko-KR", timeOptions),
+            };
+        });
+
+        return res.status(200).json({ advices });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 };
 
 // [a-03] 조언 작성
