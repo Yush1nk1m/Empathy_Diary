@@ -1,9 +1,9 @@
 const Op = require("sequelize").Op;
-const db = require("../models");
-const { Advice } = require("../models");
+const { sequelize, Advice } = require("../models");
 
 // [a-03] 조언 작성
 exports.writeAdvice = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
     try {
         const { content } = req.body;
         if (!content) {
@@ -16,6 +16,8 @@ exports.writeAdvice = async (req, res, next) => {
         const advice = await Advice.create({
             content,
             writer: user.id,
+        }, {
+            transaction,
         });
 
         // 오늘과 내일 날짜 계산
@@ -42,10 +44,12 @@ exports.writeAdvice = async (req, res, next) => {
 
         // 조언과 감정 매핑
         for (const emotion of emotions) {
-            await advice.addEmotions(emotion);
+            await advice.addEmotions(emotion, { transaction });
         }
 
         emotions = [...emotions].map(emotion => emotion.type);
+
+        await transaction.commit();
 
         return res.status(200).json({
             adviceId: advice.id,
@@ -53,6 +57,7 @@ exports.writeAdvice = async (req, res, next) => {
             emotions,
         });
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
