@@ -14,7 +14,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { writeAdvice, getDailyAdvices } = require("../controllers/advice");
+const { writeAdvice, getDailyAdvices, getMyAllAdvices } = require("../controllers/advice");
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ const router = express.Router();
 router.get("/today", isLoggedIn, getDailyAdvices);
 
 // [a-02] GET /advices/me
-router.get("/me",);
+router.get("/me", isLoggedIn, getMyAllAdvices);
 
 // [a-03] POST /advices
 router.post("/", isLoggedIn, writeAdvice);

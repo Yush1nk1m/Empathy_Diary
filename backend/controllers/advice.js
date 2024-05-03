@@ -70,6 +70,31 @@ exports.getDailyAdvices = async (req, res, next) => {
     }
 };
 
+// [a-02] 작성한 모든 조언 조회
+exports.getMyAllAdvices = async (req, res, next) => {
+    try {
+        let advices = await Advice.findAll({
+            where: {
+                writer: req.user.id,
+            },
+        });
+
+        advices = advices.map((advice) => {
+            return {
+                adviceId: advice.id,
+                content: advice.content,
+                writeDate: (advice.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (advice.createdAt).toLocaleString("ko-KR", timeOptions),
+            };
+        });
+
+        return res.status(200).json({ advices });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
 // [a-03] 조언 작성
 exports.writeAdvice = async (req, res, next) => {
     const transaction = await sequelize.transaction();

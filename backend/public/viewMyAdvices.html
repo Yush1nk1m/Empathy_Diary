@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내가 작성한 조언 조회</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.advice-entry {
+    background: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.advice-entry p {
+    font-size: 16px;
+    color: #333;
+}
+
+.advice-entry small {
+    display: block;
+    margin-top: 10px;
+    color: #666;
+    font-size: 12px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+</style>
+<body>
+    <div class="container">
+        <h1>내가 작성한 조언</h1>
+        <div id="advicesContainer"></div>
+    </div>
+    <script src="viewMyAdvices.js"></script>
+</body>
+</html>
