@@ -1,13 +1,124 @@
 jest.mock("sequelize");
 jest.mock("../models");
 
-const { sequelize, Advice } = require("../models");
-const { writeAdvice } = require("./advice");
+const { sequelize, Advice, Emotion } = require("../models");
+const { writeAdvice, getDailyAdvices } = require("./advice");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
     rollback: jest.fn(() => Promise.resolve(true)),
 }));
+
+const dateOptions = {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: 'Asia/Seoul', // 한국 시간대 설정
+};
+const timeOptions = {
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Seoul', // 한국 시간대 설정
+    hour12: false // 24시간 표기법 사용
+};
+
+// [a-01] 오늘의 조언 조회
+describe("[a-01] getDailyAdvices", () => {
+    const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("user.getPosts() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        const req = {
+            user: {
+                getPosts: jest.fn(() => Promise.reject(error)),
+            }
+        };
+
+        await getDailyAdvices(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("post.getEmotions() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        const posts = [{
+            getEmotions: jest.fn(() => Promise.reject(error)),
+        }];
+        const req = {
+            user: {
+                getPosts: jest.fn(() => Promise.resolve(posts)),
+            }
+        };
+
+        await getDailyAdvices(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 조회 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+
+        const postEmotions = [{ type: "기쁨", type: "사랑", type: "뿌듯함" }];
+        const posts = [{
+            getEmotions: jest.fn(() => Promise.resolve(postEmotions)),
+        }];
+        const req = {
+            user: {
+                getPosts: jest.fn(() => Promise.resolve(posts)),
+            }
+        };
+
+        Advice.findAll.mockReturnValueOnce(Promise.reject(error));
+
+        await getDailyAdvices(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하지 않는다면 조언 조회에 성공한다.", async () => {
+        const postEmotions = [{ type: "기쁨", type: "사랑", type: "뿌듯함" }];
+        const posts = [{
+            getEmotions: jest.fn(() => Promise.resolve(postEmotions)),
+        }];
+        const req = {
+            user: {
+                getPosts: jest.fn(() => Promise.resolve(posts)),
+            }
+        };
+
+        const adviceEmotions = [
+            { id: 1, content: "내용 1", createdAt: new Date() },
+            { id: 1, content: "내용 1", createdAt: new Date() },
+            { id: 1, content: "내용 1", createdAt: new Date() },
+            { id: 2, content: "내용 2", createdAt: new Date() },
+            { id: 2, content: "내용 2", createdAt: new Date() },
+            { id: 2, content: "내용 2", createdAt: new Date() },
+            { id: 3, content: "내용 3", createdAt: new Date() },            
+            { id: 3, content: "내용 3", createdAt: new Date() },            
+            { id: 3, content: "내용 3", createdAt: new Date() },            
+        ];
+        Advice.findAll.mockReturnValueOnce(Promise.resolve(adviceEmotions));
+
+        await getDailyAdvices(req, res, next);
+
+        let advices = new Map();
+        for (const advice of adviceEmotions) {
+            advices.set(advice.id, advice);
+        }
+        advices = advices.values();
+        advices = [...advices].map((advice) => {
+            return {
+                content: advice.content,
+                writeDate: (advice.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (advice.createdAt).toLocaleString("ko-KR", timeOptions),
+            };
+        });
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ advices });
+    });
+});
 
 // [a-03] 조언 작성
 describe("[a-03] writeAdvice", () => {

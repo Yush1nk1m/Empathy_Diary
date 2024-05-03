@@ -22,7 +22,7 @@ exports.getDailyAdvices = async (req, res, next) => {
         for (const post of posts) {
             const postEmotions = await post.getEmotions();
             for (const emotion of postEmotions) {
-                emotions.add(emotion);
+                emotions.add(emotion.type);
             }
         }
 
@@ -31,12 +31,12 @@ exports.getDailyAdvices = async (req, res, next) => {
 
         // 감정별로 사용자에게 온 조언 조회
         let advices = new Map();
-        for (const emotion of emotions) {
+        for (const type of emotions) {
             const adviceEmotions = await Advice.findAll({
                 include: [{
                     model: Emotion,
                     where: {
-                        type: emotion.type,
+                        type,
                     },
                 }],
                 where: {
