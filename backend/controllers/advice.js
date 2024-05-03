@@ -1,6 +1,11 @@
 const Op = require("sequelize").Op;
 const { sequelize, Advice } = require("../models");
 
+// [a-01] 오늘 자신에게 온 조언 조회
+exports.getDailyAdvices = async (req, res, next) => {
+
+};
+
 // [a-03] 조언 작성
 exports.writeAdvice = async (req, res, next) => {
     const transaction = await sequelize.transaction();
