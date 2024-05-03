@@ -13,6 +13,9 @@
 */
 const express = require("express");
 
+const { isLoggedIn } = require("../middlewares");
+const { writeAdvice } = require("../controllers/advice");
+
 const router = express.Router();
 
 // [a-01] GET /advices/today
@@ -22,7 +25,7 @@ router.get("/today",);
 router.get("/me",);
 
 // [a-03] POST /advices
-router.post("/",);
+router.post("/", isLoggedIn, writeAdvice);
 
 // [a-04] PATCH /advices
 router.patch("/",);
