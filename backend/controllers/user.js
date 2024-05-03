@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const { User } = require("../models");
+const { sequelize, User } = require("../models");
 
 // [u-01] 회원 정보 조회
 exports.getUserInfo = (req, res) => {
@@ -11,6 +11,7 @@ exports.getUserInfo = (req, res) => {
 
 // [u-02] 회원 가입
 exports.join = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
     const { userId, email, nickname, password, confirmPassword } = req.body;
 
     try {
@@ -29,11 +30,16 @@ exports.join = async (req, res, next) => {
             email,
             nickname,
             password: hashedPassword,
+        }, {
+            transaction,
         });
+
+        await transaction.commit();
 
         return res.status(200).send("회원 가입에 성공했습니다.");
 
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         return next(error);
     }
@@ -64,6 +70,7 @@ exports.login = (req, res, next) => {
 
 // [u-04] 회원 정보 수정
 exports.modifyUserInfo = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
     const { userId, nickname } = req.user;
     let { newNickname, newPassword, newConfirmPassword, password } = req.body;
 
@@ -91,11 +98,14 @@ exports.modifyUserInfo = async (req, res, next) => {
         if (newPassword !== '')
             user.password = await bcrypt.hash(newPassword, 12);
 
-        await user.save();
+        await user.save({ transaction });
+
+        await transaction.commit();
 
         return res.status(200).send("회원 정보가 수정되었습니다.");
 
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
@@ -103,6 +113,7 @@ exports.modifyUserInfo = async (req, res, next) => {
 
 // [u-05] 회원 탈퇴
 exports.deleteUserInfo = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
     const { confirmMessage } = req.body;
 
     try {
@@ -114,12 +125,16 @@ exports.deleteUserInfo = async (req, res, next) => {
             where: {
                 userId: req.user.userId,
             },
+            transaction,
         });
         
-        req.logout(() => {
+
+        req.logout(async () => {
+            await transaction.commit();
             return res.status(200).send("회원 탈퇴가 완료되었습니다.");
         });
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
