@@ -1,9 +1,14 @@
 jest.mock("../models");
 
 const db = require("../models");
-const { Post, Sentiment } = require("../models");
+const { sequelize, Post, Sentiment } = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
+
+sequelize.transaction.mockReturnValue(Promise.resolve({
+    commit: jest.fn(() => Promise.resolve(true)),
+    rollback: jest.fn(() => Promise.resolve(true)),
+}));
 
 // [p-01] 모든 일기 조회
 describe("[p-01] getAllDiaries", () => {

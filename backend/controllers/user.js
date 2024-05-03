@@ -128,9 +128,9 @@ exports.deleteUserInfo = async (req, res, next) => {
             transaction,
         });
         
+        await transaction.commit();
 
-        req.logout(async () => {
-            await transaction.commit();
+        req.logout(() => {
             return res.status(200).send("회원 탈퇴가 완료되었습니다.");
         });
     } catch (error) {
