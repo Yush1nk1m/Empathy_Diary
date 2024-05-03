@@ -156,3 +156,43 @@ exports.writeAdvice = async (req, res, next) => {
         next(error);
     }
 };
+
+// [a-04] 조언 내용 수정
+exports.modifyAdviceContent = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const { adviceId, newContent } = req.body;
+        if (!adviceId) {
+            return res.status(400).send("조언 ID가 전달되지 않았습니다.");
+        }
+        if (!newContent) {
+            return res.status(400).send("조언 내용이 전달되지 않았습니다.");
+        }
+
+        const advice = await Advice.findOne({
+            where: {
+                id: adviceId,
+            },
+        });
+
+        if (advice.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        advice.content = newContent;
+
+        await advice.save({ transaction });
+
+        await transaction.commit();
+
+        return res.status(200).json({
+            adviceId,
+            newContent,
+        });
+    } catch (error) {
+        await transaction.rollback();
+        console.error(error);
+        next(error);
+    }
+};

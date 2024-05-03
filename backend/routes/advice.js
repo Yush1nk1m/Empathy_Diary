@@ -14,7 +14,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { writeAdvice, getDailyAdvices, getMyAllAdvices } = require("../controllers/advice");
+const { writeAdvice, getDailyAdvices, getMyAllAdvices, modifyAdviceContent } = require("../controllers/advice");
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.get("/me", isLoggedIn, getMyAllAdvices);
 router.post("/", isLoggedIn, writeAdvice);
 
 // [a-04] PATCH /advices
-router.patch("/",);
+router.patch("/", isLoggedIn, modifyAdviceContent);
 
 // [a-05] /advices/{adviceId}
 router.delete("/:adviceId",);
