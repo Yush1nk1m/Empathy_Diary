@@ -1,8 +1,8 @@
 jest.mock("sequelize");
 jest.mock("../models");
 
-const { sequelize, Advice, Emotion } = require("../models");
-const { writeAdvice, getDailyAdvices } = require("./advice");
+const { sequelize, Advice } = require("../models");
+const { writeAdvice, getDailyAdvices, modifyAdviceContent } = require("./advice");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -262,6 +262,129 @@ describe("[a-03] writeAdvice", () => {
             adviceId: advice.id,
             content: advice.content,
             emotions: emotions.map(emotion => emotion.type),
+        });
+    });
+});
+
+// [a-04] 조언 내용 수정
+describe("[a-04] modifyAdviceContent", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("요청 바디에 adviceId가 없으면 조언 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {},
+        };
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("조언 ID가 전달되지 않았습니다.");
+    });
+
+    test("요청 바디에 newContent가 없으면 조언 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                adviceId: 1,
+            },
+        };
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("조언 내용이 전달되지 않았습니다.");
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                adviceId: 1,
+                newContent: "새로운 조언",
+            },
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Advice.findOne.mockReturnValueOnce(Promise.reject(error));
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("조언 작성자와 사용자가 일치하지 않으면 조언 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                adviceId: 1,
+                newContent: "새로운 조언",
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const advice = {
+            writer: 2,      // req.user.id === 1
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(403);
+        expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
+    });
+
+    test("데이터베이스 저장 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
+        const req = {
+            body: {
+                adviceId: 1,
+                newContent: "새로운 조언",
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.")
+        const advice = {
+            writer: 1,      // req.user.id === 1
+            content: "기존 조언",
+            save: jest.fn(() => Promise.reject(error)),
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("요청 바디 형식에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 내용 수정에 성공한다.", async () => {
+        const req = {
+            body: {
+                adviceId: 1,
+                newContent: "새로운 조언",
+            },
+            user: {
+                id: 1,
+            },
+        };
+
+        const advice = {
+            writer: 1,      // req.user.id === 1
+            content: "기존 조언",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        await modifyAdviceContent(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({
+            adviceId: req.body.adviceId,
+            newContent: req.body.newContent,
         });
     });
 });
