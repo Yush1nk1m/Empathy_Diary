@@ -1,6 +1,5 @@
 const Op = require("sequelize").Op;
-const { where } = require("sequelize");
-const { Post, Sentiment } = require("../models");
+const { sequelize, Post, Sentiment } = require("../models");
 const db = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 
@@ -105,6 +104,8 @@ exports.getDiaryById = async (req, res, next) => {
 // 추후 chatGPT API 연동 및 감정 정보 연결 로직 추가
 // [p-03] 일기 등록
 exports.postDiary = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
     try {
         const { content } = req.body;
         if (content === '') {
@@ -115,6 +116,8 @@ exports.postDiary = async (req, res, next) => {
             content,
             image: null,
             writer: req.user.id,
+        }, {
+            transaction,
         });
 
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
@@ -123,6 +126,8 @@ exports.postDiary = async (req, res, next) => {
             await PostEmotions.create({
                 PostId: post.id,
                 EmotionType: emotion,
+            }, {
+                transaction,
             });
         }
 
@@ -133,9 +138,13 @@ exports.postDiary = async (req, res, next) => {
             positive: positiveScore,
             negative: negativeScore,
             postId: post.id,
+        }, {
+            transaction,
         });
 
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+
+        await transaction.commit();
 
         return res.status(200).json({
             postId: post.id,
@@ -144,6 +153,7 @@ exports.postDiary = async (req, res, next) => {
             negativeScore,
         });
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
@@ -152,6 +162,8 @@ exports.postDiary = async (req, res, next) => {
 // 추후 chatGPT API를 연결하여 일기를 새로 작성하는 것처럼 감정, 감성 분석을 다시 수행하는 로직을 추가한다.
 // [p-04] 일기 내용 수정
 exports.modifyDiaryContent = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
     try {
         const { postId, newContent } = req.body;
         if (newContent === '') {
@@ -177,7 +189,7 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
         post.content = newContent;
 
-        await post.save();
+        await post.save({ transaction });
 
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
         // 기존 정보 삭제
@@ -185,12 +197,16 @@ exports.modifyDiaryContent = async (req, res, next) => {
             where: {
                 PostId: post.id,
             },
+        }, {
+            transaction,
         });
 
         await Sentiment.destroy({
             where: {
                 postId: post.id,
             },
+        }, {
+            transaction,
         });
 
         // 수정된 정보에 맞춰 다시 추가
@@ -199,6 +215,8 @@ exports.modifyDiaryContent = async (req, res, next) => {
             await PostEmotions.create({
                 PostId: post.id,
                 EmotionType: emotion,
+            }, {
+                transaction,
             });
         }
 
@@ -209,9 +227,13 @@ exports.modifyDiaryContent = async (req, res, next) => {
             positive: positiveScore,
             negative: negativeScore,
             postId: post.id,
+        }, {
+            transaction,
         });
 
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+
+        await transaction.commit();
 
         return res.status(200).json({
             postId: post.id,
@@ -220,6 +242,7 @@ exports.modifyDiaryContent = async (req, res, next) => {
             negativeScore,
         });
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
@@ -227,6 +250,8 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
 // [p-05] 일기 삭제
 exports.deleteDiary = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
     try {
         const postId = req.params.postId;
 
@@ -244,10 +269,13 @@ exports.deleteDiary = async (req, res, next) => {
             return res.status(403).send("접근 권한이 없습니다.");
         }
 
-        await post.destroy();
+        await post.destroy({ transaction });
+
+        await transaction.commit();
 
         return res.status(200).send("일기가 삭제되었습니다.");
     } catch (error) {
+        await transaction.rollback();
         console.error(error);
         next(error);
     }
