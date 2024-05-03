@@ -196,3 +196,36 @@ exports.modifyAdviceContent = async (req, res, next) => {
         next(error);
     }
 };
+
+// [a-05] 조언 삭제
+exports.deleteAdvice = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const adviceId = req.params.adviceId;
+        const advice = await Advice.findOne({
+            where: {
+                id: adviceId,
+            },
+        });
+
+        if (advice.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        await Advice.destroy({
+            where: {
+                id: adviceId,
+            },
+            transaction,
+        })
+
+        await transaction.commit();
+
+        return res.status(200).send("조언이 삭제되었습니다.");
+    } catch (error) {
+        await transaction.rollback();
+        console.error(error);
+        next(error);
+    }
+};

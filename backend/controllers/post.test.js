@@ -733,9 +733,9 @@ describe("[p-05] deleteDiary", () => {
 
         const post = {
             writer: 1,      // req.user.id === 1
-            destroy: jest.fn(() => Promise.resolve(true)),
         }
         Post.findOne.mockReturnValue(Promise.resolve(post));
+        Post.destroy.mockReturnValueOnce(Promise.resolve(true));
 
         await deleteDiary(req, res, next);
 
@@ -807,9 +807,9 @@ describe("[p-05] deleteDiary", () => {
         const error = new Error("데이터베이스 삭제 중 에러가 발생했습니다.");
         const post = {
             writer: 1,      // req.user.id === 1
-            destroy: jest.fn(() => Promise.reject(error)),
         }
         Post.findOne.mockReturnValue(Promise.resolve(post));
+        Post.destroy.mockReturnValueOnce(Promise.reject(error));
 
         await deleteDiary(req, res, next);
 

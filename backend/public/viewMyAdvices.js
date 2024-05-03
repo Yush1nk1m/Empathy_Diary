@@ -26,6 +26,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
+function deleteAdvice(adviceId) {
+    if (confirm("정말로 삭제하시겠습니까?")) {
+        fetch(`http://localhost:8080/advices/${adviceId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(text => {
+            alert(text);
+        })
+        .catch(error => {
+            alert('일기 삭제 실패: ' + error.message);
+        });
+    }
+}
+
 function editAdvice(adviceId) {
     const contentP = document.getElementById(`content-${adviceId}`);
     const currentContent = contentP.innerText;
@@ -60,10 +75,4 @@ function submitAdviceEdit(adviceId) {
     .catch(error => {
         alert('수정 실패: ' + error.message);
     });
-}
-  
-
-function deleteAdvice(adviceId) {
-    console.log('Delete advice:', adviceId);
-    // 삭제 로직을 구현하세요.
 }

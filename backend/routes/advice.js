@@ -14,7 +14,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { writeAdvice, getDailyAdvices, getMyAllAdvices, modifyAdviceContent } = require("../controllers/advice");
+const { writeAdvice, getDailyAdvices, getMyAllAdvices, modifyAdviceContent, deleteAdvice } = require("../controllers/advice");
 
 const router = express.Router();
 
@@ -31,6 +31,6 @@ router.post("/", isLoggedIn, writeAdvice);
 router.patch("/", isLoggedIn, modifyAdviceContent);
 
 // [a-05] /advices/{adviceId}
-router.delete("/:adviceId",);
+router.delete("/:adviceId", isLoggedIn, deleteAdvice);
 
 module.exports = router;

@@ -269,7 +269,12 @@ exports.deleteDiary = async (req, res, next) => {
             return res.status(403).send("접근 권한이 없습니다.");
         }
 
-        await post.destroy({ transaction });
+        await Post.destroy({
+            where: {
+                id: postId,
+            },
+            transaction,
+        });
 
         await transaction.commit();
 
