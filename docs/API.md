@@ -393,8 +393,8 @@
    - **목적**: 특정 기간 동안 사용자가 작성한 모든 일기에 매핑된 감정들의 총 개수를 조회한다.
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
-   - **경로 및 쿼리 파라미터**: /emotions?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET www.example.com/emotions?startDate=2024-05-05&endDate=2024-05-05
+   - **경로 및 쿼리 파라미터**: /emotions/period?startDate=[시작 날짜]&endDate=[종료 날짜]
+   - **요청 예시**: GET www.example.com/emotions/period?startDate=2024-05-05&endDate=2024-05-05
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -412,6 +412,24 @@
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
 | GET | /sentiments/period?{startDate}&{endDate} | s-01 | 특정 기간 동안의 감성 점수 조회 |
+
+### [s-01] 특정 기간 동안의 감성 점수 조회
+
+1. **개요**
+   - **목적**: 특정 기간 동안 일별로 사용자가 작성한 일기의 감성 점수 평균을 조회한다.
+2. **HTTP 요청**
+   - **HTTP 메소드**: GET
+   - **경로 및 쿼리 파라미터**: /sentiments/period?startDate=[시작 날짜]&endDate=[종료 날짜]
+   - **요청 예시**: GET www.example.com/sentiments/period?startDate=2024-05-01&endDate=2024-05-05
+3. **HTTP 응답**
+   - **응답 코드**
+     - 200: 성공
+     - 403: 로그인되지 않음
+     - 500: 서버 에러
+   - **응답 형태**: TEXT(실패 시), JSON(성공 시)
+   - **응답 예시**
+     - 로그인이 필요합니다.
+     - {"sentiments":[{"2024. 05. 03.":{"positive":50,"negative":50}},{"2024. 05. 05.":{"positive":50,"negative":50}}]}
 
 ## 대화방
 
