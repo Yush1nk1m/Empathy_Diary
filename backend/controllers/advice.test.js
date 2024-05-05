@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const { sequelize, Advice } = require("../models");
-const { writeAdvice, getDailyAdvices, modifyAdviceContent } = require("./advice");
+const { writeAdvice, getMyAllAdvices, getDailyAdvices, modifyAdviceContent } = require("./advice");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -109,6 +109,59 @@ describe("[a-01] getDailyAdvices", () => {
         advices = advices.values();
         advices = [...advices].map((advice) => {
             return {
+                content: advice.content,
+                writeDate: (advice.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (advice.createdAt).toLocaleString("ko-KR", timeOptions),
+            };
+        });
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({ advices });
+    });
+});
+
+// [a-02] 작성한 모든 조언 조회
+describe("[a-02] getMyAllAdvices", () => {
+    const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("데이터베이스 조회 중 에러가 발생하면 조언 조회에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Advice.findAll.mockReturnValueOnce(Promise.reject(error));
+
+        await getMyAllAdvices(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하지 않으면 조언 조회에 성공한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+        };
+
+        let advices = [
+            { id: 1, content: "내용 1", createdAt: new Date() },
+            { id: 2, content: "내용 2", createdAt: new Date() },
+            { id: 3, content: "내용 3", createdAt: new Date() },
+        ];
+        Advice.findAll.mockReturnValueOnce(Promise.resolve(advices));
+
+        await getMyAllAdvices(req, res, next);
+
+        advices = advices.map((advice) => {
+            return {
+                adviceId: advice.id,
                 content: advice.content,
                 writeDate: (advice.createdAt).toLocaleString("ko-KR", dateOptions),
                 writeTime: (advice.createdAt).toLocaleString("ko-KR", timeOptions),
