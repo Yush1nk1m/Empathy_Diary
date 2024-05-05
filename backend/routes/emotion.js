@@ -6,20 +6,19 @@
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
 | GET | /emotions | e-01 | 사용자의 누적된 모든 감정 조회 |
-| GET | /emotions/{postId} | e-02 | 특정 일기장에 매핑된 감정 모두 조회 |
-| GET | /emotions/duration?{startDate}&{endDate} | e-03 | 특정 기간 동안 매핑된 감정 모두 조회 |
+| GET | /emotions/period?{startDate}&{endDate} | e-02 | 특정 기간 동안 누적된 감정 모두 조회 |
 */
 const express = require("express");
+
+const { isLoggedIn } = require("../middlewares");
+const { getTotalEmotions } = require("../controllers/emotion");
 
 const router = express.Router();
 
 // [e-01] GET /emotions
-router.get("/",);
+router.get("/", isLoggedIn, getTotalEmotions);
 
-// [e-02] GET /emotions/{postId}
-router.get("/:postId",);
-
-// [e-03] GET /emotions/duration?{startDate}&{endDate}
-router.get("/duration",);
+// [e-03] GET /emotions/period?{startDate}&{endDate}
+router.get("/period",);
 
 module.exports = router;
