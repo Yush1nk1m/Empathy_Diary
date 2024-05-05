@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const { sequelize, Advice } = require("../models");
-const { writeAdvice, getMyAllAdvices, getDailyAdvices, modifyAdviceContent } = require("./advice");
+const { writeAdvice, getMyAllAdvices, getDailyAdvices, modifyAdviceContent, deleteAdvice } = require("./advice");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -439,5 +439,123 @@ describe("[a-04] modifyAdviceContent", () => {
             adviceId: req.body.adviceId,
             newContent: req.body.newContent,
         });
+    });
+});
+
+// [a-05] 조언 삭제
+describe("[a-05] deleteAdvice", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("요청 파라미터가 적절한 형식이 아니라면 다른 라우터로 넘긴다.", async () => {
+        const req = {
+            params: {
+                adviceId: "otherPath",
+            },
+        };
+
+        await deleteAdvice(req, res, next);
+
+        expect(next).toBeCalledTimes(1);
+    });
+
+    test("데이터베이스 조회 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                adviceId: 1,
+            },
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Advice.findOne.mockReturnValueOnce(Promise.reject(error));
+
+        await deleteAdvice(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 조회 결과가 없으면 조언 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                adviceId: 1,
+            },
+        };
+
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(null));
+
+        await deleteAdvice(req, res, next);
+
+        expect(res.status).toBeCalledWith(404);
+        expect(res.send).toBeCalledWith(`[ID: ${req.params.adviceId}] 조언이 존재하지 않습니다.`);
+    });
+
+    test("조언의 작성자와 사용자가 일치하지 않으면 조언 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                adviceId: 1,
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const advice = {
+            writer: 2,      // req.user.id === 1
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        await deleteAdvice(req, res, next);
+
+        expect(res.status).toBeCalledWith(403);
+        expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
+    });
+
+    test("데이터베이스 삭제 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
+        const req = {
+            params: {
+                adviceId: 1,
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const advice = {
+            writer: 1,      // req.user.id === 1
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        const error = new Error("데이터베이스 삭제 중 에러가 발생했습니다.");
+        Advice.destroy.mockReturnValueOnce(Promise.reject(error));
+
+        await deleteAdvice(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("조언의 작성자와 사용자가 일치하고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 삭제에 성공한다.", async () => {
+        const req = {
+            params: {
+                adviceId: 1,
+            },
+            user: {
+                id: 1,
+            }
+        };
+
+        const advice = {
+            writer: 1,      // req.user.id === 1
+        };
+        Advice.findOne.mockReturnValueOnce(Promise.resolve(advice));
+
+        Advice.destroy.mockReturnValueOnce(Promise.resolve(true));
+
+        await deleteAdvice(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.send).toBeCalledWith("조언이 삭제되었습니다.");
     });
 });

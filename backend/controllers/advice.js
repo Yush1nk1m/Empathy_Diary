@@ -203,11 +203,18 @@ exports.deleteAdvice = async (req, res, next) => {
 
     try {
         const adviceId = req.params.adviceId;
+        if (isNaN(adviceId)) {
+            return next();
+        }
+
         const advice = await Advice.findOne({
             where: {
                 id: adviceId,
             },
         });
+        if (!advice) {
+            return res.status(404).send(`[ID: ${adviceId}] 조언이 존재하지 않습니다.`);
+        }
 
         if (advice.writer !== req.user.id) {
             return res.status(403).send("접근 권한이 없습니다.");
