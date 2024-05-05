@@ -1,15 +1,5 @@
 const Op = require("sequelize").Op;
-const { sequelize, Post, Emotion } = require("../models");
-
-const dateOptions = {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    timeZone: 'Asia/Seoul', // 한국 시간대 설정
-};
-const timeOptions = {
-    hour: '2-digit', minute: '2-digit',
-    timeZone: 'Asia/Seoul', // 한국 시간대 설정
-    hour12: false // 24시간 표기법 사용
-};
+const { Post, Emotion } = require("../models");
 
 // [e-01] 사용자의 누적된 모든 감정 조회
 exports.getTotalEmotions = async (req, res, next) => {

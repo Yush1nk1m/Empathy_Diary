@@ -157,7 +157,7 @@
      - 403: 로그인되지 않음
      - 500: 서버 에러
    - **응답 형태**: JSON()
-   - **응답 예시**: { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" }, ...] }
+   - **응답 예시**: { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": 50, "negativeScore": 50 }, ...] }
 
 ### [p-02] 특정 일기 조회
 
@@ -175,7 +175,7 @@
      - 500: 서버 에러
    - **응답 형태**: JSON(성공 시), TEST(실패 시)
    - **응답 예시**
-     - { "diary": { "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" } }
+     - { "diary": { "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": 50, "negativeScore": 50 } }
      - 접근 권한이 없습니다.
 
 ### [p-03] 일기 등록
@@ -196,7 +196,7 @@
    - **응답 형태**: JSON(성공 시), TEXT(실패 시)
    - **응답 예시**
      - 일기 내용이 존재하지 않습니다.
-     - { "postId": "1", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" }
+     - { "postId": "1", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": 50, "negativeScore": 50 }
 
 ### [p-04] 일기 내용 수정
 
@@ -217,7 +217,7 @@
    - **응답 형태**: JSON(성공 시), TEXT(실패 시)
    - **응답 예시**
      - 수정될 내용이 없습니다.
-     - { "postId": "1", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" }
+     - { "postId": "1", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": 50, "negativeScore": 50 }
 
 ### [p-05] 일기 삭제
 
@@ -252,7 +252,7 @@
      - 500: 서버 에러
    - **응답 형태**: TEXT(실패 시), JSON(성공 시)
    - **응답 예시**
-     - { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": "50", "negativeScore": "50" }, ...] }
+     - { "diaries": [{ "id": "[일기 ID]", "content": "[일기 내용]", "writeDate": "[작성 날짜]", "writeTime": "[작성 시각]", "emotions": ["기쁨", "사랑", "뿌듯함"], "positiveScore": 50, "negativeScore": 50 }, ...] }
      - 쿼리 파라미터의 값이 유효하지 않습니다.
 
 ## 조언
@@ -385,7 +385,7 @@
    - **응답 형태**: TEXT(실패 시), JSON(성공 시)
    - **응답 예시**
      - 로그인이 필요합니다.
-     - { "emotions": [ {"기쁨": "0"}, {"사랑": "3"}, {"뿌듯함": "2"}] }
+     - { "emotions": [ {"기쁨": 0}, {"사랑": 3}, {"뿌듯함": 2}] }
 
 ### [e-02] 특정 기간 동안 누적된 모든 감정 조회
 
@@ -403,7 +403,7 @@
    - **응답 형태**: TEXT(실패 시), JSON(성공 시)
    - **응답 예시**
      - 로그인이 필요합니다.
-     - { "emotions": [ {"기쁨": "0"}, {"사랑": "3"}, {"뿌듯함": "2"}] }
+     - { "emotions": [ {"기쁨": 0}, {"사랑": 3}, {"뿌듯함": 2}] }
 
 ## 감성
 

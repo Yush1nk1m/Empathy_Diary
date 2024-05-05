@@ -5,17 +5,16 @@
 
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
-| GET | /sentiments/{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
-| GET | /sentiments/duration?{startDate}&{endDate} | e-02 | 특정 기간 동안의 감성 점수 조회 |
+| GET | /sentiments/period?{startDate}&{endDate} | s-01 | 특정 기간 동안의 감성 점수 조회 |
 */
 const express = require("express");
 
+const { isLoggedIn } = require("../middlewares");
+const { getSentimentScoresForSpecificPeriod } = require("../controllers/sentiment");
+
 const router = express.Router();
 
-// [e-01] GET /sentiments/{postId}
-router.get("/:postId",);
-
-// [e-02] GET /sentiments/duration?{startDate}&{endDate}
-router.get("/duration",);
+// [s-01] GET /sentiments/period?{startDate}&{endDate}
+router.get("/period", isLoggedIn, getSentimentScoresForSpecificPeriod);
 
 module.exports = router;
