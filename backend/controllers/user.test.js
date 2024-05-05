@@ -339,6 +339,94 @@ describe("[u-04] modifyUserInfo", () => {
         expect(next).toBeCalledWith(error);
     });
 
+    test("요청 바디에 newNickname과 newPassword의 값이 존재하면 조회한 로우에 값을 저장하는 연산이 수행된다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const user = {
+            nickname: '',
+            password: '',
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        User.findOne.mockReturnValue(Promise.resolve(user));
+        bcrypt.hash.mockReturnValue(Promise.resolve(req.body.newPassword));
+
+        await modifyUserInfo(req, res, next);
+
+        expect(user.nickname).toEqual(req.body.newNickname);
+        expect(user.password).toEqual(req.body.newPassword);
+    });
+
+    test("요청 바디에 newNickname 값이 존재하지 않으면 조회한 로우에 값을 저장하는 연산이 수행되지 않는다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: '',
+                newPassword: "54321",
+                newConfirmPassword: "54321",
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const user = {
+            nickname: '',
+            password: '',
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        User.findOne.mockReturnValue(Promise.resolve(user));
+        bcrypt.hash.mockReturnValue(Promise.resolve(req.body.newPassword));
+
+        await modifyUserInfo(req, res, next);
+
+        expect(user.nickname).toEqual(user.nickname);
+    });
+
+    test("요청 바디에 newPassword의 값이 존재하지 않으면 조회한 로우에 값을 저장하는 연산이 수행되지 않는다.", async () => {
+        const req = {
+            user: {
+                userId: "kys",
+                nickname: "yushin",
+            },
+            body: {
+                newNickname: "newYushin",
+                newPassword: '',
+                newConfirmPassword: '',
+                password: "12345",
+            },
+        };
+
+        bcrypt.compare.mockReturnValue(Promise.resolve(true));
+
+        const user = {
+            nickname: '',
+            password: "기존 비밀번호",
+            save: jest.fn(() => Promise.resolve(true)),
+        };
+        User.findOne.mockReturnValue(Promise.resolve(user));
+        bcrypt.hash.mockReturnValue(Promise.resolve(true));
+
+        await modifyUserInfo(req, res, next);
+
+        expect(user.password).toEqual(user.password);
+    });
+
     test("데이터베이스 저장 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             user: {

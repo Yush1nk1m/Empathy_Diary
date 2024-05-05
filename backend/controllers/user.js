@@ -93,9 +93,9 @@ exports.modifyUserInfo = async (req, res, next) => {
         }
 
         let user = await User.findOne({ where: { userId } });
-        if (newNickname !== nickname)
+        if (newNickname)
             user.nickname = newNickname;
-        if (newPassword !== '')
+        if (newPassword)
             user.password = await bcrypt.hash(newPassword, 12);
 
         await user.save({ transaction });
