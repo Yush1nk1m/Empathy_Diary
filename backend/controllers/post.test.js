@@ -938,8 +938,8 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
     test("쿼리 파라미터에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
         const req = {
             query: {
-                startDate: new Date(),
-                endDate: new Date(),
+                startDate: new Date("2024-05-02"),
+                endDate: new Date("2024-05-02"),
             },
             user: {
                 id: 1,

@@ -294,8 +294,8 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
             return res.status(400).send("충분한 쿼리 파라미터가 제공되지 않았습니다.");
         }
         
-        const startDate = new Date(req.query.startDate);
-        const endDate = new Date(req.query.endDate);
+        const startDate = new Date(new Date(req.query.startDate).setHours(0, 0, 0, 0));
+        const endDate = new Date(new Date(req.query.endDate).setHours(24, 0, 0, 0));
 
         if (isNaN(startDate) || isNaN(endDate)) {
             return res.status(400).send("쿼리 파라미터의 값이 유효하지 않습니다.");

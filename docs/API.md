@@ -243,7 +243,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET www.example.com/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 1일 00시 00분 전까지)
+   - **요청 예시**: GET www.example.com/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 2일 00시 00분 전까지)
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
