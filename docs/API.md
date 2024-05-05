@@ -367,8 +367,7 @@
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
 | GET | /emotions | e-01 | 사용자의 누적된 모든 감정 조회 |
-| GET | /emotions/{postId} | e-02 | 특정 일기장에 매핑된 감정 모두 조회 |
-| GET | /emotions/duration?{startDate}&{endDate} | e-03 | 특정 기간 동안 매핑된 감정 모두 조회 |
+| GET | /emotions/period?{startDate}&{endDate} | e-02 | 특정 기간 동안 누적된 감정 모두 조회 |
 
 ## 감성
 
@@ -376,8 +375,7 @@
 
 | HTTP method | URI | API ID | role |
 | :--: | :-- | :--: | :-- |
-| GET | /sentiments/{postId} | e-01 | 특정 일기장의 감성 점수 조회 |
-| GET | /sentiments/duration?{startDate}&{endDate} | e-02 | 특정 기간 동안의 감성 점수 조회 |
+| GET | /sentiments/period?{startDate}&{endDate} | s-01 | 특정 기간 동안의 감성 점수 조회 |
 
 ## 대화방
 
