@@ -56,7 +56,6 @@ exports.getTotalEmotions = async (req, res, next) => {
 exports.getTotalEmotionsForSpecificPeriod = async (req, res, next) => {
     try {
         let { startDate, endDate } = req.query;
-
         if (!startDate || !endDate) {
             return res.status(400).send("충분한 쿼리 파라미터가 제공되지 않았습니다.");
         }
