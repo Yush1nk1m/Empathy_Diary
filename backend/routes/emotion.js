@@ -11,7 +11,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { getTotalEmotions } = require("../controllers/emotion");
+const { getTotalEmotions, getTotalEmotionsForSpecificPeriod } = require("../controllers/emotion");
 
 const router = express.Router();
 
@@ -19,6 +19,6 @@ const router = express.Router();
 router.get("/", isLoggedIn, getTotalEmotions);
 
 // [e-03] GET /emotions/period?{startDate}&{endDate}
-router.get("/period",);
+router.get("/period", isLoggedIn, getTotalEmotionsForSpecificPeriod);
 
 module.exports = router;
