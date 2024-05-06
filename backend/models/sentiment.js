@@ -34,7 +34,7 @@ class Sentiment extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Sentiment.belongsTo(db.Post, { foreignKey: "postId", targetKey: "id" });
+        db.Sentiment.belongsTo(db.Post, { foreignKey: "postId", targetKey: "id", onDelete: "CASCADE", hooks: true });
     }
 };
 

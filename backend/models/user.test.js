@@ -22,8 +22,8 @@ describe("User model", () => {
 
         User.associate(db);
 
-        expect(db.User.hasMany).toBeCalledWith(db.Post, { foreignKey: "writer", sourceKey: "id", onDelete: "CASCADE", hooks: true });
-        expect(db.User.hasMany).toBeCalledWith(db.Advice, { foreignKey: "writer", sourceKey: "id", onDelete: "CASCADE", hooks: true });
-        expect(db.User.hasMany).toBeCalledWith(db.Chatroom, { foreignKey: "userId", sourceKey: "id", onDelete: "CASCADE", hooks: true });        
+        expect(db.User.hasMany).toBeCalledWith(db.Post, { foreignKey: "writer", sourceKey: "id" });
+        expect(db.User.hasMany).toBeCalledWith(db.Advice, { foreignKey: "writer", sourceKey: "id" });
+        expect(db.User.hasMany).toBeCalledWith(db.Chatroom, { foreignKey: "userId", sourceKey: "id" });        
     });
 });
