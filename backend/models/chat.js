@@ -38,7 +38,7 @@ class Chat extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Chat.belongsTo(db.Chatroom, { foreignKey: "roomId", targetKey: "id" });
+        db.Chat.belongsTo(db.Chatroom, { foreignKey: "roomId", targetKey: "id", onDelete: "CASCADE", hooks: true });
     }
 };
 
