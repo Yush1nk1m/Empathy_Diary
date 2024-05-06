@@ -1,21 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('http://localhost:8080/chatrooms', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const chatContainer = document.getElementById('chatContainer');
-        const chatMessage = document.createElement('div');
-        chatMessage.className = data.chat.role === 'assistant' ? 'chat-assistant' : 'chat-user';
-        chatMessage.textContent = data.chat.content;
-        chatContainer.appendChild(chatMessage);
-    })
-    .catch(error => {
-        console.error('Error loading chats:', error);
-    });
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get('source');
+
+    if (source === "index") {
+        fetch('http://localhost:8080/chatrooms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const chatContainer = document.getElementById('chatContainer');
+            const chatMessage = document.createElement('div');
+            chatMessage.className = data.chat.role === 'assistant' ? 'chat-assistant' : 'chat-user';
+            chatMessage.textContent = data.chat.content;
+            chatContainer.appendChild(chatMessage);
+        })
+        .catch(error => {
+            console.error('Error loading chats:', error);
+        });
+    }
+    else if (source === "summarize") {
+        fetch('http://localhost:8080/chatrooms', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const chatContainer = document.getElementById('chatContainer');
+            data.chats.forEach(chat => {
+                const chatMessage = document.createElement('div');
+                chatMessage.className = chat.role === 'assistant' ? 'chat-assistant' : 'chat-user';
+                chatMessage.textContent = chat.content;
+                chatContainer.appendChild(chatMessage);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading chats:', error);
+        });
+    }
 });
 
 function sendMessage() {
@@ -67,5 +93,5 @@ function sendMessage() {
 
 function summarizeDiary() {
     // 일기 요약 기능을 호출하는 함수 (서버 API 호출 필요)
-    alert('일기 요약 기능 구현 필요');
+    window.location.href='summarizeDiary.html';
 }

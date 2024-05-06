@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일기 요약하기</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>일기 요약</h1>
+        <textarea id="diarySummary" placeholder="여기에 요약된 일기 내용이 로드됩니다."></textarea>
+        <button onclick="saveDiary()">일기 작성하기</button>
+        <button onclick="continueWriting()">이어서 작성하기</button>
+        <button onclick="window.location.href='/'">메인 페이지로 돌아가기</button>
+    </div>
+    <script src="summarizeDiary.js"></script>
+</body>
+</html>
