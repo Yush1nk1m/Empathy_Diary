@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const Op = require("sequelize").Op;
-const { sequelize, Post, Emotion } = require("../models");
+const { Post, Emotion } = require("../models");
 const { getTotalEmotions, getTotalEmotionsForSpecificPeriod } = require("./emotion");
 
 const dateOptions = {
@@ -147,7 +147,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Emotion.findAll.mockReturnValueOnce(Promise.reject(error));
 
-        await getTotalEmotions(req, res, next);
+        await getTotalEmotionsForSpecificPeriod(req, res, next);
 
         expect(next).toBeCalledWith(error);
     });
@@ -173,7 +173,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Post.findAll.mockReturnValueOnce(Promise.reject(error));
 
-        await getTotalEmotions(req, res, next);
+        await getTotalEmotionsForSpecificPeriod(req, res, next);
 
         expect(next).toBeCalledWith(error);
     });
@@ -203,7 +203,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         ]
         Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
 
-        await getTotalEmotions(req, res, next);
+        await getTotalEmotionsForSpecificPeriod(req, res, next);
 
         const emotionMap = new Map();
         emotions.forEach((emotion) => {
