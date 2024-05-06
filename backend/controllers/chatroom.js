@@ -12,6 +12,7 @@ exports.createNewChatRoom = async (req, res, next) => {
         }, {
             transaction,
         });
+        const roomId = chatroom.id;
 
         // AI의 첫 대화 생성
         const chat = {
@@ -31,7 +32,7 @@ exports.createNewChatRoom = async (req, res, next) => {
         await transaction.commit();
 
         return res.status(200).json({
-            roomId: chatroom.id,
+            roomId,
             chat,
         });
     } catch (error) {
@@ -85,6 +86,45 @@ exports.summarizeChatsIntoDiary = async (req, res, next) => {
         next(error);
     }
 }
+
+// [cr-03] AI 챗봇과의 최근 대화 내용 불러오기
+exports.getLatestChatRoom = async (req, res, next) => {
+    try {
+        // 최근 채팅방 정보 조회
+        const chatroom = await Chatroom.findOne({
+            where: {
+                userId: req.user.id,
+            },
+            order: [["createdAt", "DESC"]],
+        });
+        if (!chatroom) {
+            throw new Error("채팅방이 존재하지 않습니다.");
+        }
+        const roomId = chatroom.id;
+
+        // 채팅방의 모든 대화 시간 순으로 조회
+        let chats = await Chat.findAll({
+            where: {
+                roomId,
+            },
+            order: [["createdAt", "ASC"]],
+        });
+        chats = chats.map((chat) => {
+            return {
+                role: chat.role,
+                content: chat.content,
+            };
+        });
+
+        return res.status(200).json({
+            roomId,
+            chats,
+        });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
 
 // 추후 chatGPT API 연결 시 AI의 응답을 생성하는 로직 추가
 // [cr-04] AI 챗봇에게 메시지 전송

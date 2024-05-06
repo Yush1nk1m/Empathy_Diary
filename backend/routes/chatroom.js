@@ -13,7 +13,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { createNewChatRoom, sendMessage, summarizeChatsIntoDiary } = require("../controllers/chatroom");
+const { createNewChatRoom, sendMessage, summarizeChatsIntoDiary, getLatestChatRoom } = require("../controllers/chatroom");
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.post("/", isLoggedIn, createNewChatRoom);
 router.post("/summarize", isLoggedIn, summarizeChatsIntoDiary);
 
 // [cr-03] GET /chatrooms
-router.get("/",);
+router.get("/", isLoggedIn, getLatestChatRoom);
 
 // [cr-04] POST /chatrooms/chats
 router.post("/chats", isLoggedIn, sendMessage);

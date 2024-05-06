@@ -17,7 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function saveDiary() {
     // 여기에 일기 저장 로직을 구현
-    window.location.href = '/';
+    const content = document.getElementById('diarySummary').value;
+    fetch('http://localhost:8080/posts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+    })
+    .then(response => {
+        return response.text().then(text => {
+            alert(text);
+            if (response.ok) {
+                window.location.href = '/';
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("일기 작성 중 에러가 발생했습니다.");
+    });
 }
 
 function continueWriting() {
