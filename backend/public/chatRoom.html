@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 챗봇과 일기 작성하기</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#chatContainer {
+    height: 400px;
+    overflow-y: scroll;
+    background-color: #e9e9e9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.chat-assistant, .chat-user {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 4px;
+    color: white;
+}
+
+.chat-assistant {
+    background-color: #007BFF;
+    text-align: left;
+}
+
+.chat-user {
+    background-color: #28a745;
+    text-align: right;
+}
+
+input[type="text"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+</style>
+<body>
+    <div class="container">
+        <h1>AI 챗봇과 일기 작성하기</h1>
+        <div id="chatContainer"></div>
+        <input type="text" id="messageInput" placeholder="메시지 입력...">
+        <button onclick="sendMessage()">전송</button>
+        <button onclick="summarizeDiary()">일기 요약하기</button>
+        <button onclick="window.location.href='/'">뒤로 가기</button>
+    </div>
+    <script src="chatRoom.js"></script>
+</body>
+</html>

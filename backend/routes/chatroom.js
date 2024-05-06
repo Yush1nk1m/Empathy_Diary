@@ -10,10 +10,13 @@
 */
 const express = require("express");
 
+const { isLoggedIn } = require("../middlewares");
+const { createNewChatRoom } = require("../controllers/chatroom");
+
 const router = express.Router();
 
 // [cr-01] POST /chatrooms
-router.post("/",);
+router.post("/", isLoggedIn, createNewChatRoom);
 
 // [cr-02] POST /chatrooms/posts
 router.post("/posts",);
