@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const { sequelize, Chatroom, Chat } = require("../models");
-const { createNewChatRoom, summarizeChatsIntoDiary } = require("./chatroom");
+const { createNewChatRoom, summarizeChatsIntoDiary, getLatestChatRoom } = require("./chatroom");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -129,5 +129,74 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
 
         expect(res.status).toBeCalledWith(200);
         expect(res.json({ content }));
+    });
+});
+
+// [cr-03] AI 챗봇과의 최근 대화 내용 불러오기
+describe("[cr-03] getLatestChatRoom", () => {
+    const req = {
+        user: {
+            id: 1,
+        },
+    };
+    const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("데이터베이스에서 채팅방 정보 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Chatroom.findOne.mockReturnValueOnce(Promise.reject(error));
+
+        await getLatestChatRoom(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("조회된 채팅방이 존재하지 않으면 대화 내용 불러오기에 실패한다.", async () => {
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(null));
+        
+        const error = new Error("채팅방이 존재하지 않습니다.");
+
+        await getLatestChatRoom(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+    
+    test("데이터베이스에서 대화 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
+        const chatroom = {
+            id: 1,
+        };
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Chat.findAll.mockReturnValueOnce(Promise.reject(error));
+
+        await getLatestChatRoom(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스 작업 중 에러가 발생하지 않으면 대화 내용 불러오기에 성공한다.", async () => {
+        const chatroom = {
+            id: 1,
+        };
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        const chats = [
+            { role: "assistant", content: "AI의 메시지 1" },
+            { role: "user", content: "사용자의 메시지 1" },
+            { role: "assistant", content: "AI의 메시지 2" },
+        ]
+        Chat.findAll.mockReturnValueOnce(Promise.resolve(chats));
+
+        await getLatestChatRoom(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({
+            roomId: chatroom.id,
+            chats,
+        });
     });
 });
