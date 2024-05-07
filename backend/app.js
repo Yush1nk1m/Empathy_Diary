@@ -10,15 +10,14 @@ const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
 const redis = require("redis");
-const RedisStore = require("connect-redis")(session);
+const RedisStore = require('connect-redis').default;
 
 dotenv.config();
 const redisClient = redis.createClient({
     url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     password: process.env.REDIS_PASSWORD,
-    lagacyMode: true,
 });
-redisClient.connect.catch(console.error);
+redisClient.connect().catch(console.error);
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
