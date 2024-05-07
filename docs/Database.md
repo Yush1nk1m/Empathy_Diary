@@ -67,6 +67,7 @@
 ### sentiments: 감성 테이블
 | column | meaning |
 | :-- | :-- |
+| id | 로우 고유의 ID |
 | postId | 일기의 고유한 ID |
 | positive | 긍정 확률 |
 | negative | 부정 확률 |
@@ -94,3 +95,5 @@
 | createdAt | 대화 전송 일시 |
 | updatedAt | 로우 수정 일시 |
 | deletedAt | 로우 삭제 일시 |
+
+사용자는 대화방에서 AI 챗봇과 대화를 주고 받을 수 있다. 이때 AI 챗봇의 role은 "assistant", 사용자의 role은 "user"이다.
