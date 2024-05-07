@@ -7,8 +7,18 @@ const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
 const passport = require("passport");
 const cors = require("cors");
+const helmet = require("helmet");
+const hpp = require("hpp");
+const redis = require("redis");
+const RedisStore = require("connect-redis")(session);
 
 dotenv.config();
+const redisClient = redis.createClient({
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    password: process.env.REDIS_PASSWORD,
+    lagacyMode: true,
+});
+redisClient.connect.catch(console.error);
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
@@ -36,12 +46,24 @@ sequelize.sync({ force: false })
 app.use(cors({
     credentials: true,
 }));
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === "production") {
+    app.use(morgan("combined"));
+    app.use(
+        helmet({
+            contentSecurityPolicy: false,
+            crossOriginEmbedderPolicy: false,
+            crossOriginResourcePolicy: false,
+        }),
+    );
+    app.use(hpp());
+} else {
+    app.use(morgan("dev"));
+}
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(session({
+const sessionOption = {
     resave: false,
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
@@ -49,7 +71,12 @@ app.use(session({
         httpOnly: true,
         secure: false,
     },
-}));
+    store: new RedisStore({ client: redisClient }),
+};
+if (process.env.NODE_ENV === "production") {
+    sessionOption.proxy = true;
+}
+app.use(session(sessionOption));
 app.use(passport.initialize());     // 1. req 객체에 passport 설정을 저장한다.
 app.use(passport.session());        // 2. req.session 객체에 passport 정보를 저장한다.
 
