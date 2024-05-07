@@ -17,8 +17,8 @@ module.exports = {
   },
   "production": {
     "username": "root",
-    "password": process.env.SEQUELIZE_PASSWORD,
-    "database": "empathy_diary",
+    "password": null,
+    "database": "empathy_diary_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }

@@ -6,6 +6,7 @@ const session = require("express-session");
 const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
 const passport = require("passport");
+const cors = require("cors");
 
 dotenv.config();
 const indexRouter = require("./routes");
@@ -32,6 +33,9 @@ sequelize.sync({ force: false })
         console.error(err);
     });
 
+app.use(cors({
+    credentials: true,
+}));
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
@@ -63,6 +67,4 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).send("서버 에러가 발생했습니다.");
 });
 
-app.listen(app.get("port"), () => {
-    console.log(app.get("port"), "번 포트에서 대기 중");
-})
+module.exports = app;

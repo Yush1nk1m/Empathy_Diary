@@ -2,11 +2,11 @@
   "name": "empathy_diary",
   "version": "0.0.1",
   "description": "AI empathy diary project in Sogang",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon app",
-    "test": "jest --silent",
-    "coverage": "jest --coverage --silent"
+    "start": "nodemon server",
+    "test": "jest --silent --detectOpenHandles --forceExit",
+    "coverage": "jest --coverage --silent --detectOpenHandles --forceExit"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
   }
 }
