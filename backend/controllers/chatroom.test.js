@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const { sequelize, Chatroom, Chat } = require("../models");
-const { createNewChatRoom, summarizeChatsIntoDiary, getLatestChatRoom } = require("./chatroom");
+const { createNewChatRoom, summarizeChatsIntoDiary, getLatestChatRoom, sendMessage } = require("./chatroom");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -198,5 +198,138 @@ describe("[cr-03] getLatestChatRoom", () => {
             roomId: chatroom.id,
             chats,
         });
+    });
+});
+
+// [cr-04] AI 챗봇에게 메시지 전송
+describe("[cr-04] sendMessage", () => {
+    const res = {
+        status: jest.fn(() => res),
+        send: jest.fn(),
+        json: jest.fn(),
+    };
+    const next = jest.fn();
+
+    test("요청 바디가 유효하지 않을 경우 메시지 전송에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {},
+        };
+
+        await sendMessage(req, res, next);
+
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("요청 바디가 유효하지 않습니다.");
+    });
+
+    test("데이터베이스에서 채팅방 조회 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {
+                content: "메시지 내용",
+            },
+        };
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        Chatroom.findOne.mockReturnValueOnce(Promise.reject(error));
+
+        await sendMessage(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("조회된 채팅방이 존재하지 않으면 메시지 전송에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {
+                content: "메시지 내용",
+            },
+        };
+
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(null));
+        
+        const error = new Error("채팅방이 존재하지 않습니다.");
+
+        await sendMessage(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스에 사용자의 채팅 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {
+                content: "메시지 내용",
+            },
+        };
+
+        const chatroom = {
+            id: 1,
+        };
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
+        Chat.create.mockReturnValueOnce(Promise.reject(error));
+
+        await sendMessage(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("데이터베이스에 AI의 응답 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {
+                content: "메시지 내용",
+            },
+        };
+
+        const chatroom = {
+            id: 1,
+        };
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
+        Chat.create.mockReturnValueOnce(Promise.reject(error));
+
+        await sendMessage(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("요청 형식이 유효하고 데이터베이스 작업 중 에러가 발생하지 않으면 메시지 전송에 성공한다.", async () => {
+        const req = {
+            user: {
+                id: 1,
+            },
+            body: {
+                content: "메시지 내용",
+            },
+        };
+
+        const chatroom = {
+            id: 1,
+        };
+        Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        await sendMessage(req, res, next);
+
+        expect(res.status).toBeCalledWith(200);
     });
 });

@@ -133,6 +133,9 @@ exports.sendMessage = async (req, res, next) => {
 
     try {
         const { content } = req.body;
+        if (!content) {
+            return res.status(400).send("요청 바디가 유효하지 않습니다.");
+        }
 
         // AI와의 채팅은 일시적인 것으로, 예전의 채팅을 불러올 수 없다.
         // 그러므로 사용자가 대화하는 채팅방은 항상 최근에 생성된 것이다.
