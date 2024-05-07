@@ -33,7 +33,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: GET www.example.com/users
+   - **요청 예시**: GET http://43.201.47.70/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -49,7 +49,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: POST www.example.com/users
+   - **요청 예시**: POST http://43.201.47.70/users
    - **요청 바디**: { userId: "kys010306", email: "kys010306@sogang.ac.kr", nickname: "유신", password: "12345", confirmPassword: "12345" }
 3. **HTTP 응답**
    - **응답 코드**
@@ -68,7 +68,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users/login
    - **요청 바디**: { userId: "kys010306", password: "12345" }
-   - **요청 예시**: POST www.example.com/users/login
+   - **요청 예시**: POST http://43.201.47.70/users/login
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -85,7 +85,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: PATCH www.example.com/users
+   - **요청 예시**: PATCH http://43.201.47.70/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -102,7 +102,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: DELETE www.example.com/users
+   - **요청 예시**: DELETE http://43.201.47.70/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -119,7 +119,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users/logout
-   - **요청 예시**: POST www.example.com/users/logout
+   - **요청 예시**: POST http://43.201.47.70/users/logout
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -150,7 +150,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts
-   - **요청 예시**: GET www.example.com/posts
+   - **요청 예시**: GET http://43.201.47.70/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -166,7 +166,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts/:postId
-   - **요청 예시**: GET www.example.com/posts/1
+   - **요청 예시**: GET http://43.201.47.70/posts/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -186,7 +186,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /posts
    - **요청 바디**: { content: "[일기 내용]" }
-   - **요청 예시**: POST www.example.com/posts
+   - **요청 예시**: POST http://43.201.47.70/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -206,7 +206,7 @@
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /posts
    - **요청 바디**: { postId: "[일기 ID]", newContent: "[일기 내용]" }
-   - **요청 예시**: PATCH www.example.com/posts
+   - **요청 예시**: PATCH http://43.201.47.70/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -226,7 +226,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /posts/:postId
-   - **요청 예시**: DELETE www.example.com/posts/1
+   - **요청 예시**: DELETE http://43.201.47.70/posts/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -243,7 +243,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET www.example.com/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 2일 00시 00분 전까지)
+   - **요청 예시**: GET http://43.201.47.70/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 2일 00시 00분 전까지)
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -274,7 +274,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /advices/today
-   - **요청 예시**: GET www.example.com/advices/today
+   - **요청 예시**: GET http://43.201.47.70/advices/today
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -292,7 +292,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /advices/me
-   - **요청 예시**: GET www.example.com/advices/me
+   - **요청 예시**: GET http://43.201.47.70/advices/me
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -311,7 +311,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /advices
    - **요청 바디**: { content: [조언 내용] }
-   - **요청 예시**: POST www.example.com/advices
+   - **요청 예시**: POST http://43.201.47.70/advices
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -331,7 +331,7 @@
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /advices
    - **요청 바디**: { adviceId: [조언 ID], newContent: [수정한 조언 내용] }
-   - **요청 예시**: PATCH www.example.com/advices
+   - **요청 예시**: PATCH http://43.201.47.70/advices
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -350,7 +350,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /advices/:adviceId
-   - **요청 예시**: DELETE www.example.com/advices/1
+   - **요청 예시**: DELETE http://43.201.47.70/advices/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -376,7 +376,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /emotions
-   - **요청 예시**: GET www.example.com/emotions
+   - **요청 예시**: GET http://43.201.47.70/emotions
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -394,7 +394,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /emotions/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET www.example.com/emotions/period?startDate=2024-05-05&endDate=2024-05-05
+   - **요청 예시**: GET http://43.201.47.70/emotions/period?startDate=2024-05-05&endDate=2024-05-05
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -420,7 +420,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /sentiments/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET www.example.com/sentiments/period?startDate=2024-05-01&endDate=2024-05-05
+   - **요청 예시**: GET http://43.201.47.70/sentiments/period?startDate=2024-05-01&endDate=2024-05-05
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -449,7 +449,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms
-   - **요청 예시**: POST www.example.com/chatrooms
+   - **요청 예시**: POST http://43.201.47.70/chatrooms
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -467,7 +467,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms/summarize
-   - **요청 예시**: POST www.example.com/chatrooms/summarize
+   - **요청 예시**: POST http://43.201.47.70/chatrooms/summarize
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -485,7 +485,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /chatrooms
-   - **요청 예시**: GET www.example.com/chatrooms
+   - **요청 예시**: GET http://43.201.47.70/chatrooms
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -504,7 +504,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms/chats
    - **요청 바디**: { content: "[사용자의 메시지]" }
-   - **요청 예시**: POST www.example.com/chatrooms/chats
+   - **요청 예시**: POST http://43.201.47.70/chatrooms/chats
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
