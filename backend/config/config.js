@@ -16,10 +16,10 @@ module.exports = {
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": process.env.SEQUELIZE_PASSWORD,
+    "username": "dbmasteruser",
+    "password": process.env.AWS_MYSQL_PASSWORD,
     "database": "empathy_diary_production",
-    "host": "127.0.0.1",
+    "host": "ls-0d3643b4dce3940505ab97d7230434586c352465.cvm0cq22wskr.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
     "logging": false,
   },
