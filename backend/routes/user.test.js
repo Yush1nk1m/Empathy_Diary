@@ -2,6 +2,7 @@ const request = require("supertest");
 const { sequelize } = require("../models");
 const app = require("../app");
 
+// 로그인된 에이전트
 const agent = request.agent(app);
 
 beforeAll(async () => {
@@ -16,6 +17,21 @@ beforeAll(async () => {
     await agent.post("/users/login").send({
             userId: "agent",
             password: "test",
+    });
+});
+
+// [u-01] 회원 정보 조회
+describe("[u-01] GET /users", () => {
+    test("로그인되어 있지 않으면 회원 정보 조회에 실패한다.", (done) => {
+        request(app)
+            .get("/users")
+            .expect(403, done);
+    });
+
+    test("로그인되어 있으면 회원 정보 조회에 성공한다.", (done) => {
+        agent
+            .get("/users")
+            .expect(200, done);
     });
 });
 

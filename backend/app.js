@@ -13,11 +13,13 @@ const redis = require("redis");
 const RedisStore = require('connect-redis').default;
 
 dotenv.config();
-const redisClient = redis.createClient({
-    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-    password: process.env.REDIS_PASSWORD,
-});
-redisClient.connect().catch(console.error);
+if (process.env.NODE_ENV === "production") {
+    const redisClient = redis.createClient({
+        url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+        password: process.env.REDIS_PASSWORD,
+    });
+    redisClient.connect().catch(console.error);
+}
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
@@ -70,10 +72,10 @@ const sessionOption = {
         httpOnly: true,
         secure: false,
     },
-    store: new RedisStore({ client: redisClient }),
 };
 if (process.env.NODE_ENV === "production") {
     sessionOption.proxy = true;
+    sessionOption.store = new RedisStore({ client: redisClient });
 }
 app.use(session(sessionOption));
 app.use(passport.initialize());     // 1. req 객체에 passport 설정을 저장한다.
