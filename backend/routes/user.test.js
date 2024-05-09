@@ -7,7 +7,7 @@ jest.setTimeout(2000);
 // 로그인된 에이전트
 const agent = request.agent(app);
 
-beforeAll(async () => {
+beforeEach(async () => {
     await sequelize.sync({ force: true });
     
     await agent.post("/users").send({
@@ -227,4 +227,47 @@ describe("[u-04] PATCH /users", () => {
             .expect(200)
             .expect("회원 정보가 수정되었습니다.");        
     });
+});
+
+// [u-05] 회원 탈퇴
+describe("[u-05] DELETE /users", () => {
+    test("로그인되어 있지 않으면 회원 탈퇴에 실패한다.", async () => {
+        return request(app)
+            .delete("/users")
+            .expect(403)
+            .expect("로그인이 필요합니다.");
+    });
+
+    test("확인 메시지가 불일치하면 회원 탈퇴에 실패한다.", async () => {
+        const agent = request.agent(app);
+        await agent.post("/users/login").send({
+            userId: "user",
+            password: "test",
+        }).expect(200);
+        
+        return agent
+            .delete("/users")
+            .send({ confirmMessage: "회원 탈퇴를 희망하지 않습니다." })
+            .expect(400)
+            .expect("확인 메시지가 잘못되었습니다.");
+    });
+
+    test("확인 메시지가 일치하면 회원 탈퇴에 성공하고 다시 로그인할 수 없다.", async () => {
+        const agent = request.agent(app);
+        await agent.post("/users/login").send({
+            userId: "user",
+            password: "test",
+        }).expect(200);
+
+        await agent
+            .delete("/users")
+            .send({ confirmMessage: "회원 탈퇴를 희망합니다." })
+            .expect(200)
+            .expect("회원 탈퇴가 완료되었습니다.");
+
+        return agent.post("/users/login").send({
+            userId: "user",
+            password: "test",
+        }).expect(400);
+    })
 });
