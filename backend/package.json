@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=production PORT=80 pm2 start server.js -i 0",
     "dev": "nodemon server",
-    "test": "jest --silent --watchAll --detectOpenHandles --forceExit",
+    "test": "jest --watchAll --detectOpenHandles --forceExit",
     "coverage": "jest --coverage --silent --detectOpenHandles --forceExit"
   },
   "repository": {
@@ -43,6 +43,6 @@
   "devDependencies": {
     "jest": "^26.6.3",
     "nodemon": "^3.1.0",
-    "supertest": "^6.2.3"
+    "supertest": "^6.3.4"
   }
 }

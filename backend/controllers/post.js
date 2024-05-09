@@ -152,6 +152,7 @@ exports.postDiary = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
+        console.error(error);
         next(error);
     }
 };
