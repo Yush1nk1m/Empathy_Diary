@@ -69,7 +69,6 @@ exports.getSentimentScoresForSpecificPeriod = async (req, res, next) => {
 
         return res.status(200).json({ sentiments });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };

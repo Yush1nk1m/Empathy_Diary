@@ -37,7 +37,6 @@ exports.createNewChatRoom = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -82,7 +81,6 @@ exports.summarizeChatsIntoDiary = async (req, res, next) => {
 
         return res.status(200).json({ content });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 }
@@ -121,7 +119,6 @@ exports.getLatestChatRoom = async (req, res, next) => {
             chats,
         });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
@@ -180,7 +177,6 @@ exports.sendMessage = async (req, res, next) => {
         return res.status(200).json({ chat });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };

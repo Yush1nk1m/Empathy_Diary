@@ -40,7 +40,6 @@ exports.join = async (req, res, next) => {
 
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         return next(error);
     }
 };
@@ -71,28 +70,28 @@ exports.login = (req, res, next) => {
 // [u-04] 회원 정보 수정
 exports.modifyUserInfo = async (req, res, next) => {
     const transaction = await sequelize.transaction();
-    const { userId, nickname } = req.user;
-    let { newNickname, newPassword, newConfirmPassword, password } = req.body;
-
+    
     try {
+        const { userId, nickname } = req.user;
+        const { newNickname, newPassword, newConfirmPassword, password } = req.body;
+        
         const isPasswordCorrect = await bcrypt.compare(password, req.user.password);
         if (!isPasswordCorrect) {
             return res.status(400).send("비밀번호가 일치하지 않습니다.");
         }
 
-        if (newPassword === '' && newNickname === nickname) {
+        if (!newPassword && newNickname === nickname) {
             return res.status(400).send("변경될 정보가 존재하지 않습니다.");
         }
 
-        if (newPassword !== '' && newPassword !== newConfirmPassword) {
-            return res.status(400).send("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+        if (newPassword) {
+            if (newPassword !== newConfirmPassword)
+                return res.status(400).send("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+            if (newPassword === password)
+                return res.status(400).send("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
         }
 
-        if (newPassword === password) {
-            return res.status(400).send("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
-        }
-
-        let user = await User.findOne({ where: { userId } });
+        const user = await User.findOne({ where: { userId } });
         if (newNickname)
             user.nickname = newNickname;
         if (newPassword)
@@ -106,7 +105,6 @@ exports.modifyUserInfo = async (req, res, next) => {
 
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -114,9 +112,9 @@ exports.modifyUserInfo = async (req, res, next) => {
 // [u-05] 회원 탈퇴
 exports.deleteUserInfo = async (req, res, next) => {
     const transaction = await sequelize.transaction();
-    const { confirmMessage } = req.body;
-
+    
     try {
+        const { confirmMessage } = req.body;
         if (confirmMessage !== "회원 탈퇴를 희망합니다.") {
             return res.status(400).send("확인 메시지가 잘못되었습니다.");
         }
@@ -135,7 +133,6 @@ exports.deleteUserInfo = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };

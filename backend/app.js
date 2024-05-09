@@ -6,14 +6,19 @@ const session = require("express-session");
 const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
 const passport = require("passport");
-const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
-const redis = require("redis");
-const RedisStore = require('connect-redis').default;
+
 
 dotenv.config();
 if (process.env.NODE_ENV === "production") {
+    const cors = require("cors");
+    app.use(cors({
+        credentials: true,
+    }));
+
+    const redis = require("redis");
+    const RedisStore = require('connect-redis').default;
     const redisClient = redis.createClient({
         url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
         password: process.env.REDIS_PASSWORD,
@@ -44,9 +49,6 @@ sequelize.sync({ force: false })
         console.error(err);
     });
 
-app.use(cors({
-    credentials: true,
-}));
 if (process.env.NODE_ENV === "production") {
     app.use(morgan("combined"));
     app.use(

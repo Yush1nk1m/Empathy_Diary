@@ -37,7 +37,6 @@ exports.getTotalEmotions = async (req, res, next) => {
 
         return res.status(200).json({ emotions });
     } catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -93,7 +92,6 @@ exports.getTotalEmotionsForSpecificPeriod = async (req, res, next) => {
 
         return res.status(200).json({ emotions });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };

@@ -85,6 +85,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /users
+   - **요청 바디**: { newNickname: [새로운 닉네임], newPassword: [새로운 비밀번호], newConfirmPassword: [새로운 확인 비밀번호], password: [현재 비밀번호] }
    - **요청 예시**: PATCH http://43.201.47.70/users
 3. **HTTP 응답**
    - **응답 코드**

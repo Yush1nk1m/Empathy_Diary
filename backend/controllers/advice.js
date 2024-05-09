@@ -65,7 +65,6 @@ exports.getDailyAdvices = async (req, res, next) => {
 
         return res.status(200).json({ advices });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
@@ -90,7 +89,6 @@ exports.getMyAllAdvices = async (req, res, next) => {
 
         return res.status(200).json({ advices });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
@@ -152,7 +150,6 @@ exports.writeAdvice = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -192,7 +189,6 @@ exports.modifyAdviceContent = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -232,7 +228,6 @@ exports.deleteAdvice = async (req, res, next) => {
         return res.status(200).send("조언이 삭제되었습니다.");
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };

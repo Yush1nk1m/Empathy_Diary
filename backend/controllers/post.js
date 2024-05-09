@@ -47,7 +47,6 @@ exports.getAllDiaries = async (req, res, next) => {
 
         return res.status(200).json({ diaries });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
@@ -96,7 +95,6 @@ exports.getDiaryById = async (req, res, next) => {
         return res.status(200).json({ diary });
 
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
@@ -154,7 +152,6 @@ exports.postDiary = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -243,7 +240,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -281,7 +277,6 @@ exports.deleteDiary = async (req, res, next) => {
         return res.status(200).send("일기가 삭제되었습니다.");
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
@@ -335,7 +330,6 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
 
         return res.status(200).json({ diaries });
     } catch (error) {
-        console.error(error);
         next(error);
     }
 };
