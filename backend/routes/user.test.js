@@ -269,5 +269,27 @@ describe("[u-05] DELETE /users", () => {
             userId: "user",
             password: "test",
         }).expect(400);
-    })
+    });
+});
+
+// [u-06] 로그아웃
+describe("[u-06] POST /users/logout", () => {
+    test("로그인되지 않은 상태면 로그아웃에 실패한다.", async () => {
+        return request(app)
+            .post("/users/logout")
+            .expect(403)
+            .expect("로그인이 필요합니다.");
+    });
+
+    test("로그인된 상태면 로그아웃에 성공하고 다시 로그인할 수 있다.", async () => {
+        await agent
+            .post("/users/logout")
+            .expect(200)
+            .expect("로그아웃에 성공하였습니다.");
+        
+        return agent
+            .post("/users/login")
+            .send({ userId: "agent", password: "test" })
+            .expect(200);
+    });
 });
