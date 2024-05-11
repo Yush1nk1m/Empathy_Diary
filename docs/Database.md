@@ -81,7 +81,6 @@
 | userId | 대화 사용자 ID |
 | createdAt | 대화 시작 일시 |
 | updatedAt | 로우 수정 일시 |
-| deletedAt | 로우 삭제 일시 |
 
 사용자는 일기를 작성하기 위해 AI 챗봇과 대화를 시작할 수 있다. 이때 대화방이 생성된다.
 
@@ -94,6 +93,5 @@
 | content | 메시지 내용 |
 | createdAt | 대화 전송 일시 |
 | updatedAt | 로우 수정 일시 |
-| deletedAt | 로우 삭제 일시 |
 
 사용자는 대화방에서 AI 챗봇과 대화를 주고 받을 수 있다. 이때 AI 챗봇의 role은 "assistant", 사용자의 role은 "user"이다.

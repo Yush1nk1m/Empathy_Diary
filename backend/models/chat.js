@@ -31,7 +31,6 @@ class Chat extends Sequelize.Model {
             underscored: false,
             modelName: "Chat",
             tableName: "chats",
-            paranoid: true,
             charset: "utf8",
             collate: "utf8_general_ci",
         });

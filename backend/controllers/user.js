@@ -84,11 +84,8 @@ exports.modifyUserInfo = async (req, res, next) => {
             return res.status(400).send("변경될 정보가 존재하지 않습니다.");
         }
 
-        if (newPassword) {
-            if (newPassword !== newConfirmPassword)
-                return res.status(400).send("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
-            if (newPassword === password)
-                return res.status(400).send("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
+        if (newPassword && newPassword !== newConfirmPassword) {
+            return res.status(400).send("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
         }
 
         const user = await User.findOne({ where: { userId } });

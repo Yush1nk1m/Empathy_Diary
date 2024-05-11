@@ -293,28 +293,6 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
-    test("변경할 비밀번호와 원래의 비밀번호가 일치하면 회원 정보 수정에 실패한다.", async () => {
-        const req = {
-            user: {
-                userId: "kys",
-                nickname: "yushin",
-            },
-            body: {
-                newNickname: "newYushin",
-                newPassword: "12345",
-                newConfirmPassword: "12345",
-                password: "12345",
-            },
-        };
-
-        bcrypt.compare.mockReturnValue(Promise.resolve(true));
-
-        await modifyUserInfo(req, res, next);
-
-        expect(res.status).toBeCalledWith(400);
-        expect(res.send).toBeCalledWith("변경할 비밀번호는 원래의 비밀번호와 달라야 합니다.");
-    });
-
     test("데이터베이스 탐색 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             user: {
