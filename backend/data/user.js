@@ -19,6 +19,11 @@ exports.loginUserInfo = {
     password: "1234567890",
 };
 
+exports.loginNewUserInfo = {
+    userId: "newUser",
+    password: "1234567890",
+};
+
 exports.wrongLoginUserInfo = {
     userId: "user",
     password: "12345678901",
