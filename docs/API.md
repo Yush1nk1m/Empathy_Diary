@@ -103,6 +103,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /users
+   - **요청 바디**: { confirmMessage: "회원 탈퇴를 희망합니다." }
    - **요청 예시**: DELETE http://43.201.47.70/users
 3. **HTTP 응답**
    - **응답 코드**

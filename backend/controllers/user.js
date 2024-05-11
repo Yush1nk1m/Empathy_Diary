@@ -123,6 +123,7 @@ exports.deleteUserInfo = async (req, res, next) => {
             where: {
                 userId: req.user.userId,
             },
+            force: true,
             transaction,
         });
         
