@@ -8,6 +8,5 @@ exports.setEmotion = async () => {
             where: { type: emotion },
             defaults: { type: emotion },
         });
-        console.log(`[EMOTION: ${emotion}] FOUND OR CREATED.`);
     }
 };

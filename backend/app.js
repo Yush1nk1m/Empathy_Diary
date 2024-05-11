@@ -38,16 +38,19 @@ nunjucks.configure("views", {
     express: app,
     watch: true,
 });
-sequelize.sync({ force: false })
-    .then(() => {
-        console.log("데이터베이스 연결 성공");
-    })
-    .then(async () => {
-        await setEmotion();
-    })
-    .catch((err) => {
-        console.error(err);
-    });
+
+if (process.env.NODE_ENV !== "test") {
+    sequelize.sync({ force: false })
+        .then(() => {
+            console.log("데이터베이스 연결 성공");
+        })
+        .then(async () => {
+            await setEmotion();
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+}
 
 if (process.env.NODE_ENV === "production") {
     app.use(morgan("combined"));
