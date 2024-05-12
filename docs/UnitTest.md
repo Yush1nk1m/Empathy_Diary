@@ -4,7 +4,11 @@
 
 모델에 대한 단위 테스트는 간단히 `static initiate`, `static associate` 메소드의 호출 여부만을 테스트한다. 그러므로 상세 문서는 기술하지 않는다.
 
-## Controllers, Middlewares
+## Middlewares
+
+passport와 관련된 미들웨어만 존재한다. 이에 대한 단위 테스트는 간단히 로그인 중 로그인, 로그인 중 로그아웃, 로그아웃 후 로그인, 로그아웃 후 로그아웃에 대한 단위 테스트만 작성하였다. 그러므로 상세 문서는 기술하지 않는다.
+
+## Controllers
 
 ### User Controller
 
@@ -72,3 +76,18 @@
 | API ID | Test Name | Test Case ID | Description |
 | :-- | :-- | :--: | :-- |
 | u-06 | 로그아웃 성공 | uut-06-1 | 상태 코드 200 응답 조건 |
+
+### Post Controller
+
+#### [p-01] 모든 일기 조회
+
+본 섹션은 [p-01](./API.md#p-01-모든-일기-조회)에 대한 단위 테스트의 기술이다.
+
+| API ID | Test Name | Test Case ID | Description |
+| :-- | :-- | :--: | :-- |
+| p-01 | 사용자가 작성한 일기 없음 | put-01-1 | 빈 리스트 및 상태 코드 200 응답 조건 |
+| p-01 | 첫 번째 findAll 수행 중 에러 | put-01-2 | 서버 에러 발생 조건 |
+| p-01 | 첫 번째 getEmotion 수행 중 에러 | put-01-3 | 서버 에러 발생 조건 |
+| p-01 | 첫 번째 getSentiment 수행 중 에러 | put-01-4 | 서버 에러 발생 조건 |
+| p-01 | 모든 일기 조회 성공 | put-01-5 | 내용이 있는 리스트 및 상태 코드 200 응답 조건 |
+

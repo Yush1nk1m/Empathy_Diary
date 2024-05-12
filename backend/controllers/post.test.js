@@ -33,7 +33,7 @@ describe("[p-01] getAllDiaries", () => {
     };
     const next = jest.fn();
 
-    test("사용자가 작성한 일기가 없으면 빈 리스트를 반환한다.", async () => {
+    test("[put-01-1] 사용자가 작성한 일기가 없으면 빈 리스트를 반환한다.", async () => {
         Post.findAll.mockReturnValue(Promise.resolve([]));
 
         await getAllDiaries(req, res, next);
@@ -42,7 +42,7 @@ describe("[p-01] getAllDiaries", () => {
         expect(res.json).toBeCalledWith({ diaries: [] });
     });
 
-    test("데이터베이스 조회 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-01-2] 데이터베이스 조회 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Post.findAll.mockReturnValue(Promise.reject(error));
 
@@ -51,7 +51,7 @@ describe("[p-01] getAllDiaries", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getEmotions() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-01-3] getEmotions() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const result = [{
             getEmotions: jest.fn(async () => Promise.reject(error)),
@@ -63,7 +63,7 @@ describe("[p-01] getAllDiaries", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getSentiment() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-01-4] getSentiment() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
@@ -80,7 +80,7 @@ describe("[p-01] getAllDiaries", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
+    test("[put-01-5] 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
         const sentiment = { positive: 50, negative: 50 };
         const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
