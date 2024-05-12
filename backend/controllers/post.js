@@ -164,7 +164,7 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
     try {
         const { postId, newContent } = req.body;
-        if (newContent === '') {
+        if (!newContent) {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }
 
@@ -179,10 +179,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
         if (post.writer !== req.user.id) {
             return res.status(403).send("접근 권한이 없습니다.");
-        }
-
-        if (post.content === newContent) {
-            return res.status(400).send("수정될 내용이 없습니다.");
         }
 
         post.content = newContent;

@@ -507,29 +507,6 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("수정될 내용이 없으면 일기 내용 수정에 실패한다.", async () => {
-        const req = {
-            body: {
-                postId: 1,
-                newContent: "새로운 내용입니다.",
-            },
-            user: {
-                id: 1,
-            }
-        };
-
-        const post = {
-            writer: 1,      // req.user.id === 1
-            content: req.body.newContent,
-        };
-        Post.findOne.mockReturnValue(Promise.resolve(post));
-
-        await modifyDiaryContent(req, res, next);
-
-        expect(res.status).toBeCalledWith(400);
-        expect(res.send).toBeCalledWith("수정될 내용이 없습니다.");
-    });
-
     test("데이터베이스 저장 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
