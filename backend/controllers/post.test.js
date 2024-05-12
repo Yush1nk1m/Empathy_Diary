@@ -173,7 +173,7 @@ describe("[p-02] getDiaryById", () => {
         await getDiaryById(req, res, next);
 
         expect(res.status).toBeCalledWith(404);
-        expect(res.send).toBeCalledWith(`[id: ${req.params.postId}] 일기가 존재하지 않습니다.`);
+        expect(res.send).toBeCalledWith(`[ID: ${req.params.postId}] 일기가 존재하지 않습니다.`);
     });
 
     test("일기 작성자와 사용자의 ID가 일치하지 않으면 일기 조회에 실패한다.", async () => {
@@ -428,7 +428,7 @@ describe("[p-04] modifyDiaryContent", () => {
     };
     const next = jest.fn();
 
-    test("요청 바디에 속성이 존재하지 않으면 서버 에러가 발생한다.", async () => {
+    test("요청 바디에 속성이 존재하지 않으면 일기 내용 수정에 실패패한다.", async () => {
         const req = {
             body: {
             },
@@ -436,7 +436,8 @@ describe("[p-04] modifyDiaryContent", () => {
 
         await modifyDiaryContent(req, res, next);
 
-        expect(next).toBeCalledTimes(1);
+        expect(res.status).toBeCalledWith(400);
+        expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
     });
 
     test("새로운 일기의 내용이 빈 문자열이면 일기 내용 수정에 실패한다.", async () => {
@@ -482,7 +483,7 @@ describe("[p-04] modifyDiaryContent", () => {
         await modifyDiaryContent(req, res, next);
 
         expect(res.status).toBeCalledWith(404);
-        expect(res.send).toBeCalledWith(`[id: ${req.body.postId}] 일기가 존재하지 않습니다.`);
+        expect(res.send).toBeCalledWith(`[ID: ${req.body.postId}] 일기가 존재하지 않습니다.`);
     });
 
     test("일기의 작성자가 일치하지 않으면 일기 내용 수정에 실패한다.", async () => {

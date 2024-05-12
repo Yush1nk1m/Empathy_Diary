@@ -68,4 +68,12 @@ describe("[p-05] DELETE /posts/:postId", () => {
         expect(response.status).toBe(404);
         expect(response.text).toBe("[ID: -1] 일기가 존재하지 않습니다.");
     });
+
+    test("[pit-05-4] 성공적인 일기 삭제 요청", async () => {
+        const post = await agent.post("/posts").send({ content: "일기" });
+        const response = await agent.delete(`/posts/${post.body.postId}`);
+
+        expect(response.status).toBe(200);
+        expect(response.text).toBe("일기가 삭제되었습니다.");
+    });
 });
