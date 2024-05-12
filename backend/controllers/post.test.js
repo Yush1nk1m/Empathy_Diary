@@ -304,7 +304,7 @@ describe("[p-03] postDiary", () => {
     };
     const next = jest.fn();
 
-    test("일기 내용이 존재하면 일기를 등록한다.", async () => {
+    test("[put-03-1] 일기 내용이 존재하면 일기를 등록한다.", async () => {
         const req = {
             body: {
                 content: "일기의 내용입니다.",
@@ -336,7 +336,7 @@ describe("[p-03] postDiary", () => {
         });
     });
 
-    test("일기 내용이 존재하지 않으면 일기 등록에 실패한다.", async () => {
+    test("[put-03-2] 일기 내용이 존재하지 않으면 일기 등록에 실패한다.", async () => {
         const req = {
             body: {
                 content: '',
@@ -352,7 +352,7 @@ describe("[p-03] postDiary", () => {
         expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
     });
 
-    test("Post 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-03-3] Post 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             body: {
                 content: "일기의 내용입니다.",
@@ -370,7 +370,7 @@ describe("[p-03] postDiary", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("PostEmotion 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-03-4] PostEmotion 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             body: {
                 content: "일기의 내용입니다.",
@@ -393,7 +393,7 @@ describe("[p-03] postDiary", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("Sentiment 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-03-5] Sentiment 모델에서 데이터베이스 생성 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             body: {
                 content: "일기의 내용입니다.",
