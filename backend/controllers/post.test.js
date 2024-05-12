@@ -804,7 +804,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
     };
     const next = jest.fn();
 
-    test("해당 기간 동안 작성한 게시글이 존재하지 않으면 빈 리스트를 반환하고 일기 조회에 성공한다.", async () => {
+    test("[put-06-1] 해당 기간 동안 작성한 게시글이 존재하지 않으면 빈 리스트를 반환하고 일기 조회에 성공한다.", async () => {
         const req = {
             query: {
                 startDate: new Date(),
@@ -823,7 +823,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(res.json).toBeCalledWith({ diaries: [] });
     });
 
-    test("쿼리 파라미터가 존재하지 않으면 일기 조회에 실패한다.", async () => {
+    test("[put-06-2] 쿼리 파라미터가 존재하지 않으면 일기 조회에 실패한다.", async () => {
         const req = {
             query: {},
         };
@@ -834,7 +834,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("충분한 쿼리 파라미터가 제공되지 않았습니다.");
     });
 
-    test("쿼리 파라미터가 Date 객체로 파싱이 불가능하면 일기 조회에 실패한다.", async () => {
+    test("[put-06-3] 쿼리 파라미터가 Date 객체로 파싱이 불가능하면 일기 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "Cannot Parse",
@@ -848,7 +848,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("쿼리 파라미터의 값이 유효하지 않습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-06-4] 데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             query: {
                 startDate: new Date(),
@@ -867,7 +867,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-06-5] getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             query: {
                 startDate: new Date(),
@@ -889,7 +889,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-06-6] getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             query: {
                 startDate: new Date(),
@@ -913,7 +913,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("쿼리 파라미터에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
+    test("[put-06-7] 쿼리 파라미터에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
         const req = {
             query: {
                 startDate: new Date("2024-05-02"),
