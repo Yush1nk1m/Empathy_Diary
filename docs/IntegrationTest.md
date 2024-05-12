@@ -171,6 +171,14 @@
 
 본 섹션은 [a-04](./API.md#a-04-조언-내용-수정)에 대한 통합 테스트의 기술이다.
 
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| PATCH | /advices | 로그인되지 않은 상태에서 조언 수정 요청 | ait-04-1 | 즉시 조언 수정 요청을 보낸다. | 상태 코드 403 응답 |
+| PATCH | /advices | 요청 바디에 adviceId 누락된 상태로 조언 슈정 요청 | ait-04-2 | adviceId 속성을 null로 설정하고 조언 수정 요청을 보낸다. | 상태 코드 400 응답 |
+| PATCH | /advices | 요청 바디에 newContent 누락된 상태로 조언 수정 요청 | ait-04-3 | newContent 속성을 null로 설정하고 조언 수정 요청을 보낸다. | 상태 코드 400 응답 |
+| PATCH | /advices | 다른 사용자의 조언 수정 요청 | ait-04-4 | agent가 조언을 작성하고, agent2가 해당 조언의 수정을 요청한다. | 상태 코드 403 응답 |
+| PATCH | /advices | 성공적인 조언 수정 요청 | ait-04-5 | agent가 조언을 작성한 후 해당 조언의 수정을 요청한다. | 상태 코드 200 및 수정된 조언의 정보 응답 |
+
 ### [a-05] 조언 삭제
 
 본 섹션은 [a-05](./API.md#a-05-조언-삭제)에 대한 통합 테스트의 기술이다.
