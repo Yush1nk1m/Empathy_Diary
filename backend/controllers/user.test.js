@@ -28,7 +28,7 @@ describe("[u-01] getUserInfo", () => {
         json: jest.fn(),
     };
 
-    test("회원 정보를 조회하면 사용자의 ID, 이메일, 닉네임을 응답한다.", () => {
+    test("[uut-01-1] 회원 정보를 조회하면 사용자의 ID, 이메일, 닉네임을 응답한다.", () => {
         getUserInfo(req, res);
 
         expect(res.status).toBeCalledWith(200);
@@ -55,7 +55,7 @@ describe("[u-02] join", () => {
     
     User.create.mockReturnValue(Promise.resolve(true));
 
-    test("같은 ID를 가진 사용자가 존재하지 않으면 회원 가입에 성공한다.", async () => {
+    test("[uut-02-1] 같은 ID를 가진 사용자가 존재하지 않으면 회원 가입에 성공한다.", async () => {
         User.findOne.mockReturnValue(Promise.resolve(false));
 
         await join(req, res, next);
@@ -64,7 +64,7 @@ describe("[u-02] join", () => {
         expect(res.send).toBeCalledWith("회원 가입에 성공했습니다.");
     });
 
-    test("비밀번호와 확인 비밀번호가 일치하지 않을 경우 회원 가입에 실패한다.", async () => {
+    test("[uut-02-2] 비밀번호와 확인 비밀번호가 일치하지 않을 경우 회원 가입에 실패한다.", async () => {
         req.body.confirmPassword = "54321";
 
         await join(req, res, next);
@@ -75,7 +75,7 @@ describe("[u-02] join", () => {
         expect(res.send).toBeCalledWith("비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
-    test("같은 ID를 가진 사용자가 존재할 경우 회원 가입에 실패한다.", async () => {
+    test("[uut-02-3] 같은 ID를 가진 사용자가 존재할 경우 회원 가입에 실패한다.", async () => {
         User.findOne.mockReturnValue(Promise.resolve(true));
 
         await join(req, res, next);
@@ -84,7 +84,7 @@ describe("[u-02] join", () => {
         expect(res.send).toBeCalledWith("이미 존재하는 회원 ID입니다.");
     });
 
-    test("데이터베이스 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[uut-02-4] 데이터베이스 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 에러가 발생하였습니다.");
         User.findOne.mockReturnValue(Promise.reject(error));
 
@@ -102,7 +102,7 @@ describe("[u-03] login", () => {
     };
     const next = jest.fn();
     
-    test("인증 및 로그인 과정에 에러가 없고, 사용자 정보가 존재하면 로그인에 성공한다.", () => {
+    test("[uut-03-1] 인증 및 로그인 과정에 에러가 없고, 사용자 정보가 존재하면 로그인에 성공한다.", () => {
         const req = {
             login: jest.fn((null, jest.fn((user, callback) => {
                 callback(false);
@@ -118,7 +118,7 @@ describe("[u-03] login", () => {
         expect(res.send).toBeCalledWith("로그인에 성공했습니다.");
     });
 
-    test("로그인 에러가 발생하면 next(loginError)가 호출된다.", () => {
+    test("[uut-03-2] 로그인 에러가 발생하면 next(loginError)가 호출된다.", () => {
         const loginError = new Error("로그인 중 에러가 발생했습니다.");
         const req = {
             login: jest.fn((null, jest.fn((user, callback) => {
@@ -134,7 +134,7 @@ describe("[u-03] login", () => {
         expect(next).toBeCalledWith(loginError);
     });
 
-    test("사용자 정보가 일치하지 않으면 로그인에 실패한다.", () => {
+    test("[uut-03-3] 사용자 정보가 일치하지 않으면 로그인에 실패한다.", () => {
         const req = {
             login: jest.fn(),
         };
@@ -149,7 +149,7 @@ describe("[u-03] login", () => {
         expect(req.login).toBeCalledTimes(0);
     });
 
-    test("인증 에러가 발생하면 로그인에 실패한다.", () => {
+    test("[uut-03-4] 인증 에러가 발생하면 로그인에 실패한다.", () => {
         const authError = new Error("인증 에러가 발생했습니다.");
         const req = {
             login: jest.fn(),
@@ -173,7 +173,7 @@ describe("[u-04] modifyUserInfo", () => {
     };
     const next = jest.fn();
 
-    test("오류가 발생하지 않고, 비밀번호가 일치하며 변경될 정보가 있으면 회원 정보를 수정한다.", async () => {
+    test("[uut-04-1] 오류가 발생하지 않고, 비밀번호가 일치하며 변경될 정보가 있으면 회원 정보를 수정한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -200,7 +200,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("회원 정보가 수정되었습니다.");
     });
 
-    test("새로운 비밀번호 해싱 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[uut-04-2] 새로운 비밀번호 해싱 작업 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -227,7 +227,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("현재 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
+    test("[uut-04-3] 현재 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
