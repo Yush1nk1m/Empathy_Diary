@@ -50,23 +50,28 @@ describe("[p-01] GET /posts", () => {
 
     test("[pit-01-2] 성공적인 일기 조회 요청", async () => {
         // 사용자가 일기를 3개 등록한 상황을 가정한다.
-        const post = await agent.post("/posts").send({ content: "일기 1" });
-        await agent.post("/posts").send({ content: "일기 2" });
-        await agent.post("/posts").send({ content: "일기 3" });
+        const posts = [];
+        posts.push(await agent.post("/posts").send({ content: "일기 1" }));
+        posts.push(await agent.post("/posts").send({ content: "일기 1" }));
+        posts.push(await agent.post("/posts").send({ content: "일기 1" }));
         
         const response = await agent.get("/posts");
 
+        const result = posts.map((post) => {
+            return {
+                id: post.body.postId,
+                content: expect.any(String),
+                writeDate: expect.any(String),
+                writeTime: expect.any(String),
+                emotions: expect.any(Array),
+                positiveScore: expect.any(Number),
+                negativeScore: expect.any(Number),
+            };
+        });
+
         expect(response.status).toBe(200);
         expect(response.body.diaries.length).toBe(3);
-        expect(response.body.diaries[0]).toEqual({
-            id: post.body.postId,
-            content: "일기 1",
-            writeDate: expect.any(String),
-            writeTime: expect.any(String),
-            emotions: expect.any(Array),
-            positiveScore: expect.any(Number),
-            negativeScore: expect.any(Number),
-        });
+        expect(response.body.diaries).toEqual(result);
     });
 });
 

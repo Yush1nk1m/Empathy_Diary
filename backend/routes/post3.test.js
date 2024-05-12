@@ -145,17 +145,21 @@ describe("[p-06] GET /posts/period?[startDate]&[endDate]", () => {
         expect(todayResponse.status).toBe(200);
         expect(tomorrowResponse.status).toBe(200);
 
+        const result = posts.map((post) => {
+            return {
+                id: post.body.postId,
+                content: expect.any(String),
+                writeDate: expect.any(String),
+                writeTime: expect.any(String),
+                emotions: expect.any(Array),
+                positiveScore: expect.any(Number),
+                negativeScore: expect.any(Number),
+            };
+        });
+
         expect(yesterdayResponse.body.diaries).toEqual([]);
         expect(tomorrowResponse.body.diaries).toEqual([]);
         expect(todayResponse.body.diaries.length).toBe(3);
-        expect(todayResponse.body.diaries[0]).toEqual({
-            id: posts[0].body.postId,
-            content: "일기 1",
-            writeDate: expect.any(String),
-            writeTime: expect.any(String),
-            emotions: expect.any(Array),
-            positiveScore: expect.any(Number),
-            negativeScore: expect.any(Number),
-        });
+        expect(todayResponse.body.diaries).toEqual(result);
     });
 });
