@@ -168,3 +168,19 @@ passport와 관련된 미들웨어만 존재한다. 이에 대한 단위 테스�
 | p-06 | 첫 번째 getEmotions 수행 중 에러 | put-06-5 | 서버 에러 발생 조건 |
 | p-06 | 첫 번째 getSentiment 수행 중 에러 | put-06-6 | 서버 에러 발생 조건 |
 | p-06 | 일기 조회 성공 | put-06-7 | 상태 코드 200 응답 조건 |
+
+### Advice Controller
+
+[[Test Code](../backend/controllers/advice.test.js)]
+
+#### [a-01] 오늘의 조언 조회
+
+본 섹션은 [a-01](./API.md#a-01-오늘-자신에게-온-조언-조회)에 대한 단위 테스트의 기술이다.
+
+| API ID | Test Name | Test Case ID | Description |
+| :-- | :-- | :--: | :-- |
+| a-01 | 첫 번째 getPosts 수행 중 에러 | aut-01-1 | 서버 에러 발생 조건 |
+| a-01 | 첫 번째 getEmotions 수행 중 에러 | aut-01-2 | 서버 에러 발생 조건 |
+| a-01 | 첫 번째 findAll 수행 중 에러 | aut-01-3 | 서버 에러 발생 조건 |
+| a-01 | 조언 조회 성공 | aut-01-4 | 상태 코드 200 응답 조건 |
+

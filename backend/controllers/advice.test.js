@@ -27,7 +27,7 @@ describe("[a-01] getDailyAdvices", () => {
     };
     const next = jest.fn();
 
-    test("user.getPosts() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+    test("[aut-01-1] user.getPosts() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const req = {
             user: {
@@ -40,7 +40,7 @@ describe("[a-01] getDailyAdvices", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("post.getEmotions() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+    test("[aut-01-2] post.getEmotions() 수행 중 에러 발생 시 조언 조회에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const posts = [{
             getEmotions: jest.fn(() => Promise.reject(error)),
@@ -56,7 +56,7 @@ describe("[a-01] getDailyAdvices", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러 발생 시 조언 조회에 실패한다.", async () => {
+    test("[aut-01-3] 데이터베이스 조회 중 에러 발생 시 조언 조회에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
 
         const postEmotions = [{ type: "기쁨", type: "사랑", type: "뿌듯함" }];
@@ -76,7 +76,7 @@ describe("[a-01] getDailyAdvices", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하지 않는다면 조언 조회에 성공한다.", async () => {
+    test("[aut-01-4] 데이터베이스 조회 중 에러가 발생하지 않는다면 조언 조회에 성공한다.", async () => {
         const postEmotions = [{ type: "기쁨", type: "사랑", type: "뿌듯함" }];
         const posts = [{
             getEmotions: jest.fn(() => Promise.resolve(postEmotions)),
