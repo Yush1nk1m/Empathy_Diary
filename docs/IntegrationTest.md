@@ -182,3 +182,9 @@
 ### [a-05] 조언 삭제
 
 본 섹션은 [a-05](./API.md#a-05-조언-삭제)에 대한 통합 테스트의 기술이다.
+
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| DELETE | /advices/:adviceId | 로그인되지 않은 상태에서 조언 삭제 요청 | ait-05-1 | 즉시 조언 삭제를 요청한다. | 상태 코드 403 응답 |
+| DELETE | /advices/:adviceId | 다른 사용자의 조언 삭제 요청 | ait-05-2 | agent가 조언을 작성하고, agent2가 해당 조언의 삭제를 요청한다. | 상태 코드 403 응답 |
+| DELETE | /advices/:adviceId | 성공적인 조언 삭제 요청 | ait-05-3 | agent가 조언을 작성한 후 해당 조언의 삭제를 요청한다. | 상태 코드 200 응답 |
