@@ -699,7 +699,7 @@ describe("[p-05] deleteDiary", () => {
     };
     const next = jest.fn();
 
-    test("데이터베이스 작업 중 문제가 없고, 같은 사용자의 일기에 대한 삭제 요청이 들어오면 일기 삭제에 성공한다.", async () => {
+    test("[put-05-1] 데이터베이스 작업 중 문제가 없고, 같은 사용자의 일기에 대한 삭제 요청이 들어오면 일기 삭제에 성공한다.", async () => {
         const req = {
             params: {
                 postId: 1,
@@ -721,7 +721,7 @@ describe("[p-05] deleteDiary", () => {
         expect(res.send).toBeCalledWith("일기가 삭제되었습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-05-2] 데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             params: {
                 postId: 1,
@@ -736,7 +736,7 @@ describe("[p-05] deleteDiary", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 결과가 존재하지 않으면 일기 삭제에 실패한다.", async () => {
+    test("[put-05-3] 데이터베이스 조회 결과가 존재하지 않으면 일기 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 postId: 1,
@@ -751,7 +751,7 @@ describe("[p-05] deleteDiary", () => {
         expect(res.send).toBeCalledWith(`[ID: ${req.params.postId}] 일기가 존재하지 않습니다.`);
     });
 
-    test("일기 작성자와 삭제를 요청한 사용자가 일치하지 않으면 일기 삭제에 실패한다.", async () => {
+    test("[put-05-4] 일기 작성자와 삭제를 요청한 사용자가 일치하지 않으면 일기 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 postId: 1,
@@ -772,7 +772,7 @@ describe("[p-05] deleteDiary", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("데이터베이스 삭제 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-05-5] 데이터베이스 삭제 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             params: {
                 postId: 1,
