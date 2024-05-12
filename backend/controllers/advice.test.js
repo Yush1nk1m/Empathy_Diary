@@ -328,7 +328,7 @@ describe("[a-04] modifyAdviceContent", () => {
     };
     const next = jest.fn();
 
-    test("요청 바디에 adviceId가 없으면 조언 내용 수정에 실패한다.", async () => {
+    test("[aut-04-1] 요청 바디에 adviceId가 없으면 조언 내용 수정에 실패한다.", async () => {
         const req = {
             body: {},
         };
@@ -339,7 +339,7 @@ describe("[a-04] modifyAdviceContent", () => {
         expect(res.send).toBeCalledWith("조언 ID가 전달되지 않았습니다.");
     });
 
-    test("요청 바디에 newContent가 없으면 조언 내용 수정에 실패한다.", async () => {
+    test("[aut-04-2] 요청 바디에 newContent가 없으면 조언 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 adviceId: 1,
@@ -352,7 +352,7 @@ describe("[a-04] modifyAdviceContent", () => {
         expect(res.send).toBeCalledWith("조언 내용이 전달되지 않았습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
+    test("[aut-04-3] 데이터베이스 조회 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 adviceId: 1,
@@ -368,7 +368,7 @@ describe("[a-04] modifyAdviceContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("조언 작성자와 사용자가 일치하지 않으면 조언 내용 수정에 실패한다.", async () => {
+    test("[aut-04-4] 조언 작성자와 사용자가 일치하지 않으면 조언 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 adviceId: 1,
@@ -390,7 +390,7 @@ describe("[a-04] modifyAdviceContent", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("데이터베이스 저장 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
+    test("[aut-04-5] 데이터베이스 저장 중 에러가 발생하면 조언 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 adviceId: 1,
@@ -414,7 +414,7 @@ describe("[a-04] modifyAdviceContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("요청 바디 형식에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 내용 수정에 성공한다.", async () => {
+    test("[aut-04-6] 요청 바디 형식에 문제가 없고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 내용 수정에 성공한다.", async () => {
         const req = {
             body: {
                 adviceId: 1,
@@ -450,7 +450,7 @@ describe("[a-05] deleteAdvice", () => {
     };
     const next = jest.fn();
 
-    test("요청 파라미터가 적절한 형식이 아니라면 다른 라우터로 넘긴다.", async () => {
+    test("[aut-05-1] 요청 파라미터가 적절한 형식이 아니라면 다른 라우터로 넘긴다.", async () => {
         const req = {
             params: {
                 adviceId: "otherPath",
@@ -462,7 +462,7 @@ describe("[a-05] deleteAdvice", () => {
         expect(next).toBeCalledTimes(1);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
+    test("[aut-05-2] 데이터베이스 조회 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 adviceId: 1,
@@ -477,7 +477,7 @@ describe("[a-05] deleteAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 결과가 없으면 조언 삭제에 실패한다.", async () => {
+    test("[aut-05-3] 데이터베이스 조회 결과가 없으면 조언 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 adviceId: 1,
@@ -492,7 +492,7 @@ describe("[a-05] deleteAdvice", () => {
         expect(res.send).toBeCalledWith(`[ID: ${req.params.adviceId}] 조언이 존재하지 않습니다.`);
     });
 
-    test("조언의 작성자와 사용자가 일치하지 않으면 조언 삭제에 실패한다.", async () => {
+    test("[aut-05-4] 조언의 작성자와 사용자가 일치하지 않으면 조언 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 adviceId: 1,
@@ -513,7 +513,7 @@ describe("[a-05] deleteAdvice", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("데이터베이스 삭제 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
+    test("[aut-05-5] 데이터베이스 삭제 중 에러가 발생하면 조언 삭제에 실패한다.", async () => {
         const req = {
             params: {
                 adviceId: 1,
@@ -536,7 +536,7 @@ describe("[a-05] deleteAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("조언의 작성자와 사용자가 일치하고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 삭제에 성공한다.", async () => {
+    test("[aut-05-6] 조언의 작성자와 사용자가 일치하고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 삭제에 성공한다.", async () => {
         const req = {
             params: {
                 adviceId: 1,
