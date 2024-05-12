@@ -249,7 +249,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("비밀번호가 일치하지 않습니다.");
     });
 
-    test("변경될 정보가 존재하지 않으면 회원 정보 수정에 실패한다.", async () => {
+    test("[uut-04-4] 변경될 정보가 존재하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -271,7 +271,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("변경될 정보가 존재하지 않습니다.");
     });
 
-    test("변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
+    test("[uut-04-5] 변경할 비밀번호와 그 확인 비밀번호가 일치하지 않으면 회원 정보 수정에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -293,7 +293,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(res.send).toBeCalledWith("변경할 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
     });
 
-    test("데이터베이스 탐색 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[uut-04-6] 데이터베이스 탐색 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -317,7 +317,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("요청 바디에 newNickname과 newPassword의 값이 존재하면 조회한 로우에 값을 저장하는 연산이 수행된다.", async () => {
+    test("[uut-04-7] 요청 바디에 newNickname과 newPassword의 값이 존재하면 조회한 로우에 값을 저장하는 연산이 수행된다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -347,7 +347,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(user.password).toEqual(req.body.newPassword);
     });
 
-    test("요청 바디에 newNickname 값이 존재하지 않으면 조회한 로우에 값을 저장하는 연산이 수행되지 않는다.", async () => {
+    test("[uut-04-8] 요청 바디에 newNickname 값이 존재하지 않으면 조회한 로우에 값을 저장하는 연산이 수행되지 않는다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -405,7 +405,7 @@ describe("[u-04] modifyUserInfo", () => {
         expect(user.password).toEqual(user.password);
     });
 
-    test("데이터베이스 저장 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[uut-04-10] 데이터베이스 저장 작업 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             user: {
                 userId: "kys",
@@ -440,7 +440,7 @@ describe("[u-05] deleteUserInfo", () => {
     };
     const next = jest.fn();
 
-    test("확인 메시지가 일치하고 데이터베이스에서 삭제된 경우 회원 탈퇴한다.", async () => {
+    test("[uut-05-1] 확인 메시지가 일치하고 데이터베이스에서 삭제된 경우 회원 탈퇴한다.", async () => {
         const req = {
             user: {
                 userId: "yushin",
@@ -459,7 +459,7 @@ describe("[u-05] deleteUserInfo", () => {
         expect(res.send).toBeCalledWith("회원 탈퇴가 완료되었습니다.");
     });
     
-    test("확인 메시지가 일치하지 않을 경우 회원 탈퇴에 실패한다.", async () => {
+    test("[uut-05-2] 확인 메시지가 일치하지 않을 경우 회원 탈퇴에 실패한다.", async () => {
         const req = {
             user: {
                 userId: "yushin",
@@ -477,7 +477,7 @@ describe("[u-05] deleteUserInfo", () => {
         expect(res.send).toBeCalledWith("확인 메시지가 잘못되었습니다.");
     });
 
-    test("데이터베이스 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[uut-05-3] 데이터베이스 에러 발생 시 next(error)를 호출한다.", async () => {
         const req = {
             user: {
                 userId: "yushin",
@@ -509,7 +509,7 @@ describe("[u-06] logout", () => {
         send: jest.fn(),
     };
 
-    test("로그아웃을 시도하면 로그아웃에 성공한다.", () => {
+    test("[uut-06-1] 로그아웃을 시도하면 로그아웃에 성공한다.", () => {
         logout(req, res);
 
         expect(res.status).toBeCalledWith(200);
