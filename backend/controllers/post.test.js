@@ -154,7 +154,7 @@ describe("[p-02] getDiaryById", () => {
     };
     const next = jest.fn();
 
-    test("URL 경로에 전달된 것이 쿼리 파라미터가 아닌 다른 값이라면 next()를 반환한다.", async () => {
+    test("[put-02-1] URL 경로에 전달된 것이 쿼리 파라미터가 아닌 다른 값이라면 next()를 반환한다.", async () => {
         const req = {
             params: {
                 postId: "period",       //GET /posts/period 
@@ -167,7 +167,7 @@ describe("[p-02] getDiaryById", () => {
         expect(next).toBeCalledWith();
     });
 
-    test("데이터베이스에서 일기가 조회되지 않으면 일기 조회에 실패한다.", async () => {
+    test("[put-02-2] 데이터베이스에서 일기가 조회되지 않으면 일기 조회에 실패한다.", async () => {
         Post.findOne.mockReturnValue(Promise.resolve(null));
 
         await getDiaryById(req, res, next);
@@ -176,7 +176,7 @@ describe("[p-02] getDiaryById", () => {
         expect(res.send).toBeCalledWith(`[ID: ${req.params.postId}] 일기가 존재하지 않습니다.`);
     });
 
-    test("일기 작성자와 사용자의 ID가 일치하지 않으면 일기 조회에 실패한다.", async () => {
+    test("[put-02-3] 일기 작성자와 사용자의 ID가 일치하지 않으면 일기 조회에 실패한다.", async () => {
         Post.findOne.mockReturnValue(Promise.resolve({
             writer: 2,      // req.params.id === 1
         }));
@@ -187,7 +187,7 @@ describe("[p-02] getDiaryById", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-02-4] 데이터베이스 조회 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생하였습니다.");
         Post.findOne.mockReturnValue(Promise.reject(error));
 
@@ -196,7 +196,7 @@ describe("[p-02] getDiaryById", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-02-5] getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             params: {
                 postId: 1,       //GET /posts/period 
@@ -218,7 +218,7 @@ describe("[p-02] getDiaryById", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-02-6] getSentiment() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             params: {
                 postId: 1,       //GET /posts/period 
@@ -242,7 +242,7 @@ describe("[p-02] getDiaryById", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않고 사용자가 작성한 일기에 대한 요청이라면 일기 조회에 성공한다.", async () => {
+    test("[put-02-7] 데이터베이스 작업 중 에러가 발생하지 않고 사용자가 작성한 일기에 대한 요청이라면 일기 조회에 성공한다.", async () => {
         const req = {
             params: {
                 postId: 1,       //GET /posts/period 
