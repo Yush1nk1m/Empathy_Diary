@@ -138,6 +138,8 @@
 ## Advice API
 
 - [[Test Code 1](../backend/routes/advice1.test.js)]
+- [[Test Code 2](../backend/routes/advice2.test.js)]
+- [[Test Code 3](../backend/routes/advice3.test.js)]
 
 ### [a-01] 오늘의 조언 조회
 
@@ -188,3 +190,16 @@
 | DELETE | /advices/:adviceId | 로그인되지 않은 상태에서 조언 삭제 요청 | ait-05-1 | 즉시 조언 삭제를 요청한다. | 상태 코드 403 응답 |
 | DELETE | /advices/:adviceId | 다른 사용자의 조언 삭제 요청 | ait-05-2 | agent가 조언을 작성하고, agent2가 해당 조언의 삭제를 요청한다. | 상태 코드 403 응답 |
 | DELETE | /advices/:adviceId | 성공적인 조언 삭제 요청 | ait-05-3 | agent가 조언을 작성한 후 해당 조언의 삭제를 요청한다. | 상태 코드 200 응답 |
+
+## Sentiment Controller
+
+[[Test Code](../backend/routes/sentiment.test.js)]
+
+### [s-01] 특정 기간 감성 점수 조회
+
+본 섹션은 [s-01](./API.md#s-01-특정-기간-동안의-감성-점수-조회)에 대한 통합 테스트의 기술이다.
+
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| GET | /sentiments/period?[startDate]&[endDate] | 로그인되지 않은 상태에서 감성 점수 조회 | sit-01-1 | 즉시 감성 점수 조회를 요청한다. | 상태 코드 403 응답 |  
+| GET | /sentiments/period?[startDate]&[endDate] | 성공적인 감성 점수 조회 요청 | sit-01-2 | agent가 일기를 작성하고 어제, 오늘, 내일 날짜에 대해 감성 점수를 요청한다. | 모든 요청에 대해 상태 코드 200 응답, 바디의 sentiments 속성은 어제와 내일 날짜에 대해선 빈 리스트, 오늘 날짜에 대해선 1개의 일기 정보를 담은 리스트로 응답 |  

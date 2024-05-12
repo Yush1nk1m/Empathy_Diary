@@ -55,7 +55,7 @@ describe("[s-01] GET /sentiments/period?[startDate]&[endDate]", () => {
     });
 
     test("[sit-01-2] 성공적인 감성 점수 조회 요청", async () => {
-        const post = await agent.post("/posts").send({ content: "내용" });
+        await agent.post("/posts").send({ content: "내용" });
         const yesterdayResponse = await agent.get(`/sentiments/period?startDate=${yesterdayString}&endDate=${yesterdayString}`)
         const todayResponse = await agent.get(`/sentiments/period?startDate=${todayString}&endDate=${todayString}`);
         const tomorrowResponse = await agent.get(`/sentiments/period?startDate=${tomorrowString}&endDate=${tomorrowString}`);
