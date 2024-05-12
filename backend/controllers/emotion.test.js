@@ -28,7 +28,7 @@ describe("[e-01] getTotalEmotions", () => {
     };
     const next = jest.fn();
 
-    test("Emotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+    test("[eut-01-1] Emotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Emotion.findAll.mockReturnValueOnce(Promise.reject(error));
 
@@ -37,7 +37,7 @@ describe("[e-01] getTotalEmotions", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("Post.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+    test("[eut-01-2] Post.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
         let emotions = [
             { type: "기쁨" },
             { type: "사랑" },
@@ -53,7 +53,7 @@ describe("[e-01] getTotalEmotions", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
+    test("[eut-01-3] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
         let emotions = [
             { type: "기쁨" },
             { type: "사랑" },
@@ -99,7 +99,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
     };
     const next = jest.fn();
 
-    test("쿼리 파라미터가 충분히 주어지지 않으면 감정 조회에 실패한다.", async () => {
+    test("[eut-02-1] 쿼리 파라미터가 충분히 주어지지 않으면 감정 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: '',
@@ -116,7 +116,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("충분한 쿼리 파라미터가 제공되지 않았습니다.");
     });
 
-    test("쿼리 파라미터의 값이 유효하지 않으면 감정 조회에 실패한다.", async () => {
+    test("[eut-02-2] 쿼리 파라미터의 값이 유효하지 않으면 감정 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "Cannot Parse",
@@ -133,7 +133,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("쿼리 파라미터의 값이 유효하지 않습니다.");
     });
 
-    test("Emotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+    test("[eut-02-3] Emotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-05",
@@ -152,7 +152,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("Post.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+    test("[eut-02-4] Post.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-05",
@@ -178,7 +178,7 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
+    test("[eut-02-5] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-05",
