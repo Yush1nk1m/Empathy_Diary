@@ -428,7 +428,7 @@ describe("[p-04] modifyDiaryContent", () => {
     };
     const next = jest.fn();
 
-    test("요청 바디에 속성이 존재하지 않으면 일기 내용 수정에 실패패한다.", async () => {
+    test("[put-04-1] 요청 바디에 속성이 존재하지 않으면 일기 내용 수정에 실패패한다.", async () => {
         const req = {
             body: {
             },
@@ -440,7 +440,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
     });
 
-    test("새로운 일기의 내용이 빈 문자열이면 일기 내용 수정에 실패한다.", async () => {
+    test("[put-04-2] 새로운 일기의 내용이 빈 문자열이면 일기 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -454,7 +454,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(res.send).toBeCalledWith("일기 내용이 존재하지 않습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-3] 데이터베이스 조회 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -470,7 +470,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스에서 조회된 일기가 없으면 일기 내용 수정에 실패한다.", async () => {
+    test("[put-04-4] 데이터베이스에서 조회된 일기가 없으면 일기 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -486,7 +486,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(res.send).toBeCalledWith(`[ID: ${req.body.postId}] 일기가 존재하지 않습니다.`);
     });
 
-    test("일기의 작성자가 일치하지 않으면 일기 내용 수정에 실패한다.", async () => {
+    test("[put-04-5] 일기의 작성자가 일치하지 않으면 일기 내용 수정에 실패한다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -508,7 +508,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(res.send).toBeCalledWith("접근 권한이 없습니다.");
     });
 
-    test("데이터베이스 저장 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-6] 데이터베이스 저장 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -532,7 +532,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("PostEmotions 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-7] PostEmotions 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -558,7 +558,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("Sentiment 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-8] Sentiment 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -586,7 +586,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("PostEmotions 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-9] PostEmotions 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -616,7 +616,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("Sentiment 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-10] Sentiment 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -648,7 +648,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않고 같은 사용자의 일기 내용에 수정 사항이 있으면 일기 내용 수정에 성공한다.", async () => {
+    test("[put-04-11] 데이터베이스 작업 중 에러가 발생하지 않고 같은 사용자의 일기 내용에 수정 사항이 있으면 일기 내용 수정에 성공한다.", async () => {
         const emotions = ["기쁨", "사랑", "뿌듯함"];
         const positiveScore = 50;
         const negativeScore = 50;

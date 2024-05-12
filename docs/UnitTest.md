@@ -2,15 +2,21 @@
 
 ## Models
 
+[[Test Code](../backend/models/)]
+
 모델에 대한 단위 테스트는 간단히 `static initiate`, `static associate` 메소드의 호출 여부만을 테스트한다. 그러므로 상세 문서는 기술하지 않는다.
 
 ## Middlewares
+
+[[Test Code](../backend/middlewares/index.test.js)]
 
 passport와 관련된 미들웨어만 존재한다. 이에 대한 단위 테스트는 간단히 로그인 중 로그인, 로그인 중 로그아웃, 로그아웃 후 로그인, 로그아웃 후 로그아웃에 대한 단위 테스트만 작성하였다. 그러므로 상세 문서는 기술하지 않는다.
 
 ## Controllers
 
 ### User Controller
+
+[[Test Code](../backend/controllers/user.test.js)]
 
 #### [u-01] 회원 정보 조회
 
@@ -79,6 +85,8 @@ passport와 관련된 미들웨어만 존재한다. 이에 대한 단위 테스�
 
 ### Post Controller
 
+[[Test Code](../backend/controllers/post.test.js)]
+
 #### [p-01] 모든 일기 조회
 
 본 섹션은 [p-01](./API.md#p-01-모든-일기-조회)에 대한 단위 테스트의 기술이다.
@@ -117,3 +125,20 @@ passport와 관련된 미들웨어만 존재한다. 이에 대한 단위 테스�
 | p-03 | 두 번째 create 수행 중 에러 | put-03-4 | 서버 에러 발생 조건 |
 | p-03 | 세 번째 create 수행 중 에러 | put-03-5 | 서버 에러 발생 조건 |
 
+#### [p-04] 일기 내용 수정
+
+본 섹션은 [p-04](./API.md#p-04-일기-내용-수정)에 대한 단위 테스트의 기술이다.
+
+| API ID | Test Name | Test Case ID | Description |
+| :-- | :-- | :--: | :-- |
+| p-04 | 유효하지 않은 요청 바디 | put-04-1 | 상태 코드 400 응답 조건 |
+| p-04 | 수정할 일기 내용 없음 | put-04-2 | 상태 코드 400 응답 조건 |
+| p-04 | 첫 번째 findOne 수행 중 에러 | put-04-3 | 서버 에러 발생 조건 |
+| p-04 | 조회된 일기 없음 | put-04-4 | 상태 코드 404 응답 조건 |
+| p-04 | 작성자 불일치 | put-04-5 | 상태 코드 403 응답 조건 |
+| p-04 | 첫 번째 save 수행 중 에러 | put-04-6 | 서버 에러 발생 조건 |
+| p-04 | 첫 번째 destroy 수행 중 에러 | put-04-7 | 서버 에러 발생 조건 |
+| p-04 | 두 번째 destroy 수행 중 에러 | put-04-8 | 서버 에러 발생 조건 |
+| p-04 | 첫 번째 create 수행 중 에러 | put-04-9 | 서버 에러 발생 조건 |
+| p-04 | 두 번째 create 수행 중 에러 | put-04-10 | 서버 에러 발생 조건 |
+| p-04 | 일기 내용 수정 성공 | put-04-11 | 상태 코드 200 응답 조건 |
