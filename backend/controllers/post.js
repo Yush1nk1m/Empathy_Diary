@@ -67,7 +67,7 @@ exports.getDiaryById = async (req, res, next) => {
             },
         });
         if (!post) {
-            return res.status(404).send(`[id: ${postId}] 일기가 존재하지 않습니다.`);
+            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
         }
 
         if (post.writer !== req.user.id) {

@@ -123,7 +123,7 @@ describe("[p-02] GET /posts/:postId", () => {
         const response = await agent.get("/posts/-1");
 
         expect(response.status).toBe(404);
-        expect(response.text).toBe("[id: -1] 일기가 존재하지 않습니다.");
+        expect(response.text).toBe("[ID: -1] 일기가 존재하지 않습니다.");
     });
 
     test("[pit-02-4] 성공적인 일기 조회 요청", async () => {
@@ -186,6 +186,7 @@ describe("[p-03] POST /posts", () => {
     test("[pit-03-3] 성공적인 일기 등록 요청", async () => {
         const response = await agent.post("/posts").send({ content: "일기" });
 
+        expect(response.status).toBe(200);
         expect(response.body).toEqual({
             postId: expect.any(Number),
             emotions: expect.any(Array),
