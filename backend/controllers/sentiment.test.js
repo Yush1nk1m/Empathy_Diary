@@ -19,7 +19,7 @@ describe("[s-01] getSentimentScoresForSpecificPeriod", () => {
     };
     const next = jest.fn();
 
-    test("쿼리 파라미터가 주어지지 않으면 감성 점수 조회에 실패한다.", async () => {
+    test("[sut-01-1] 쿼리 파라미터가 주어지지 않으면 감성 점수 조회에 실패한다.", async () => {
         const req = {
             query: {},
         };
@@ -30,7 +30,7 @@ describe("[s-01] getSentimentScoresForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("충분한 쿼리 파라미터가 전달되지 않았습니다.");
     });
 
-    test("쿼리 파라미터의 값이 유효하지 않으면 감성 점수 조회에 실패한다.", async () => {
+    test("[sut-01-2] 쿼리 파라미터의 값이 유효하지 않으면 감성 점수 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "Cannot Parse",
@@ -44,7 +44,7 @@ describe("[s-01] getSentimentScoresForSpecificPeriod", () => {
         expect(res.send).toBeCalledWith("쿼리 파라미터의 값이 유효하지 않습니다.");
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 감성 점수 조회에 실패한다.", async () => {
+    test("[sut-01-3] 데이터베이스 조회 중 에러가 발생하면 감성 점수 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-01",
@@ -63,7 +63,7 @@ describe("[s-01] getSentimentScoresForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하면 감성 점수 조회에 실패한다.", async () => {
+    test("[sut-01-4] 데이터베이스 조회 중 에러가 발생하면 감성 점수 조회에 실패한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-01",
