@@ -128,7 +128,7 @@ describe("[a-02] getMyAllAdvices", () => {
     };
     const next = jest.fn();
 
-    test("데이터베이스 조회 중 에러가 발생하면 조언 조회에 실패한다.", async () => {
+    test("[aut-02-1] 데이터베이스 조회 중 에러가 발생하면 조언 조회에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -143,7 +143,7 @@ describe("[a-02] getMyAllAdvices", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 조회 중 에러가 발생하지 않으면 조언 조회에 성공한다.", async () => {
+    test("[aut-02-2] 데이터베이스 조회 중 에러가 발생하지 않으면 조언 조회에 성공한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -182,7 +182,7 @@ describe("[a-03] writeAdvice", () => {
     };
     const next = jest.fn();
 
-    test("요청 바디에 문제가 있을 경우 조언 작성에 실패한다.", async () => {
+    test("[aut-03-1] 요청 바디에 문제가 있을 경우 조언 작성에 실패한다.", async () => {
         const req = {
             body: {
             }
@@ -194,7 +194,7 @@ describe("[a-03] writeAdvice", () => {
         expect(res.send).toBeCalledWith("조언이 전달되지 않았습니다.");
     });
 
-    test("주어진 조언 내용이 빈 문자열일 경우 조언 작성에 실패한다.", async () => {
+    test("[aut-03-2] 주어진 조언 내용이 빈 문자열일 경우 조언 작성에 실패한다.", async () => {
         const req = {
             body: {
                 content: '',
@@ -207,7 +207,7 @@ describe("[a-03] writeAdvice", () => {
         expect(res.send).toBeCalledWith("조언이 전달되지 않았습니다.");
     });
 
-    test("데이터베이스 생성 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
+    test("[aut-03-3] 데이터베이스 생성 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
         const req = {
             body: {
                 content: "조언",
@@ -223,7 +223,7 @@ describe("[a-03] writeAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("user.getPosts() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
+    test("[aut-03-4] user.getPosts() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 오류가 발생했습니다.");
         const req = {
             body: {
@@ -241,7 +241,7 @@ describe("[a-03] writeAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("post.getEmotions() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
+    test("[aut-03-5] post.getEmotions() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const posts = [{
             getEmotions: jest.fn(() => Promise.reject(error)),
@@ -262,7 +262,7 @@ describe("[a-03] writeAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("advice.addEmotions() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
+    test("[aut-03-6] advice.addEmotions() 수행 중 오류가 발생하면 조언 작성에 실패한다.", async () => {
         const error = new Error("데이터베이스 생성 중 에러가 발생했습니다.");
         const advice = {
             addEmotions: jest.fn(() => Promise.reject(error)),
@@ -287,7 +287,7 @@ describe("[a-03] writeAdvice", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("요청 바디 형식이 적절하고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 작성에 성공한다.", async () => {
+    test("[aut-03-7] 요청 바디 형식이 적절하고 데이터베이스 작업 중 에러가 발생하지 않으면 조언 작성에 성공한다.", async () => {
         const advice = {
             id: 1,
             content: "조언",
