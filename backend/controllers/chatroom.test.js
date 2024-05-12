@@ -210,7 +210,7 @@ describe("[cr-04] sendMessage", () => {
     };
     const next = jest.fn();
 
-    test("요청 바디가 유효하지 않을 경우 메시지 전송에 실패한다.", async () => {
+    test("[crut-04-1] 요청 바디가 유효하지 않을 경우 메시지 전송에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -224,7 +224,7 @@ describe("[cr-04] sendMessage", () => {
         expect(res.send).toBeCalledWith("요청 바디가 유효하지 않습니다.");
     });
 
-    test("데이터베이스에서 채팅방 조회 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+    test("[crut-04-2] 데이터베이스에서 채팅방 조회 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -242,7 +242,7 @@ describe("[cr-04] sendMessage", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("조회된 채팅방이 존재하지 않으면 메시지 전송에 실패한다.", async () => {
+    test("[crut-04-3] 조회된 채팅방이 존재하지 않으면 메시지 전송에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -261,7 +261,7 @@ describe("[cr-04] sendMessage", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스에 사용자의 채팅 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+    test("[crut-04-4] 데이터베이스에 사용자의 채팅 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -284,7 +284,7 @@ describe("[cr-04] sendMessage", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스에 AI의 응답 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
+    test("[crut-04-5] 데이터베이스에 AI의 응답 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -309,7 +309,7 @@ describe("[cr-04] sendMessage", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("요청 형식이 유효하고 데이터베이스 작업 중 에러가 발생하지 않으면 메시지 전송에 성공한다.", async () => {
+    test("[crut-04-6] 요청 형식이 유효하고 데이터베이스 작업 중 에러가 발생하지 않으면 메시지 전송에 성공한다.", async () => {
         const req = {
             user: {
                 id: 1,
