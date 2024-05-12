@@ -17,7 +17,7 @@ describe("[cr-01] createNewChatRoom", () => {
     };
     const next = jest.fn();
 
-    test("데이터베이스에 새로운 대화방 생성 중 에러가 발생하면 대화 시작에 실패한다.", async () => {
+    test("[crut-01-1] 데이터베이스에 새로운 대화방 생성 중 에러가 발생하면 대화 시작에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -32,7 +32,7 @@ describe("[cr-01] createNewChatRoom", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스에 AI의 첫 번째 대화 생성 중 에러가 발생하면 대화 시작에 실패한다.", async () => {
+    test("[crut-01-2] 데이터베이스에 AI의 첫 번째 대화 생성 중 에러가 발생하면 대화 시작에 실패한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -49,7 +49,7 @@ describe("[cr-01] createNewChatRoom", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않으면 대화 시작에 성공한다.", async () => {
+    test("[crut-01-3] 데이터베이스 작업 중 에러가 발생하지 않으면 대화 시작에 성공한다.", async () => {
         const req = {
             user: {
                 id: 1,
@@ -91,7 +91,7 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
     };
     const next = jest.fn();
 
-    test("데이터베이스에서 채팅방 조회 중 에러가 발생하면 대화 제출에 실패한다.", async () => {
+    test("[crut-02-1] 데이터베이스에서 채팅방 조회 중 에러가 발생하면 대화 제출에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Chatroom.findOne.mockReturnValueOnce(Promise.reject(error));
 
@@ -100,7 +100,7 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스에서 조회된 채팅방이 없으면 대화 제출에 실패한다.", async () => {
+    test("[crut-02-2] 데이터베이스에서 조회된 채팅방이 없으면 대화 제출에 실패한다.", async () => {
         const error = new Error("채팅방이 존재하지 않습니다.");
 
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(null));
@@ -110,7 +110,7 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않으면 대화 제출에 성공한다.", async () => {
+    test("[crut-02-3] 데이터베이스 작업 중 에러가 발생하지 않으면 대화 제출에 성공한다.", async () => {
         const chatroom = {
             id: 1,
         };
@@ -145,7 +145,7 @@ describe("[cr-03] getLatestChatRoom", () => {
     };
     const next = jest.fn();
 
-    test("데이터베이스에서 채팅방 정보 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
+    test("[crut-03-1] 데이터베이스에서 채팅방 정보 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Chatroom.findOne.mockReturnValueOnce(Promise.reject(error));
 
@@ -154,7 +154,7 @@ describe("[cr-03] getLatestChatRoom", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("조회된 채팅방이 존재하지 않으면 대화 내용 불러오기에 실패한다.", async () => {
+    test("[crut-03-2] 조회된 채팅방이 존재하지 않으면 대화 내용 불러오기에 실패한다.", async () => {
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(null));
         
         const error = new Error("채팅방이 존재하지 않습니다.");
@@ -164,7 +164,7 @@ describe("[cr-03] getLatestChatRoom", () => {
         expect(next).toBeCalledWith(error);
     });
     
-    test("데이터베이스에서 대화 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
+    test("[crut-03-3] 데이터베이스에서 대화 조회 중 에러가 발생하면 대화 내용 불러오기에 실패한다.", async () => {
         const chatroom = {
             id: 1,
         };
@@ -178,7 +178,7 @@ describe("[cr-03] getLatestChatRoom", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("데이터베이스 작업 중 에러가 발생하지 않으면 대화 내용 불러오기에 성공한다.", async () => {
+    test("[crut-03-4] 데이터베이스 작업 중 에러가 발생하지 않으면 대화 내용 불러오기에 성공한다.", async () => {
         const chatroom = {
             id: 1,
         };
