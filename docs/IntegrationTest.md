@@ -245,6 +245,12 @@
 
 본 섹션은 [cr-02](./API.md#cr-02-ai-챗봇과의-대화-제출일기-생성)에 대한 통합 테스트의 기술이다.
 
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| POST | /chatrooms/summarize | 로그인되지 않은 상태에서 대화 제출 요청 | crit-02-1 | 즉시 대화 제출 요청을 보낸다. | 상태 코드 403 응답 |
+| POST | /chatrooms/summarize | 채팅방이 존재하지 않은 상태에서 대화 제출 요청 | crit-02-2 | agent가 회원 가입 직후 채팅방 생성 없이 대화 제출 요청을 보낸다. | 상태 코드 404 응답 |
+| POST | /chatrooms/summarize | 성공적인 대화 제출 요청 | crit-02-3 | agent가 채팅방 생성 후 대화 제출 요청을 보낸다. | 상태 코드 200 및 생성된 일기 내용 응답 |
+
 ### [cr-03] AI 챗봇과의 최근 대화 내용 불러오기
 
 본 섹션은 [cr-02](./API.md#cr-03-ai-챗봇과의-최근-대화-내용-불러오기)에 대한 통합 테스트의 기술이다.
