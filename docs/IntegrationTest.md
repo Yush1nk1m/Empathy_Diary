@@ -208,6 +208,13 @@
 
 본 섹션은 [e-02](./API.md#e-02-특정-기간-동안-누적된-모든-감정-조회)에 대한 통합 테스트의 기술이다.
 
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| GET | /emotions/period?[startDate]&[endDate] | 로그인되지 않은 상태에서 감정 조회 요청 | eit-02-1 | 즉시 감정 조회 요청을 보낸다. | 상태 코드 403 응답 |
+| GET | /emotions/period?[startDate]&[endDate] | 불충분한 쿼리 파라미터로 감정 조회 요청 | eit-02-2 | 쿼리 파라미터 없이 감정 조회 요청을 보낸다. | 상태 코드 400 응답 |
+| GET | /emotions/period?[startDate]&[endDate] | 유효하지 않은 쿼리 파라미터 값으로 감정 조회 요청 | eit-02-3 | 쿼리 파라미터의 값을 "invalid"로 설정하고 요청을 보낸다. | 상태 코드 400 응답 |
+| GET | /emotions/period?[startDate]&[endDate] | 성공적인 감정 조회 요청 | eit-02-4 | 쿼리 파라미터를 오늘 날짜를 표현한 문자열로 설정하고 요청을 보낸다. | 상태 코드 200 및 감정 종류별 개수가 매핑된 객체의 배열 응답 |
+
 ## Sentiment Controller
 
 [[Test Code](../backend/routes/sentiment.test.js)]
