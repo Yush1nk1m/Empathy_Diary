@@ -195,3 +195,62 @@ describe("[cr-03] GET /chatrooms", () => {
         });
     });
 });
+
+// [cr-04] POST /chatrooms/chats
+describe("[cr-04] POST /chatrooms/chats", () => {
+    const agent = request.agent(app);
+
+    // 모든 테스트 시작 전: 회원 가입
+    beforeAll(async () => {
+        await request(app).post("/users").send(joinUserInfo);
+    });
+
+    // 각 테스트 시작 전: 로그인
+    beforeEach(async () => {
+        await agent.post("/users/login").send(loginUserInfo);
+    });
+
+    // 각 테스트 종료 후: 로그아웃
+    afterEach(async () => {
+        await agent.post("/users/logout");
+    });
+
+    // 모든 테스트 종료 후: 회원 탈퇴
+    afterAll(async () => {
+        await agent.post("/users/login").send(loginUserInfo);
+        await agent.delete("/users").send({ confirmMessage: "회원 탈퇴를 희망합니다." });
+    });
+
+    test("[crit-04-1] 로그인되지 않은 상태에서 메시지 전송 요청", async () => {
+        const response = await request(app).post("/chatrooms/chats").send({ content: "내용" });
+
+        expect(response.status).toBe(403);
+        expect(response.text).toBe("로그인이 필요합니다.");
+    });
+
+    test("[crit-04-2] 채팅방을 생성하기 전 메시지 전송 요청", async () => {
+        const response = await agent.post("/chatrooms/chats").send({ content: "내용" });
+
+        expect(response.status).toBe(404);
+        expect(response.text).toBe("서버 에러가 발생했습니다.");
+    });
+
+    test("[crit-04-3] 유효하지 않은 요청 바디로 메시지 전송 요청", async () => {
+        await agent.post("/chatrooms");
+        const response = await agent.post("/chatrooms/chats").send({ content: '' });
+
+        expect(response.status).toBe(400);
+        expect(response.text).toBe("요청 바디가 유효하지 않습니다.");
+    });
+
+    test("[crit-04-4] 성공적인 메시지 전송 요청", async () => {
+        await agent.post("/chatrooms");
+        const response = await agent.post("/chatrooms/chats").send({ content: "내용" });
+
+        expect(response.status).toBe(200);
+        expect(response.body.chat).toEqual({
+            role: "assistant",
+            content: expect.any(String),
+        });
+    })
+});

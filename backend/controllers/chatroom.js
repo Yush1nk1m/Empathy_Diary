@@ -147,7 +147,9 @@ exports.sendMessage = async (req, res, next) => {
             order: [["createdAt", "DESC"]],
         });
         if (!chatroom) {
-            throw new Error("채팅방이 존재하지 않습니다.");
+            const error = new Error("채팅방이 존재하지 않습니다.");
+            error.status = 404;
+            throw error;
         }
 
         const roomId = chatroom.id;

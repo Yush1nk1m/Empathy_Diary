@@ -230,7 +230,7 @@
 
 ## Chatroom Controller
 
-- [[Test Code 1](../backend/routes/chatroom1.test.js)]
+[[Test Code](../backend/routes/chatroom.test.js)]
 
 ### [cr-01] AI 챗봇과의 대화방 생성
 
@@ -264,3 +264,10 @@
 ### [cr-04] AI 챗봇에게 메시지 전송
 
 본 섹션은 [cr-04](./API.md#cr-04-ai-챗봇에게-메시지-전송)에 대한 통합 테스트의 기술이다.
+
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| POST | /chatrooms/chats | 로그인되지 않은 상태에서 메시지 전송 요청 | crit-04-1 | 즉시 메시지 전송 요청을 보낸다. | 상태 코드 403 응답 |
+| POST | /chatrooms/chats | 채팅방을 생성하기 전 메시지 전송 요청 | crit-04-2 | agent가 어떤 채팅방도 생성하지 않은 상태에서 메시지 전송 요청을 보낸다. | 상태 코드 404 응답 |
+| POST | /chatrooms/chats | 유효하지 않은 요청 바디로 메시지 전송 요청 | crit-04-3 | 요청 바디의 content 속성 값을 null로 설정하고 메시지 전송 요청을 보낸다. | 상태 코드 400 응답 |
+| POST | /chatrooms/chats | 성공적인 메시지 전송 요청 | crit-04-4 | agent가 채팅방을 생성하고 유효한 내용의 메시지 전송 요청을 보낸다. | 상태 코드 200 및 AI의 답장 메시지 응답 |
