@@ -191,6 +191,23 @@
 | DELETE | /advices/:adviceId | 다른 사용자의 조언 삭제 요청 | ait-05-2 | agent가 조언을 작성하고, agent2가 해당 조언의 삭제를 요청한다. | 상태 코드 403 응답 |
 | DELETE | /advices/:adviceId | 성공적인 조언 삭제 요청 | ait-05-3 | agent가 조언을 작성한 후 해당 조언의 삭제를 요청한다. | 상태 코드 200 응답 |
 
+## Emotion Controller
+
+[[Test Code](../backend/routes/emotion.test.js)]
+
+### [e-01] 누적된 모든 감정 조회
+
+본 섹션은 [e-01](./API.md#e-01-사용자의-누적된-모든-감정-조회)에 대한 통합 테스트의 기술이다.
+
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| GET | /emotions | 로그인되지 않은 상태에서 감정 조회 요청 | eit-01-1 | 즉시 감정 조회 요청을 보낸다. | 상태 코드 403 응답 |
+| GET | /emotions | 성공적인 감정 조회 요청 | eit-01-2 | agent가 감정 조회 요청을 보낸다. | 상태 코드 200 및 감정 종류별 개수가 매핑된 객체의 배열 응답 |
+
+### [e-02] 특정 기간 누적된 모든 감정 조회
+
+본 섹션은 [e-02](./API.md#e-02-특정-기간-동안-누적된-모든-감정-조회)에 대한 통합 테스트의 기술이다.
+
 ## Sentiment Controller
 
 [[Test Code](../backend/routes/sentiment.test.js)]
