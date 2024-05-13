@@ -20,6 +20,6 @@ describe("Sentiment model", () => {
 
         Sentiment.associate(db);
 
-        expect(db.Sentiment.belongsTo).toBeCalledWith(db.Post, { foreignKey: "postId", targetKey: "id", onDelete: "CASCADE", hooks: true });
+        expect(db.Sentiment.belongsTo).toBeCalledWith(db.Post, { foreignKey: "postId", targetKey: "id" });
     });
 });

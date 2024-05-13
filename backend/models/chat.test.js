@@ -20,6 +20,6 @@ describe("Chat model", () => {
 
         Chat.associate(db);
 
-        expect(db.Chat.belongsTo).toBeCalledWith(db.Chatroom, { foreignKey: "roomId", targetKey: "id", onDelete: "CASCADE", hooks: true });
+        expect(db.Chat.belongsTo).toBeCalledWith(db.Chatroom, { foreignKey: "roomId", targetKey: "id" });
     });
 });

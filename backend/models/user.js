@@ -48,9 +48,9 @@ class User extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.User.hasMany(db.Post, { foreignKey: "writer", sourceKey: "id" });
-        db.User.hasMany(db.Advice, { foreignKey: "writer", sourceKey: "id" });
-        db.User.hasMany(db.Chatroom, { foreignKey: "userId", sourceKey: "id" });
+        db.User.hasMany(db.Post, { foreignKey: "writer", sourceKey: "id", onDelete: "CASCADE", hooks: true });
+        db.User.hasMany(db.Advice, { foreignKey: "writer", sourceKey: "id", onDelete: "CASCADE", hooks: true });
+        db.User.hasMany(db.Chatroom, { foreignKey: "userId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     }
 };
 

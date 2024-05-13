@@ -22,7 +22,7 @@ describe("Chatroom model", () => {
 
         Chatroom.associate(db);
 
-        expect(db.Chatroom.belongsTo).toBeCalledWith(db.User, { foreignKey: "userId", targetKey: "id", onDelete: "CASCADE", hooks: true });
-        expect(db.Chatroom.hasMany).toBeCalledWith(db.Chat, { foreignKey: "roomId", sourceKey: "id" });
+        expect(db.Chatroom.belongsTo).toBeCalledWith(db.User, { foreignKey: "userId", targetKey: "id" });
+        expect(db.Chatroom.hasMany).toBeCalledWith(db.Chat, { foreignKey: "roomId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     });
 });

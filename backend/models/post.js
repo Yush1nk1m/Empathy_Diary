@@ -31,9 +31,9 @@ class Post extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Post.belongsTo(db.User, { foreignKey: "writer", targetKey: "id", onDelete: "CASCADE", hooks: true });
-        db.Post.belongsToMany(db.Emotion, { through: "PostEmotions", onDelete: "CASCADE", hooks: true });
-        db.Post.hasOne(db.Sentiment, { foreignKey: "postId", sourceKey: "id" });
+        db.Post.belongsTo(db.User, { foreignKey: "writer", targetKey: "id" });
+        db.Post.belongsToMany(db.Emotion, { through: "PostEmotions" });
+        db.Post.hasOne(db.Sentiment, { foreignKey: "postId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     }
 }
 

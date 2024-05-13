@@ -22,7 +22,7 @@ describe("Advice model", () => {
 
         Advice.associate(db);
 
-        expect(db.Advice.belongsTo).toBeCalledWith(db.User, { foreignKey: "writer", targetKey: "id", onDelete: "CASCADE", hooks: true });
+        expect(db.Advice.belongsTo).toBeCalledWith(db.User, { foreignKey: "writer", targetKey: "id" });
         expect(db.Advice.belongsToMany).toBeCalledWith(db.Emotion, { through: "AdviceEmotions", onDelete: "CASCADE", hooks: true });
     });
 });
