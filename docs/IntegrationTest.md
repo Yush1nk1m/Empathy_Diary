@@ -227,3 +227,28 @@
 | :--: | :-- | :-- | :--: | :-- | :-- |
 | GET | /sentiments/period?[startDate]&[endDate] | 로그인되지 않은 상태에서 감성 점수 조회 | sit-01-1 | 즉시 감성 점수 조회를 요청한다. | 상태 코드 403 응답 |  
 | GET | /sentiments/period?[startDate]&[endDate] | 성공적인 감성 점수 조회 요청 | sit-01-2 | agent가 일기를 작성하고 어제, 오늘, 내일 날짜에 대해 감성 점수를 요청한다. | 모든 요청에 대해 상태 코드 200 응답, 바디의 sentiments 속성은 어제와 내일 날짜에 대해선 빈 리스트, 오늘 날짜에 대해선 1개의 일기 정보를 담은 리스트로 응답 |  
+
+## Chatroom Controller
+
+- [[Test Code 1](../backend/routes/chatroom1.test.js)]
+
+### [cr-01] AI 챗봇과의 대화방 생성
+
+본 섹션은 [cr-01](./API.md#cr-01-ai-챗봇과의-대화방-생성)에 대한 통합 테스트의 기술이다.
+
+| Method | API URI | Test Name | Test Case ID | Description | Expected Result |
+| :--: | :-- | :-- | :--: | :-- | :-- |
+| POST | /chatrooms | 로그인되지 않은 상태에서 대화방 생성 요청 | crit-01-1 | 즉시 대화방 생성 요청을 보낸다. | 상태 코드 403 응답 |
+| POST | /chatrooms | 성공적인 대화방 생성 요청 | crit-01-2 | 로그인된 agent가 대화방 생성 요청을 보낸다. | 상태 코드 200 및 생성된 방과 AI의 첫 번째 메시지 정보 응답 |
+
+### [cr-02] AI 챗봇과의 대화 제출
+
+본 섹션은 [cr-02](./API.md#cr-02-ai-챗봇과의-대화-제출일기-생성)에 대한 통합 테스트의 기술이다.
+
+### [cr-03] AI 챗봇과의 최근 대화 내용 불러오기
+
+본 섹션은 [cr-02](./API.md#cr-03-ai-챗봇과의-최근-대화-내용-불러오기)에 대한 통합 테스트의 기술이다.
+
+### [cr-04] AI 챗봇에게 메시지 전송
+
+본 섹션은 [cr-04](./API.md#cr-04-ai-챗봇에게-메시지-전송)에 대한 통합 테스트의 기술이다.
