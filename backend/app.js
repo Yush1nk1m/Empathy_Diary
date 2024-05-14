@@ -13,20 +13,15 @@ const cors = require("cors");
 const app = express();
 
 dotenv.config();
-app.use(cors({
-    origin: (origin, callback) => callback(null, true),
-    credentials: true,
-}));
-if (process.env.NODE_ENV === "production") {
 
-    const redis = require("redis");
-    const RedisStore = require('connect-redis').default;
-    const redisClient = redis.createClient({
-        url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-        password: process.env.REDIS_PASSWORD,
-    });
-    redisClient.connect().catch(console.error);
-}
+const redis = require("redis");
+const RedisStore = require('connect-redis').default;
+const redisClient = redis.createClient({
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    password: process.env.REDIS_PASSWORD,
+});
+redisClient.connect().catch(console.error);
+
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
@@ -70,6 +65,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cors({
+    origin: (origin, callback) => callback(null, true),
+    credentials: true,
+}));
 const sessionOption = {
     resave: false,
     saveUninitialized: false,

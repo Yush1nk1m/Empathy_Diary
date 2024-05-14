@@ -33,7 +33,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: GET http://43.201.47.70/users
+   - **요청 예시**: GET https://empathydiaryapi.com/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -49,7 +49,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users
-   - **요청 예시**: POST http://43.201.47.70/users
+   - **요청 예시**: POST https://empathydiaryapi.com/users
    - **요청 바디**: { userId: "kys010306", email: "kys010306@sogang.ac.kr", nickname: "유신", password: "12345", confirmPassword: "12345" }
 3. **HTTP 응답**
    - **응답 코드**
@@ -68,7 +68,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users/login
    - **요청 바디**: { userId: "kys010306", password: "12345" }
-   - **요청 예시**: POST http://43.201.47.70/users/login
+   - **요청 예시**: POST https://empathydiaryapi.com/users/login
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -86,7 +86,7 @@
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /users
    - **요청 바디**: { newNickname: [새로운 닉네임], newPassword: [새로운 비밀번호], newConfirmPassword: [새로운 확인 비밀번호], password: [현재 비밀번호] }
-   - **요청 예시**: PATCH http://43.201.47.70/users
+   - **요청 예시**: PATCH https://empathydiaryapi.com/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -104,7 +104,7 @@
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /users
    - **요청 바디**: { confirmMessage: "회원 탈퇴를 희망합니다." }
-   - **요청 예시**: DELETE http://43.201.47.70/users
+   - **요청 예시**: DELETE https://empathydiaryapi.com/users
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -121,7 +121,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /users/logout
-   - **요청 예시**: POST http://43.201.47.70/users/logout
+   - **요청 예시**: POST https://empathydiaryapi.com/users/logout
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -152,7 +152,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts
-   - **요청 예시**: GET http://43.201.47.70/posts
+   - **요청 예시**: GET https://empathydiaryapi.com/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -168,7 +168,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts/:postId
-   - **요청 예시**: GET http://43.201.47.70/posts/1
+   - **요청 예시**: GET https://empathydiaryapi.com/posts/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -188,7 +188,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /posts
    - **요청 바디**: { content: "[일기 내용]" }
-   - **요청 예시**: POST http://43.201.47.70/posts
+   - **요청 예시**: POST https://empathydiaryapi.com/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -208,7 +208,7 @@
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /posts
    - **요청 바디**: { postId: "[일기 ID]", newContent: "[일기 내용]" }
-   - **요청 예시**: PATCH http://43.201.47.70/posts
+   - **요청 예시**: PATCH https://empathydiaryapi.com/posts
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -228,7 +228,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /posts/:postId
-   - **요청 예시**: DELETE http://43.201.47.70/posts/1
+   - **요청 예시**: DELETE https://empathydiaryapi.com/posts/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -245,7 +245,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /posts/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET http://43.201.47.70/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 2일 00시 00분 전까지)
+   - **요청 예시**: GET https://empathydiaryapi.com/posts/period?startDate=2024-04-01&endDate=2024-05-01 (4월 1일 00시 00분부터 5월 2일 00시 00분 전까지)
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -276,7 +276,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /advices/today
-   - **요청 예시**: GET http://43.201.47.70/advices/today
+   - **요청 예시**: GET https://empathydiaryapi.com/advices/today
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -294,7 +294,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /advices/me
-   - **요청 예시**: GET http://43.201.47.70/advices/me
+   - **요청 예시**: GET https://empathydiaryapi.com/advices/me
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -313,7 +313,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /advices
    - **요청 바디**: { content: [조언 내용] }
-   - **요청 예시**: POST http://43.201.47.70/advices
+   - **요청 예시**: POST https://empathydiaryapi.com/advices
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -333,7 +333,7 @@
    - **HTTP 메소드**: PATCH
    - **경로 및 쿼리 파라미터**: /advices
    - **요청 바디**: { adviceId: [조언 ID], newContent: [수정한 조언 내용] }
-   - **요청 예시**: PATCH http://43.201.47.70/advices
+   - **요청 예시**: PATCH https://empathydiaryapi.com/advices
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -352,7 +352,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: DELETE
    - **경로 및 쿼리 파라미터**: /advices/:adviceId
-   - **요청 예시**: DELETE http://43.201.47.70/advices/1
+   - **요청 예시**: DELETE https://empathydiaryapi.com/advices/1
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -378,7 +378,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /emotions
-   - **요청 예시**: GET http://43.201.47.70/emotions
+   - **요청 예시**: GET https://empathydiaryapi.com/emotions
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -396,7 +396,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /emotions/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET http://43.201.47.70/emotions/period?startDate=2024-05-05&endDate=2024-05-05
+   - **요청 예시**: GET https://empathydiaryapi.com/emotions/period?startDate=2024-05-05&endDate=2024-05-05
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -423,7 +423,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /sentiments/period?startDate=[시작 날짜]&endDate=[종료 날짜]
-   - **요청 예시**: GET http://43.201.47.70/sentiments/period?startDate=2024-05-01&endDate=2024-05-05
+   - **요청 예시**: GET https://empathydiaryapi.com/sentiments/period?startDate=2024-05-01&endDate=2024-05-05
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -452,7 +452,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms
-   - **요청 예시**: POST http://43.201.47.70/chatrooms
+   - **요청 예시**: POST https://empathydiaryapi.com/chatrooms
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -470,7 +470,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms/summarize
-   - **요청 예시**: POST http://43.201.47.70/chatrooms/summarize
+   - **요청 예시**: POST https://empathydiaryapi.com/chatrooms/summarize
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -489,7 +489,7 @@
 2. **HTTP 요청**
    - **HTTP 메소드**: GET
    - **경로 및 쿼리 파라미터**: /chatrooms
-   - **요청 예시**: GET http://43.201.47.70/chatrooms
+   - **요청 예시**: GET https://empathydiaryapi.com/chatrooms
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
@@ -509,7 +509,7 @@
    - **HTTP 메소드**: POST
    - **경로 및 쿼리 파라미터**: /chatrooms/chats
    - **요청 바디**: { content: "[사용자의 메시지]" }
-   - **요청 예시**: POST http://43.201.47.70/chatrooms/chats
+   - **요청 예시**: POST https://empathydiaryapi.com/chatrooms/chats
 3. **HTTP 응답**
    - **응답 코드**
      - 200: 성공
