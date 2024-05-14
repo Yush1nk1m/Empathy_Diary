@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=production PORT=80 pm2 start server.js -i 0",
     "dev": "nodemon server",
-    "test": "jest --env=node --silent",
+    "test": "jest --env=node --silent --runInBand --forceExit",
     "coverage": "jest --coverage --silent --forceExit"
   },
   "repository": {
