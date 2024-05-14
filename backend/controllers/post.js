@@ -291,7 +291,6 @@ exports.deleteDiary = async (req, res, next) => {
     }
 };
 
-// 추후 chatGPT API 연결 이후 감정, 감성 점수 반환 로직 추가
 // [p-06] 특정 기간 일기 조회
 exports.getDiariesForSpecificPeriod = async (req, res, next) => {
     try {

@@ -1,6 +1,6 @@
 const { sequelize, Chatroom, Chat } = require("../models");
+const { generateWelcomeMessage, generateDiary } = require("../services/openai");
 
-// 추후 chatGPT API 연결 시 AI의 첫 대화를 생성하는 로직 추가
 // [cr-01] AI 챗봇과의 대화방 생성
 exports.createNewChatRoom = async (req, res, next) => {
     const transaction = await sequelize.transaction();
@@ -15,10 +15,7 @@ exports.createNewChatRoom = async (req, res, next) => {
         const roomId = chatroom.id;
 
         // AI의 첫 대화 생성
-        const chat = {
-            role: "assistant",
-            content: "안녕하세요. 이 기능은 아직 구현되지 않았습니다.",
-        };
+        const chat = await generateWelcomeMessage();
 
         await Chat.create({
             roomId: chatroom.id,
@@ -41,7 +38,6 @@ exports.createNewChatRoom = async (req, res, next) => {
     }
 };
 
-// 추후 chatGPT API 연결 시 대화 내용을 토대로 일기를 생성하는 로직 추가
 // [cr-02] AI 챗봇과의 대화 제출
 exports.summarizeChatsIntoDiary = async (req, res, next) => {
     try {
@@ -68,24 +64,23 @@ exports.summarizeChatsIntoDiary = async (req, res, next) => {
             },
             order: [["createdAt", "ASC"]],
         });
+
+        // 서비스에 사용할 수 있도록 { role, content } 객체의 배열로 변환한다.
         messages = messages.map((message) => {
             return {
                 role: message.role,
                 content: message.content,
             }
         });
-        // 마지막 메시지(AI의 응답) 제외
-        messages.pop();
         
-        // chatGPT API 사용하여 일기 요약하는 로직 추가
-        const content = "대화 내용을 요약하여 생성된 일기입니다. 이 기능은 아직 구현되지 않았습니다.";
-        // chatGPT API 사용하여 일기 요약하는 로직 추가
+        // chatGPT API를 사용한 일기 요약
+        const LLMResponse = await generateDiary(messages);
 
-        return res.status(200).json({ content });
+        return res.status(200).json(LLMResponse);
     } catch (error) {
         next(error);
     }
-}
+};
 
 // [cr-03] AI 챗봇과의 최근 대화 내용 불러오기
 exports.getLatestChatRoom = async (req, res, next) => {

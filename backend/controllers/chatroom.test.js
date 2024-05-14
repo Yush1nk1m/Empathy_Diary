@@ -1,3 +1,18 @@
+jest.mock("openai", () => {
+    return jest.fn().mockImplementation(() => {
+        return {
+            chat: {
+                completions: {
+                    create: jest.fn().mockImplementation(async () => {
+                        return { choices: [{ message: { content: "AI 응답" } }]};
+                    })
+                }
+            }
+        };
+    });
+});
+require("openai");
+
 jest.mock("sequelize");
 jest.mock("../models");
 
