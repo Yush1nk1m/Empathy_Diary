@@ -8,14 +8,16 @@ const dotenv = require("dotenv");
 const passport = require("passport");
 const helmet = require("helmet");
 const hpp = require("hpp");
+const cors = require("cors");
 
+const app = express();
 
 dotenv.config();
+app.use(cors({
+    origin: (origin, callback) => callback(null, true),
+    credentials: true,
+}));
 if (process.env.NODE_ENV === "production") {
-    const cors = require("cors");
-    app.use(cors({
-        credentials: true,
-    }));
 
     const redis = require("redis");
     const RedisStore = require('connect-redis').default;
@@ -30,7 +32,6 @@ const { sequelize } = require("./models");
 const passportConfig = require("./passport");
 const { setEmotion } = require("./repositories");
 
-const app = express();
 passportConfig();
 app.set("port", process.env.PORT || 8080);
 app.set("view engine", "html");
@@ -75,7 +76,8 @@ const sessionOption = {
     secret: process.env.COOKIE_SECRET,
     cookie: {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: "None",
     },
 };
 if (process.env.NODE_ENV === "production") {
