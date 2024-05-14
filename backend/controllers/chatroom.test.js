@@ -15,9 +15,11 @@ require("openai");
 
 jest.mock("sequelize");
 jest.mock("../models");
+jest.mock("../services/openai");
 
 const { sequelize, Chatroom, Chat } = require("../models");
 const { createNewChatRoom, summarizeChatsIntoDiary, getLatestChatRoom, sendMessage } = require("./chatroom");
+const { generateWelcomeMessage, generateDiary, generateResponseMessage } = require("../services/openai");
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
@@ -31,6 +33,10 @@ describe("[cr-01] createNewChatRoom", () => {
         json: jest.fn(),
     };
     const next = jest.fn();
+    generateWelcomeMessage.mockReturnValue(Promise.resolve({
+        role: "assistant",
+        content: "응답",
+    }));
 
     test("[crut-01-1] 데이터베이스에 새로운 대화방 생성 중 에러가 발생하면 대화 시작에 실패한다.", async () => {
         const req = {
@@ -79,16 +85,14 @@ describe("[cr-01] createNewChatRoom", () => {
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
         
         await createNewChatRoom(req, res, next);
-        
-        const chat = {
-            role: "assistant",
-            content: "안녕하세요. 이 기능은 아직 구현되지 않았습니다.",
-        };
 
         expect(res.status).toBeCalledWith(200);
         expect(res.json).toBeCalledWith({
             roomId: chatroom.id,
-            chat,
+            chat: {
+                role: "assistant",
+                content: expect.any(String),
+            },
         });
     });
 });
@@ -105,6 +109,9 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
         json: jest.fn(),
     };
     const next = jest.fn();
+    generateDiary.mockReturnValue(Promise.resolve({
+        content: "내용",
+    }));
 
     test("[crut-02-1] 데이터베이스에서 채팅방 조회 중 에러가 발생하면 대화 제출에 실패한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
@@ -140,10 +147,8 @@ describe("[cr-02] summarizeChatsIntoDiary", () => {
 
         await summarizeChatsIntoDiary(req, res, next);
 
-        const content = "대화 내용을 요약하여 생성된 일기입니다. 이 기능은 아직 구현되지 않았습니다.";
-
         expect(res.status).toBeCalledWith(200);
-        expect(res.json({ content }));
+        expect(res.json({ content: expect.any(String) }));
     });
 });
 
@@ -224,6 +229,10 @@ describe("[cr-04] sendMessage", () => {
         json: jest.fn(),
     };
     const next = jest.fn();
+    generateResponseMessage.mockReturnValue(Promise.resolve({
+        role: "assistant",
+        content: "응답",
+    }));
 
     test("[crut-04-1] 요청 바디가 유효하지 않을 경우 메시지 전송에 실패한다.", async () => {
         const req = {
@@ -290,7 +299,9 @@ describe("[cr-04] sendMessage", () => {
             id: 1,
         };
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
-        
+
+        Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
+
         const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         Chat.create.mockReturnValueOnce(Promise.reject(error));
 
@@ -315,6 +326,8 @@ describe("[cr-04] sendMessage", () => {
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
         
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
 
         const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         Chat.create.mockReturnValueOnce(Promise.reject(error));
@@ -341,10 +354,18 @@ describe("[cr-04] sendMessage", () => {
         
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
 
+        Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
+
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
 
         await sendMessage(req, res, next);
 
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith({
+            chat: {
+                role: "assistant",
+                content: expect.any(String),
+            }
+        });
     });
 });

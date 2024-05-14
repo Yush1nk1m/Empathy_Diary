@@ -1,5 +1,5 @@
 const { sequelize, Chatroom, Chat } = require("../models");
-const { generateWelcomeMessage, generateDiary } = require("../services/openai");
+const { generateWelcomeMessage, generateDiary, generateResponseMessage } = require("../services/openai");
 
 // [cr-01] AI 챗봇과의 대화방 생성
 exports.createNewChatRoom = async (req, res, next) => {
@@ -158,11 +158,22 @@ exports.sendMessage = async (req, res, next) => {
             transaction,
         });
 
+        // 전체 채팅 기록 조회
+        let messages = await Chat.findAll({
+            where: {
+                roomId,
+            },
+            order: [["createdAt", "ASC"]],
+        });
+        messages = messages.map((message) => {
+            return {
+                role: message.role,
+                content: message.content,
+            };
+        });
+
         // AI의 응답 생성
-        const chat = {
-            role: "assistant",
-            content: "AI의 응답입니다. 이 기능은 아직 구현되지 않았습니다.",
-        };
+        const chat = await generateResponseMessage(messages);
 
         await Chat.create({
             roomId,
@@ -177,6 +188,7 @@ exports.sendMessage = async (req, res, next) => {
 
         return res.status(200).json({ chat });
     } catch (error) {
+        console.error(error);
         await transaction.rollback();
         next(error);
     }
