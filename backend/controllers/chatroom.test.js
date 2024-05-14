@@ -350,7 +350,12 @@ describe("[cr-04] sendMessage", () => {
         
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
 
-        Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
+        const messages = [
+            { role: "assistant", content: "AI의 메시지 1" },
+            { role: "user", content: "사용자의 메시지 1" },
+            { role: "assistant", content: "AI의 메시지 2" },
+        ];
+        Chat.findAll.mockReturnValueOnce(Promise.resolve(messages));
 
         const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         Chat.create.mockReturnValueOnce(Promise.reject(error));
