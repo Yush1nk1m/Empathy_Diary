@@ -119,26 +119,30 @@ exports.postDiary = async (req, res, next) => {
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         const LLMResponse = await analysisDiary(content);
 
-        const emotionPromises = [];
+        // 병렬적으로 실행할 수 있는 모든 프로미스 저장
+        const promises = [];
+
+        // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
-            emotionPromises.push(PostEmotions.create({
+            promises.push(PostEmotions.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {
                 transaction,
             }));
         }
-        await Promise.all(emotionPromises);
-
-        await Sentiment.create({
+        
+        // 데이터베이스에 감성 정보 등록하는 프로미스 저장
+        promises.push(Sentiment.create({
             positive: LLMResponse.positiveScore,
             negative: LLMResponse.negativeScore,
             postId: post.id,
         }, {
             transaction,
-        });
-
+        }));
+        
         // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+        await Promise.all(promises);
 
         await transaction.commit();
 
