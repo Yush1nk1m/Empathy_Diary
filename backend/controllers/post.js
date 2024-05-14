@@ -2,6 +2,7 @@ const Op = require("sequelize").Op;
 const { sequelize, Post, Sentiment } = require("../models");
 const db = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
+const { analysisDiary } = require("../services/openai");
 
 const dateOptions = {
     year: 'numeric', month: '2-digit', day: '2-digit',
@@ -13,7 +14,6 @@ const timeOptions = {
     hour12: false // 24시간 표기법 사용
 };
 
-// 추후 감정, 감성 정보도 함께 반환하도록 로직 추가
 // [p-01] 모든 일기 조회
 exports.getAllDiaries = async (req, res, next) => {
     try {
@@ -51,7 +51,6 @@ exports.getAllDiaries = async (req, res, next) => {
     }
 };
 
-// 추후 감정, 감성 정보도 함께 반환하도록 로직 추가
 // [p-02] 특정 일기 조회
 exports.getDiaryById = async (req, res, next) => {
     try {
@@ -99,7 +98,6 @@ exports.getDiaryById = async (req, res, next) => {
     }
 };
 
-// 추후 chatGPT API 연동 및 감정 정보 연결 로직 추가
 // [p-03] 일기 등록
 exports.postDiary = async (req, res, next) => {
     const transaction = await sequelize.transaction();
@@ -118,23 +116,23 @@ exports.postDiary = async (req, res, next) => {
             transaction,
         });
 
-        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
-        const emotions = ["기쁨", "사랑", "뿌듯함"];
-        for (const emotion of emotions) {
-            await PostEmotions.create({
+        // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
+        const LLMResponse = await analysisDiary(content);
+
+        const emotionPromises = [];
+        for (const emotion of LLMResponse.emotions) {
+            emotionPromises.push(PostEmotions.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {
                 transaction,
-            });
+            }));
         }
-
-        const positiveScore = 50;
-        const negativeScore = 50;
+        await Promise.all(emotionPromises);
 
         await Sentiment.create({
-            positive: positiveScore,
-            negative: negativeScore,
+            positive: LLMResponse.positiveScore,
+            negative: LLMResponse.negativeScore,
             postId: post.id,
         }, {
             transaction,
@@ -146,9 +144,9 @@ exports.postDiary = async (req, res, next) => {
 
         return res.status(200).json({
             postId: post.id,
-            emotions,
-            positiveScore,
-            negativeScore,
+            emotions: LLMResponse.emotions,
+            positiveScore: LLMResponse.positiveScore,
+            negativeScore: LLMResponse.negativeScore,
         });
     } catch (error) {
         await transaction.rollback();
