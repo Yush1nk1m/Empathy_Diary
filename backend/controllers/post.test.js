@@ -11,6 +11,8 @@ jest.mock("openai", () => {
         };
     });
 });
+require("openai");
+
 jest.mock("../models");
 jest.mock("../services/openai");
 
@@ -19,7 +21,6 @@ const { sequelize, Post, Sentiment } = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
 const { analysisDiary } = require("../services/openai");
-const openai = require("openai");
 
 analysisDiary.mockReturnValue(Promise.resolve({
     emotions: ["기쁨", "사랑", "뿌듯함"],

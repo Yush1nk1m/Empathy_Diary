@@ -141,7 +141,7 @@ exports.postDiary = async (req, res, next) => {
             transaction,
         }));
         
-        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+        // 저장된 프로미스들 병렬 실행
         await Promise.all(promises);
 
         await transaction.commit();
@@ -154,12 +154,10 @@ exports.postDiary = async (req, res, next) => {
         });
     } catch (error) {
         await transaction.rollback();
-        console.error(error);
         next(error);
     }
 };
 
-// 추후 chatGPT API를 연결하여 일기를 새로 작성하는 것처럼 감정, 감성 분석을 다시 수행하는 로직을 추가한다.
 // [p-04] 일기 내용 수정
 exports.modifyDiaryContent = async (req, res, next) => {
     const transaction = await sequelize.transaction();
@@ -185,57 +183,70 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
         post.content = newContent;
 
-        await post.save({ transaction });
+        // 동시 실행 가능한 프로미스들 저장
+        const promises = [];
 
-        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
-        // 기존 정보 삭제
-        await PostEmotions.destroy({
+        // 변경된 일기 내용을 저장
+        promises.push(post.save({ transaction }));
+
+        // 기존 정보를 삭제하는 연산들은 동시 실행 가능하므로 저장한다.
+
+        // 감정 정보 삭제
+        promises.push(PostEmotions.destroy({
             where: {
                 PostId: post.id,
             },
         }, {
             transaction,
-        });
+        }));
 
-        await Sentiment.destroy({
+        // 감성 정보 삭제
+        promises.push(Sentiment.destroy({
             where: {
                 postId: post.id,
             },
         }, {
             transaction,
-        });
+        }));
 
-        // 수정된 정보에 맞춰 다시 추가
-        const emotions = ["기쁨", "사랑", "뿌듯함"];
-        for (const emotion of emotions) {
-            await PostEmotions.create({
+        // 프로미스 병렬 실행 및 배열 초기화
+        await Promise.all(promises);
+        promises.length = 0;
+
+        // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
+        const LLMResponse = await analysisDiary(newContent);
+
+        // 데이터베이스에 새로운 정보를 추가하는 연산들은 동시 실행 가능하므로 프로미스 목록에 추가한다.
+
+        // 감정 정보 등록
+        for (const emotion of LLMResponse.emotions) {
+            promises.push(PostEmotions.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {
                 transaction,
-            });
+            }));
         }
 
-        const positiveScore = 50;
-        const negativeScore = 50;
-
-        await Sentiment.create({
-            positive: positiveScore,
-            negative: negativeScore,
+        // 감성 정보 등록
+        promises.push(Sentiment.create({
+            positive: LLMResponse.positiveScore,
+            negative: LLMResponse.negativeScore,
             postId: post.id,
         }, {
             transaction,
-        });
+        }));
 
-        // chatGPT API 연결 후엔 일정한 감정을 등록하는 것에서 분석 결과를 등록하는 것으로 바꾼다.
+        // 프로미스 병렬 실행
+        await Promise.all(promises);
 
         await transaction.commit();
 
         return res.status(200).json({
             postId: post.id,
-            emotions,
-            positiveScore,
-            negativeScore,
+            emotions: LLMResponse.emotions,
+            positiveScore: LLMResponse.positiveScore,
+            negativeScore: LLMResponse.negativeScore,
         });
     } catch (error) {
         await transaction.rollback();
