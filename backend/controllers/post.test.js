@@ -1,9 +1,31 @@
+jest.mock("openai", () => {
+    return jest.fn().mockImplementation(() => {
+        return {
+            chat: {
+                completions: {
+                    create: jest.fn().mockImplementation(async () => {
+                        return { choices: [{ message: { content: "AI 응답" } }]};
+                    })
+                }
+            }
+        };
+    });
+});
 jest.mock("../models");
+jest.mock("../services/openai");
 
 const db = require("../models");
 const { sequelize, Post, Sentiment } = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
+const { analysisDiary } = require("../services/openai");
+const openai = require("openai");
+
+analysisDiary.mockReturnValue(Promise.resolve({
+    emotions: ["기쁨", "사랑", "뿌듯함"],
+    positiveScore: 50,
+    negativeScore: 50,
+}));
 
 sequelize.transaction.mockReturnValue(Promise.resolve({
     commit: jest.fn(() => Promise.resolve(true)),
