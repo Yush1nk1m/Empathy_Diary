@@ -52,3 +52,6 @@ Iterative 테스트 방법론을 선택한 근거는 다음과 같다.
 - **Operating System**: Ubuntu 22.04.4 LTS
 
 ### 용어/약어
+
+- **ut**: unit test의 약어, 테스트 아이디에 접미사로 사용된다.
+- **it**: integration test의 약어, 테스트 아이디에 접미사로 사용된다.
