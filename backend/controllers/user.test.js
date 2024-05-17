@@ -20,19 +20,29 @@ describe("[u-01] getUserInfo", () => {
         email: "yush1nk1m@github.com",
         nickname: "유신",
     };
-    const req = {
-        user,
-    };
     const res = {
         status: jest.fn(() => res),
         json: jest.fn(),
     };
-
+    const next = jest.fn();
+    
     test("[uut-01-1] 회원 정보를 조회하면 사용자의 ID, 이메일, 닉네임을 응답한다.", () => {
+        const req = {
+            user,
+        };
+        
         getUserInfo(req, res);
-
+        
         expect(res.status).toBeCalledWith(200);
         expect(res.json).toBeCalledWith(user);
+    });
+
+    test("[uut-01-2] 요청 객체가 손실되면 회원 정보 조회에 실패하고 에러가 발생한다.", () => {
+        const req = {};
+
+        getUserInfo(req, res, next);
+
+        expect(next).toBeCalledTimes(1);
     });
 });
 
