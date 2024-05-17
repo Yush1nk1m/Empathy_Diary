@@ -3,18 +3,22 @@ const passport = require("passport");
 const { sequelize, User } = require("../models");
 
 // [u-01] 회원 정보 조회
-exports.getUserInfo = (req, res) => {
-    const { userId, email, nickname } = req.user;
+exports.getUserInfo = (req, res, next) => {
+    try {
+        const { userId, email, nickname } = req.user;
 
-    return res.status(200).json({ userId, email, nickname });
+        return res.status(200).json({ userId, email, nickname });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // [u-02] 회원 가입
 exports.join = async (req, res, next) => {
     const transaction = await sequelize.transaction();
-    const { userId, email, nickname, password, confirmPassword } = req.body;
-
+    
     try {
+        const { userId, email, nickname, password, confirmPassword } = req.body;
         if (password !== confirmPassword) {
             return res.status(400).send("비밀번호와 확인 비밀번호가 일치하지 않습니다.");
         }
