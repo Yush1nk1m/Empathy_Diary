@@ -299,26 +299,35 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
             },
         });
 
-        let diaries = [];
+        // 조회된 일기들을 저장할 배열을 선언한다.
+        const diaries = [];
+        // 병렬적으로 실행 가능한 프로미스들을 담을 배열을 선언한다.
+        const emotionPromises = [];
+        const sentimentPromises = [];
 
-        for (const diary of posts) {
-            let emotions = [];
-            const result = await diary.getEmotions();
-            for (const emotion of result) {
-                emotions.push(emotion.type);
-            }
-
-            const sentiment = await diary.getSentiment();
-
+        // 각 일기에서 매핑된 감정, 감성 정보를 불러오는 작업을 모두 프로미스 배열에 저장한다.
+        for (const post of posts) {
             diaries.push({
-                id: diary.id,
-                content: diary.content,
-                writeDate: (diary.createdAt).toLocaleString("ko-KR", dateOptions),
-                writeTime: (diary.createdAt).toLocaleString("ko-KR", timeOptions),
-                emotions,
-                positiveScore: sentiment.positive,
-                negativeScore: sentiment.negative,
-            });
+                id: post.id,
+                content: post.content,
+                writeDate: (post.createdAt).toLocaleString("ko-KR", dateOptions),
+                writeTime: (post.createdAt).toLocaleString("ko-KR", timeOptions),
+            });  // 미리 일기 자체의 속성만으로 일겨 배열을 구성한다.
+            emotionPromises.push(post.getEmotions());
+            sentimentPromises.push(post.getSentiment());
+        }
+
+        // 프로미스를 병렬적으로 실행한다.
+        const [emotionArrays, sentimentArrays] = await Promise.all([
+            Promise.all(emotionPromises),
+            Promise.all(sentimentPromises),
+        ]);
+
+        // 일기 배열에 감정, 감성 정보를 추가한다.
+        for (let i = 0; i < diaries.length; i++) {
+            diaries[i].emotions = emotionArrays[i].map(emotion => emotion.type);
+            diaries[i].positiveScore = sentimentArrays[i].positive;
+            diaries[i].negativeScore = sentimentArrays[i].negative;
         }
 
         return res.status(200).json({ diaries });

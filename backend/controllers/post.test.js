@@ -901,9 +901,14 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
             },
         };
 
+        const sentiment = { positive: 50, negative: 50 };
         const error = new Error("getEmotion() 수행 중 에러가 발생했습니다.");
         const result = [{
+            id: 1,
+            content: "내용",
+            createdAt: new Date(),
             getEmotions: jest.fn(async () => Promise.reject(error)),
+            getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }]
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
 
@@ -926,6 +931,9 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         const error = new Error("getSentiment() 수행 중 에러가 발생했습니다.");
         const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
+            id: 1,
+            content: "내용",
+            createdAt: new Date(),
             getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.reject(error)),
         }]

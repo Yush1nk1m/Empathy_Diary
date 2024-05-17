@@ -1,7 +1,3 @@
 const app = require("./app");
-const fs = require("fs");
-const https = require("https");
 
-https.createServer(options, app).listen(8080, () => {
-    console.log("Server is running on port 8080.");
-});
+app.listen(app.get("port"), () => console.log(app.get("port"), "번 포트에서 서버 실행 중입니다."));
