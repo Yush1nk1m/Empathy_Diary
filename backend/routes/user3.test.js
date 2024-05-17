@@ -4,14 +4,16 @@ jest.mock("openai", () => {
             chat: {
                 completions: {
                     create: jest.fn().mockImplementation(async () => {
-                        return { choices: [{ message: { content: "AI 응답" } }]};
+                        return { choices: [{ message: { content: `{}` } }]};
                     })
                 }
             }
         };
     });
 });
-require("openai");
+jest.mock("../services/openai");
+const { analysisDiary } = require("../services/openai");
+analysisDiary.mockReturnValue({ emotions: ["기쁨", "사랑", "뿌듯함"], positiveScore: 50, negativeScore: 50 });
 
 const request = require("supertest");
 const app = require("../app");

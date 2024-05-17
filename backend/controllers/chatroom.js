@@ -122,7 +122,6 @@ exports.getLatestChatRoom = async (req, res, next) => {
     }
 };
 
-// 추후 chatGPT API 연결 시 AI의 응답을 생성하는 로직 추가
 // [cr-04] AI 챗봇에게 메시지 전송
 exports.sendMessage = async (req, res, next) => {
     const transaction = await sequelize.transaction();
@@ -171,6 +170,8 @@ exports.sendMessage = async (req, res, next) => {
                 content: message.content,
             };
         });
+        // 아직 데이터베이스에 사용자의 메시지가 저장되지 않았으므로 직접 추가한다.
+        messages.push({ role: "user", content });
 
         // AI의 응답 생성
         const chat = await generateResponseMessage(messages);
@@ -188,7 +189,6 @@ exports.sendMessage = async (req, res, next) => {
 
         return res.status(200).json({ chat });
     } catch (error) {
-        console.error(error);
         await transaction.rollback();
         next(error);
     }

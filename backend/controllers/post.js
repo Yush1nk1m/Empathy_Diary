@@ -147,6 +147,7 @@ exports.postDiary = async (req, res, next) => {
             negativeScore: LLMResponse.negativeScore,
         });
     } catch (error) {
+        console.error(error);
         await transaction.rollback();
         next(error);
     }
@@ -202,8 +203,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         const LLMResponse = await analysisDiary(newContent);
-
-        // 데이터베이스에 새로운 정보를 추가하는 연산들은 동시 실행 가능하므로 프로미스 목록에 추가한다.
 
         // 감정 정보 등록
         for (const emotion of LLMResponse.emotions) {

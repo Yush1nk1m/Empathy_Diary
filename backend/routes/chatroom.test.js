@@ -4,14 +4,19 @@ jest.mock("openai", () => {
             chat: {
                 completions: {
                     create: jest.fn().mockImplementation(async () => {
-                        return { choices: [{ message: { content: "AI 응답" } }]};
+                        return { choices: [{ message: { content: `{ "role": "assistant", "content": "AI의 응답" }` } }]};
                     })
                 }
             }
         };
     });
 });
-require("openai");
+
+jest.mock("../services/openai");
+const { generateWelcomeMessage, generateDiary, generateResponseMessage } = require("../services/openai");
+generateWelcomeMessage.mockReturnValue(Promise.resolve({ role: "assistant", content: "AI의 첫 번째 메시지" }));
+generateDiary.mockReturnValue(Promise.resolve({ content: "요약된 일기 내용"}));
+generateResponseMessage.mockReturnValue(Promise.resolve({ role: "assistant", content: "AI의 응답 메시지" }));
 
 const request = require("supertest");
 const app = require("../app");
@@ -66,6 +71,7 @@ describe("[cr-01] POST /chatrooms", () => {
     });
 
     test("[crit-01-2] 성공적인 대화방 생성 요청", async () => {
+
         const response = await agent.post("/chatrooms");
 
         expect(response.status).toBe(200);
@@ -121,10 +127,11 @@ describe("[cr-02] POST /chatrooms/summarize", () => {
 
     test("[crit-02-3] 성공적인 대화 제출 요청", async () => {
         await agent.post("/chatrooms");
-        const response = await agent.post("/chatrooms/summarize");
 
+        const response = await agent.post("/chatrooms/summarize");
+        
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({ content: expect.any(String) });
+        expect(response.body).toEqual({ content: "요약된 일기 내용" });
     });
 });
 
@@ -260,6 +267,7 @@ describe("[cr-04] POST /chatrooms/chats", () => {
 
     test("[crit-04-4] 성공적인 메시지 전송 요청", async () => {
         await agent.post("/chatrooms");
+
         const response = await agent.post("/chatrooms/chats").send({ content: "내용" });
 
         expect(response.status).toBe(200);

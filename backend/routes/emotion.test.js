@@ -4,14 +4,16 @@ jest.mock("openai", () => {
             chat: {
                 completions: {
                     create: jest.fn().mockImplementation(async () => {
-                        return { choices: [{ message: { content: "AI 응답" } }]};
+                        return { choices: [{ message: { content: `{}` } }]};
                     })
                 }
             }
         };
     });
 });
-require("openai");
+jest.mock("../services/openai");
+const { analysisDiary } = require("../services/openai");
+analysisDiary.mockReturnValue({ emotions: ["기쁨", "사랑", "뿌듯함"], positiveScore: 50, negativeScore: 50 });
 
 const request = require("supertest");
 const app = require("../app");
@@ -35,7 +37,7 @@ describe("[e-01] GET /emotions", () => {
     
     const agent = request.agent(app);
 
-    const emotions = ["기쁨", "사랑", "뿌듯함", "우울함", "불안함", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+    const emotions = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
     emotions.sort();
     
     // 모든 테스트 시작 전: 회원 가입
@@ -88,7 +90,7 @@ describe("[e-02] GET /emotions/period?[startDate]&[endDate]", () => {
     const today = new Date();
     const todayString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
 
-    const emotions = ["기쁨", "사랑", "뿌듯함", "우울함", "불안함", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+    const emotions = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
     emotions.sort();
     
     // 모든 테스트 시작 전: 회원 가입
