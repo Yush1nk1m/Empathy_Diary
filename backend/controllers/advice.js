@@ -144,11 +144,19 @@ exports.writeAdvice = async (req, res, next) => {
             },
         });
 
-        // 사용자 일기에 나타난 감정 추출
+        // 병렬 실행 가능한 프로미스들을 담을 배열을 선언한다.
+        const promises = [];
+
+        // 사용자 일기에 나타난 감정을 추출하여 Set으로 고유하게 저장한다.
         let emotions = new Set();
         for (const post of posts) {
-            const postEmotions = await post.getEmotions();
-            for (const emotion of postEmotions) {
+            // 일기마다 매핑된 감정을 가져오는 작업은 병렬 실행 가능하므로 프로미스 배열에 저장한다.
+            promises.push(post.getEmotions());
+        }
+        // 모든 프로미스를 병렬적으로 실행하고 그 결과를 Set에 저장한다.
+        const postEmotions = await Promise.all(promises);
+        for (const postEmotion of postEmotions) {
+            for (const emotion of postEmotion) {
                 emotions.add(emotion);
             }
         }

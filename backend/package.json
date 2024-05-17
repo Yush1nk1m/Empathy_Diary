@@ -7,7 +7,7 @@
     "start": "NODE_ENV=production PORT=443 pm2 start server.js -i 0",
     "dev": "nodemon server",
     "test": "jest --env=node --silent --runInBand --forceExit",
-    "coverage": "jest --coverage --silent --forceExit"
+    "coverage": "jest --coverage --env=node --silent --runInBand --forceExit"
   },
   "repository": {
     "type": "git",
