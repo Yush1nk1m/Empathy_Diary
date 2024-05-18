@@ -4,7 +4,7 @@
   "description": "AI empathy diary project in Sogang",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=production PORT=443 pm2 start server.js -i 0",
+    "start": "NODE_ENV=production pm2 start server.js -i 0",
     "dev": "nodemon server",
     "test": "jest --env=node --silent --runInBand --forceExit",
     "coverage": "jest --coverage --env=node --silent --runInBand --forceExit"
