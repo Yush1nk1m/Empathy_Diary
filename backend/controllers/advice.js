@@ -157,16 +157,18 @@ exports.writeAdvice = async (req, res, next) => {
         const postEmotions = await Promise.all(promises);
         for (const postEmotion of postEmotions) {
             for (const emotion of postEmotion) {
-                emotions.add(emotion);
+                emotions.add(emotion.type);
             }
         }
+
+        // Set을 Array로 변환한다.
+        emotions = [...emotions];
 
         // 조언과 감정 매핑
         for (const emotion of emotions) {
             await advice.addEmotions(emotion, { transaction });
         }
 
-        emotions = [...emotions].map(emotion => emotion.type);
 
         await transaction.commit();
 
