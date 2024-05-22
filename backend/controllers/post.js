@@ -117,9 +117,15 @@ exports.postDiary = async (req, res, next) => {
         });
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
-        const LLMResponse = await analysisDiary(content);
-        // LLM의 환각 현상을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
+        let LLMResponse = await analysisDiary(content);
+        // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+            LLMResponse = await analysisDiary(content);
+        }
+
+        // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        // 환각 현상으로 생성된 목록 외 감정을 제거한다.
         LLMResponse.emotions.filter((emotion) => {
             return emotionList.includes(emotion);
         });
@@ -178,9 +184,15 @@ exports.postDiaryTest = async (req, res, next) => {
         });
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
-        const LLMResponse = await analysisDiary(content);
-        // LLM의 환각 현상을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
+        let LLMResponse = await analysisDiary(content);
+        // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+            LLMResponse = await analysisDiary(content);
+        }
+
+        // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        // 환각 현상으로 생성된 목록 외 감정을 제거한다.
         LLMResponse.emotions.filter((emotion) => {
             return emotionList.includes(emotion);
         });
