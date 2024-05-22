@@ -20,12 +20,16 @@ const db = require("../models");
 const { sequelize, Post, Sentiment } = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
-const { analysisDiary } = require("../services/openai");
+const { analysisDiary, analysisMainEmotion } = require("../services/openai");
 
 analysisDiary.mockReturnValue(Promise.resolve({
     emotions: ["기쁨", "사랑", "뿌듯함"],
     positiveScore: 50,
     negativeScore: 50,
+}));
+
+analysisMainEmotion.mockReturnValue(Promise.resolve({
+    emotion: "기쁨",
 }));
 
 sequelize.transaction.mockReturnValue(Promise.resolve({

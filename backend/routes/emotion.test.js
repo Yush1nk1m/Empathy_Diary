@@ -12,8 +12,9 @@ jest.mock("openai", () => {
     });
 });
 jest.mock("../services/openai");
-const { analysisDiary } = require("../services/openai");
+const { analysisDiary, analysisMainEmotion } = require("../services/openai");
 analysisDiary.mockReturnValue({ emotions: ["기쁨", "사랑", "뿌듯함"], positiveScore: 50, negativeScore: 50 });
+analysisMainEmotion.mockReturnValue({ emotion: "기쁨" });
 
 const request = require("supertest");
 const app = require("../app");
