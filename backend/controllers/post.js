@@ -153,6 +153,62 @@ exports.postDiary = async (req, res, next) => {
     }
 };
 
+// 시연용 임시 기능
+exports.postDiaryTest = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const { content, date } = req.body;
+        if (!content || !date) {
+            return res.status(400).send("요청 바디 형식이 부적절합니다.");
+        }
+        
+        const post = await Post.create({
+            content,
+            image: null,
+            writer: req.user.id,
+            createdAt: new Date(date),
+        }, {
+            transaction,
+        });
+
+        // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
+        const LLMResponse = await analysisDiary(content);
+
+        // 데이터베이스에 감정 정보 등록하는 프로미스 저장
+        for (const emotion of LLMResponse.emotions) {
+            await PostEmotions.create({
+                PostId: post.id,
+                EmotionType: emotion,
+            }, {
+                transaction,
+            });
+        }
+        
+        // 데이터베이스에 감성 정보 등록하는 프로미스 저장
+        await Sentiment.create({
+            positive: LLMResponse.positiveScore,
+            negative: LLMResponse.negativeScore,
+            postId: post.id,
+        }, {
+            transaction,
+        });
+        
+        await transaction.commit();
+
+        return res.status(200).json({
+            postId: post.id,
+            emotions: LLMResponse.emotions,
+            positiveScore: LLMResponse.positiveScore,
+            negativeScore: LLMResponse.negativeScore,
+        });
+    } catch (error) {
+        console.error(error);
+        await transaction.rollback();
+        next(error);
+    }
+};
+
 // [p-04] 일기 내용 수정
 exports.modifyDiaryContent = async (req, res, next) => {
     const transaction = await sequelize.transaction();

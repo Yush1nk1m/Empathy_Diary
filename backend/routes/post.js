@@ -15,7 +15,7 @@
 const express = require("express");
 
 const { isLoggedIn } = require("../middlewares");
-const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("../controllers/post");
+const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod, postDiaryTest } = require("../controllers/post");
 
 const router = express.Router();
 
@@ -27,6 +27,9 @@ router.get("/:postId", isLoggedIn, getDiaryById);
 
 // [p-03] POST /posts
 router.post("/", isLoggedIn, postDiary);
+
+// 시연용 임시 라우터
+router.post("/test", isLoggedIn, postDiaryTest);
 
 // [p-04] PATCH /posts
 router.patch("/", isLoggedIn, modifyDiaryContent);

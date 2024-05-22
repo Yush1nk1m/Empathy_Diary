@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일기 추가 페이지</title>
+    <script>
+        async function submitDiary() {
+            const date = document.getElementById('date').value;
+            const content = document.getElementById('content').value;
+
+            if (!date || !content) {
+                alert("날짜와 일기 내용을 모두 입력해주세요.");
+                return;
+            }
+
+            const [year, month, day] = date.split('-');
+            const body = { content: content, date: `${year}-${month}-${day}` };
+
+            try {
+                const response = await fetch('http://localhost:8080/posts/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.status === 200) {
+                    const responseData = await response.json();
+                    alert(`서버 응답: ${JSON.stringify(responseData)}`);
+                    window.location.href = '/';
+                } else {
+                    alert('일기 전송에 실패했습니다.');
+                }
+            } catch (error) {
+                alert('오류가 발생했습니다: ' + error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>일기 추가 페이지</h1>
+    <label for="date">날짜:</label>
+    <input type="date" id="date" name="date"><br><br>
+    <label for="content">일기 내용:</label><br>
+    <textarea id="content" name="content" rows="10" cols="30"></textarea><br><br>
+    <button onclick="submitDiary()">제출</button>
+</body>
+</html>
