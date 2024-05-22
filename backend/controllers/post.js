@@ -122,14 +122,14 @@ exports.postDiary = async (req, res, next) => {
         const retryCount = 0;
         while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
             if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
-            LLMResponse = await analysisDiary(content);킵
+            LLMResponse = await analysisDiary(content);
             retryCount++;
         }
 
         // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
-        LLMResponse.emotions.filter((emotion) => {
+        LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
             return emotionList.includes(emotion);
         });
 
@@ -195,11 +195,11 @@ exports.postDiaryTest = async (req, res, next) => {
             LLMResponse = await analysisDiary(content);킵
             retryCount++;
         }
-
+정
         // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
-        LLMResponse.emotions.filter((emotion) => {
+        LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
             return emotionList.includes(emotion);
         });
 
@@ -296,7 +296,7 @@ exports.modifyDiaryContent = async (req, res, next) => {
         // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
-        LLMResponse.emotions.filter((emotion) => {
+        LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
             return emotionList.includes(emotion);
         });
 
