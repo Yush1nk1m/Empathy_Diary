@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const Op = require("sequelize").Op;
-const { Post, Emotion } = require("../models");
+const { Post, Emotion, PostEmotion } = require("../models");
 const { getTotalEmotions, getTotalEmotionsForSpecificPeriod } = require("./emotion");
 
 const dateOptions = {
@@ -14,6 +14,7 @@ const timeOptions = {
     timeZone: 'Asia/Seoul', // 한국 시간대 설정
     hour12: false // 24시간 표기법 사용
 };
+const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
 
 // [e-01] 사용자의 누적된 모든 감정 조회
 describe("[e-01] getTotalEmotions", () => {
@@ -38,7 +39,7 @@ describe("[e-01] getTotalEmotions", () => {
     });
 
     test("[eut-01-2] Post.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
-        let emotions = [
+        const emotions = [
             { type: "기쁨" },
             { type: "사랑" },
             { type: "뿌듯함" },
@@ -53,20 +54,42 @@ describe("[e-01] getTotalEmotions", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[eut-01-3] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
-        let emotions = [
+    test("[eut-01-3] PostEmotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+        const emotions = [
             { type: "기쁨" },
             { type: "사랑" },
             { type: "뿌듯함" },
         ];
         Emotion.findAll.mockReturnValueOnce(Promise.resolve(emotions));
 
-        const posts = [
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-        ]
+        const posts = [{ id: 1 }, { id: 2 }, { id: 3 }];
         Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        PostEmotion.findAll.mockReturnValue(Promise.reject(error));
+
+        await getTotalEmotions(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("[eut-01-4] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
+        const emotions = emotionList.map((emotion) => {
+            return {
+                type: emotion,
+            };
+        });
+        Emotion.findAll.mockReturnValueOnce(Promise.resolve(emotions));
+
+        const posts = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getTotalEmotions(req, res, next);
 
@@ -74,19 +97,20 @@ describe("[e-01] getTotalEmotions", () => {
         emotions.forEach((emotion) => {
             emotionMap.set(emotion.type, 0);
         });
-        for (const post of posts) {
-            for (const emotion of post.Emotions) {
-                emotionMap.set(emotion.type, emotionMap.get(emotion.type) + 1);
-            }
-        }
-        emotions = [...emotionMap.keys()].map((emotion) => {
+
+        // 위에서 일기가 세 개 조회되고 각각 기쁨, 사랑, 뿌듯함이 매핑되어 있도록 가정하였다.
+        emotionMap.set("기쁨", 3);
+        emotionMap.set("사랑", 3);
+        emotionMap.set("뿌듯함", 3);
+
+        const emotionsArray = [...emotionMap.keys()].map((emotion) => {
             return {
                 [emotion]: emotionMap.get(emotion),
             };
         });
 
         expect(res.status).toBeCalledWith(200);
-        expect(res.json).toBeCalledWith({ emotions });
+        expect(res.json).toBeCalledWith({ emotions: emotionsArray });
     });
 });
 
@@ -178,7 +202,35 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[eut-02-5] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
+    test("[eut-02-5] PostEmotion.findAll 수행 중 에러가 발생하면 감정 조회에 실패한다.", async () => {
+        const req = {
+            query: {
+                startDate: "2024-05-05",
+                endDate: "2024-05-05",
+            },
+            user: {
+                id: 1,
+            },
+        };
+        const emotions = [
+            { type: "기쁨" },
+            { type: "사랑" },
+            { type: "뿌듯함" },
+        ];
+        Emotion.findAll.mockReturnValueOnce(Promise.resolve(emotions));
+
+        const posts = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        PostEmotion.findAll.mockReturnValue(Promise.reject(error));
+
+        await getTotalEmotionsForSpecificPeriod(req, res, next);
+
+        expect(next).toBeCalledWith(error);
+    });
+
+    test("[eut-02-6] 데이터베이스 조회 중 에러가 발생하지 않으면 감정 조회에 성공한다.", async () => {
         const req = {
             query: {
                 startDate: "2024-05-05",
@@ -196,12 +248,15 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         ];
         Emotion.findAll.mockReturnValueOnce(Promise.resolve(emotions));
 
-        const posts = [
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-            { Emotions: [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }] },
-        ]
+        const posts = [{ id: 1 }, { id: 2 }, { id: 3 }];
         Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getTotalEmotionsForSpecificPeriod(req, res, next);
 
@@ -209,18 +264,19 @@ describe("[e-02] getTotalEmotionsForSpecificPeriod", () => {
         emotions.forEach((emotion) => {
             emotionMap.set(emotion.type, 0);
         });
-        for (const post of posts) {
-            for (const emotion of post.Emotions) {
-                emotionMap.set(emotion.type, emotionMap.get(emotion.type) + 1);
-            }
-        }
-        emotions = [...emotionMap.keys()].map((emotion) => {
+
+        // 위에서 일기가 세 개 조회되고 각각 기쁨, 사랑, 뿌듯함이 매핑되어 있도록 가정하였다.
+        emotionMap.set("기쁨", 3);
+        emotionMap.set("사랑", 3);
+        emotionMap.set("뿌듯함", 3);
+
+        const emotionsArray = [...emotionMap.keys()].map((emotion) => {
             return {
                 [emotion]: emotionMap.get(emotion),
             };
         });
 
         expect(res.status).toBeCalledWith(200);
-        expect(res.json).toBeCalledWith({ emotions });
+        expect(res.json).toBeCalledWith({ emotions: emotionsArray });
     });
 });

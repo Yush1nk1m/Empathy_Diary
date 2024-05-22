@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const Post = require("./post");
+const PostEmotion = require("./postEmotion");
 const config = require("../config/config")["test"];
 const sequelize = new Sequelize(
     config.database, config.username, config.password, config,
@@ -25,7 +26,7 @@ describe("Post model", () => {
         Post.associate(db);
 
         expect(db.Post.belongsTo).toBeCalledWith(db.User, { foreignKey: "writer", targetKey: "id" });
-        expect(db.Post.belongsToMany).toBeCalledWith(db.Emotion, { through: "PostEmotions" });
+        expect(db.Post.belongsToMany).toBeCalledWith(db.Emotion, { through: db.PostEmotion, onDelete: "CASCADE", hooks: true });
         expect(db.Post.hasOne).toBeCalledWith(db.Sentiment, { foreignKey: "postId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     });
 });

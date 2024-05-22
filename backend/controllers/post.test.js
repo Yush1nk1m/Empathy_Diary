@@ -17,8 +17,7 @@ jest.mock("../models");
 jest.mock("../services/openai");
 
 const db = require("../models");
-const { sequelize, Post, Sentiment } = require("../models");
-const PostEmotions = db.sequelize.models.PostEmotions;
+const { sequelize, Post, Sentiment, PostEmotion } = require("../models");
 const { postDiary, getAllDiaries, getDiaryById, modifyDiaryContent, deleteDiary, getDiariesForSpecificPeriod } = require("./post");
 const { analysisDiary, analysisMainEmotion } = require("../services/openai");
 
@@ -78,12 +77,12 @@ describe("[p-01] getAllDiaries", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[put-01-3] getEmotions() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
+    test("[put-01-3] PostEmotion.findAll 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
+        const posts = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+        Post.findAll.mockReturnValue(Promise.resolve(posts));
+
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
-        const result = [{
-            getEmotions: jest.fn(async () => Promise.reject(error)),
-        }];
-        Post.findAll.mockReturnValue(Promise.resolve(result));
+        PostEmotion.findAll.mockReturnValue(Promise.reject(error));
 
         await getAllDiaries(req, res, next);
 
@@ -92,12 +91,10 @@ describe("[p-01] getAllDiaries", () => {
 
     test("[put-01-4] getSentiment() 수행 중 에러 발생 시 next(error)를 호출한다.", async () => {
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
-        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
             id: 1,
             content: "내용 1",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.reject(error)),
         }];
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
@@ -109,31 +106,34 @@ describe("[p-01] getAllDiaries", () => {
 
     test("[put-01-5] 데이터베이스 작업 중 에러가 발생하지 않으면 일기 조회에 성공한다.", async () => {
         const sentiment = { positive: 50, negative: 50 };
-        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
-        const result = [{
+        const posts = [{
             id: 1,
             content: "내용 1",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }, {
             id: 2,
             content: "내용 2",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }];
-        Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+        Post.findAll.mockReturnValueOnce(Promise.resolve(posts));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getAllDiaries(req, res, next);
 
         let diaries = [];
 
-        for (const diary of result) {
+        for (const diary of posts) {
             let emotions = [];
-            const result = await diary.getEmotions();
-            for (const emotion of result) {
-                emotions.push(emotion.type);
+            for (const emotion of postEmotions) {
+                emotions.push(emotion.EmotionType);
             }
 
             const sentiment = await diary.getSentiment();
@@ -223,7 +223,7 @@ describe("[p-02] getDiaryById", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[put-02-5] getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-02-5] PostEmotion.findAll 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             params: {
                 postId: 1,       //GET /posts/period 
@@ -233,12 +233,13 @@ describe("[p-02] getDiaryById", () => {
             }
         };
 
-        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         const post = {
             writer: 1,
-            getEmotions: jest.fn(async () => Promise.reject(error)),
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        PostEmotion.findAll.mockReturnValue(Promise.reject(error));
 
         await getDiaryById(req, res, next);
 
@@ -256,13 +257,18 @@ describe("[p-02] getDiaryById", () => {
         };
 
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
-        const emotions = ["기쁨", "사랑", "뿌듯함"];
         const post = {
             writer: 1,
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.reject(error)),
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getDiaryById(req, res, next);
 
@@ -279,13 +285,6 @@ describe("[p-02] getDiaryById", () => {
             }
         };
 
-        const result = [{
-            type: "기쁨",
-        }, {
-            type: "사랑",
-        }, {
-            type: "뿌듯함",
-        }];
         const sentiment = {
             positive: 50,
             negative: 50,
@@ -295,16 +294,22 @@ describe("[p-02] getDiaryById", () => {
             writer: 1,
             content: "내용",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(result)),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
+
         await getDiaryById(req, res, next);
 
         let emotions = [];
-        for (const emotion of result) {
-            emotions.push(emotion.type);
+        for (const emotion of postEmotions) {
+            emotions.push(emotion.EmotionType);
         }
 
         const diary = {
@@ -347,7 +352,7 @@ describe("[p-03] postDiary", () => {
         Post.create.mockReturnValueOnce(Promise.resolve(post));
         const emotions = ["기쁨", "사랑", "뿌듯함"];
         
-        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        PostEmotion.create.mockReturnValue(Promise.resolve(true));
 
         const positiveScore = 50;
         const negativeScore = 50;
@@ -413,7 +418,7 @@ describe("[p-03] postDiary", () => {
         Post.create.mockReturnValueOnce(Promise.resolve(post));
         
         const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.")
-        PostEmotions.create.mockReturnValue(Promise.reject(error));
+        PostEmotion.create.mockReturnValue(Promise.reject(error));
 
         await postDiary(req, res, next);
         
@@ -435,7 +440,7 @@ describe("[p-03] postDiary", () => {
         };
         Post.create.mockReturnValueOnce(Promise.resolve(post));
         
-        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        PostEmotion.create.mockReturnValue(Promise.resolve(true));
         
         const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.")
         Sentiment.create.mockReturnValueOnce(Promise.reject(error));
@@ -559,7 +564,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[put-04-7] PostEmotions 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-7] PostEmotion 모델의 데이터베이스 삭제 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -578,7 +583,7 @@ describe("[p-04] modifyDiaryContent", () => {
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
         const error = new Error("데이터베이스 삭제 중 에러가 발생하였습니다.");
-        PostEmotions.destroy.mockReturnValueOnce(Promise.reject(error));
+        PostEmotion.destroy.mockReturnValueOnce(Promise.reject(error));
 
         await modifyDiaryContent(req, res, next);
 
@@ -603,7 +608,7 @@ describe("[p-04] modifyDiaryContent", () => {
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
-        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        PostEmotion.destroy.mockReturnValueOnce(Promise.resolve(true));
         
         const error = new Error("데이터베이스 삭제 중 에러가 발생하였습니다.");
         Sentiment.destroy.mockReturnValueOnce(Promise.reject(error));
@@ -613,7 +618,7 @@ describe("[p-04] modifyDiaryContent", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[put-04-9] PostEmotions 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
+    test("[put-04-9] PostEmotion 모델의 데이터베이스 생성 중 에러가 발생하면 next(error)가 호출된다.", async () => {
         const req = {
             body: {
                 postId: 1,
@@ -631,12 +636,12 @@ describe("[p-04] modifyDiaryContent", () => {
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
-        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        PostEmotion.destroy.mockReturnValueOnce(Promise.resolve(true));
         
         Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
         
         const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.");
-        PostEmotions.create.mockReturnValue(Promise.reject(error));
+        PostEmotion.create.mockReturnValue(Promise.reject(error));
 
         await modifyDiaryContent(req, res, next);
 
@@ -661,11 +666,11 @@ describe("[p-04] modifyDiaryContent", () => {
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
-        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        PostEmotion.destroy.mockReturnValueOnce(Promise.resolve(true));
         
         Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
         
-        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        PostEmotion.create.mockReturnValue(Promise.resolve(true));
         
         const error = new Error("데이터베이스 생성 중 에러가 발생하였습니다.");
         Sentiment.create.mockReturnValueOnce(Promise.reject(error));
@@ -698,11 +703,11 @@ describe("[p-04] modifyDiaryContent", () => {
         };
         Post.findOne.mockReturnValueOnce(Promise.resolve(post));
 
-        PostEmotions.destroy.mockReturnValueOnce(Promise.resolve(true));
+        PostEmotion.destroy.mockReturnValueOnce(Promise.resolve(true));
         
         Sentiment.destroy.mockReturnValueOnce(Promise.resolve(true));
         
-        PostEmotions.create.mockReturnValue(Promise.resolve(true));
+        PostEmotion.create.mockReturnValue(Promise.resolve(true));
         
         Sentiment.create.mockReturnValueOnce(Promise.resolve(true));
 
@@ -894,7 +899,7 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         expect(next).toBeCalledWith(error);
     });
 
-    test("[put-06-5] getEmotions() 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
+    test("[put-06-5] PostEmotion.findAll 수행 중 에러가 발생하면 next(error)를 호출한다.", async () => {
         const req = {
             query: {
                 startDate: new Date(),
@@ -906,16 +911,17 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         };
 
         const sentiment = { positive: 50, negative: 50 };
-        const error = new Error("getEmotion() 수행 중 에러가 발생했습니다.");
         const result = [{
             id: 1,
             content: "내용",
             createdAt: new Date(),
-            getEmotions: jest.fn(async () => Promise.reject(error)),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }]
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
 
+        const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
+        PostEmotion.findAll.mockReturnValue(Promise.reject(error));
+        
         await getDiariesForSpecificPeriod(req, res, next);
 
         expect(next).toBeCalledWith(error);
@@ -933,15 +939,20 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         };
 
         const error = new Error("getSentiment() 수행 중 에러가 발생했습니다.");
-        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
             id: 1,
             content: "내용",
             createdAt: new Date(),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.reject(error)),
         }]
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getDiariesForSpecificPeriod(req, res, next);
 
@@ -960,21 +971,30 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
         };
 
         const sentiment = { positive: 50, negative: 50 };
-        const emotions = [{ type: "기쁨" }, { type: "사랑" }, { type: "뿌듯함" }];
         const result = [{
             id: 1,
             content: "내용 1",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }, {
             id: 2,
             content: "내용 2",
             createdAt: new Date("2024-05-02"),
-            getEmotions: jest.fn(async () => Promise.resolve(emotions)),
+            getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
+        }, {
+            id: 3,
+            content: "내용 3",
+            createdAt: new Date("2024-05-02"),
             getSentiment: jest.fn(async () => Promise.resolve(sentiment)),
         }];
         Post.findAll.mockReturnValueOnce(Promise.resolve(result));
+
+        const postEmotions = [
+            { EmotionType: "기쁨" },
+            { EmotionType: "사랑" },
+            { EmotionType: "뿌듯함" },
+        ];
+        PostEmotion.findAll.mockReturnValue(Promise.resolve(postEmotions));
 
         await getDiariesForSpecificPeriod(req, res, next);
 
@@ -992,9 +1012,8 @@ describe("[p-06] getDiariesForSpecificPeriod", () => {
 
         for (const diary of result) {
             let emotions = [];
-            const result = await diary.getEmotions();
-            for (const emotion of result) {
-                emotions.push(emotion.type);
+            for (const emotion of postEmotions) {
+                emotions.push(emotion.EmotionType);
             }
 
             const sentiment = await diary.getSentiment();

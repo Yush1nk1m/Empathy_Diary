@@ -26,9 +26,14 @@ exports.getAllDiaries = async (req, res, next) => {
 
         for (const diary of posts) {
             let emotions = [];
-            const result = await diary.getEmotions();
-            for (const emotion of result) {
-                emotions.push(emotion.type);
+            const result = await PostEmotion.findAll({
+                where: {
+                    PostId: diary.id,
+                },
+                order: [["id", "ASC"]],
+            });
+            for (const postEmotion of result) {
+                emotions.push(postEmotion.EmotionType);
             }
 
             const sentiment = await diary.getSentiment();
@@ -74,9 +79,14 @@ exports.getDiaryById = async (req, res, next) => {
         }
 
         let emotions = [];
-        const result = await post.getEmotions();
-        for (const emotion of result) {
-            emotions.push(emotion.type);
+        const result = await PostEmotion.findAll({
+            where: {
+                PostId: post.id,
+            },
+            order: [["id", "ASC"]],
+        });
+        for (const postEmotion of result) {
+            emotions.push(postEmotion.EmotionType);
         }
 
         const sentiment = await post.getSentiment();
@@ -422,7 +432,12 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
                 writeDate: (post.createdAt).toLocaleString("ko-KR", dateOptions),
                 writeTime: (post.createdAt).toLocaleString("ko-KR", timeOptions),
             });  // 미리 일기 자체의 속성만으로 일겨 배열을 구성한다.
-            emotionPromises.push(post.getEmotions());
+            emotionPromises.push(PostEmotion.findAll({
+                where: {
+                    PostId: post.id,
+                },
+                order: [["id", "ASC"]],
+            }));
             sentimentPromises.push(post.getSentiment());
         }
 
@@ -434,7 +449,7 @@ exports.getDiariesForSpecificPeriod = async (req, res, next) => {
 
         // 일기 배열에 감정, 감성 정보를 추가한다.
         for (let i = 0; i < diaries.length; i++) {
-            diaries[i].emotions = emotionArrays[i].map(emotion => emotion.type);
+            diaries[i].emotions = emotionArrays[i].map(postEmotion => postEmotion.EmotionType);
             diaries[i].positiveScore = sentimentArrays[i].positive;
             diaries[i].negativeScore = sentimentArrays[i].negative;
         }
