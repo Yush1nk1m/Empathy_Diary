@@ -1,7 +1,6 @@
 const Op = require("sequelize").Op;
-const { sequelize, Post, Sentiment } = require("../models");
+const { sequelize, Post, Sentiment, PostEmotion } = require("../models");
 const db = require("../models");
-const PostEmotions = db.sequelize.models.PostEmotions;
 const { analysisDiary, analysisMainEmotion } = require("../services/openai");
 
 const dateOptions = {
@@ -141,7 +140,7 @@ exports.postDiary = async (req, res, next) => {
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
-            await PostEmotions.create({
+            await PostEmotion.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {
@@ -216,7 +215,7 @@ exports.postDiaryTest = async (req, res, next) => {
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
-            await PostEmotions.create({
+            await PostEmotion.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {
@@ -277,7 +276,7 @@ exports.modifyDiaryContent = async (req, res, next) => {
         await post.save({ transaction });
 
         // 감정 정보 삭제
-        await PostEmotions.destroy({
+        await PostEmotion.destroy({
             where: {
                 PostId: post.id,
             },
@@ -313,10 +312,11 @@ exports.modifyDiaryContent = async (req, res, next) => {
         });
         // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
         LLMResponse.emotions.unshift(LLMResponse2.emotion);
+        console.log(LLMResponse.emotions);
 
         // 감정 정보 등록
         for (const emotion of LLMResponse.emotions) {
-            await PostEmotions.create({
+            await PostEmotion.create({
                 PostId: post.id,
                 EmotionType: emotion,
             }, {

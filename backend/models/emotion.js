@@ -4,6 +4,7 @@
  * @typeName    감정의 종류
  */
 const Sequelize = require("sequelize");
+const PostEmotion = require("./postEmotion");
 
 class Emotion extends Sequelize.Model {
     static initiate(sequelize) {
@@ -27,7 +28,7 @@ class Emotion extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Emotion.belongsToMany(db.Post, { through: "PostEmotions", onDelete: "CASCADE", hooks: true });
+        db.Emotion.belongsToMany(db.Post, { through: db.PostEmotion, onDelete: "CASCADE", hooks: true });
         db.Emotion.belongsToMany(db.Advice, { through: "AdviceEmotions", onDelete: "CASCADE", hooks: true });
     }
 };

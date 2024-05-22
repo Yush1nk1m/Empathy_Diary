@@ -5,6 +5,7 @@
  * @createdAt   작성 일시
  */
 const Sequelize = require("sequelize");
+const PostEmotion = require("./postEmotion");
 
 class Post extends Sequelize.Model {
     static initiate(sequelize) {
@@ -32,7 +33,7 @@ class Post extends Sequelize.Model {
 
     static associate(db) {
         db.Post.belongsTo(db.User, { foreignKey: "writer", targetKey: "id" });
-        db.Post.belongsToMany(db.Emotion, { through: "PostEmotions" });
+        db.Post.belongsToMany(db.Emotion, { through: db.PostEmotion, onDelete: "CASCADE", hooks: true });
         db.Post.hasOne(db.Sentiment, { foreignKey: "postId", sourceKey: "id", onDelete: "CASCADE", hooks: true });
     }
 }

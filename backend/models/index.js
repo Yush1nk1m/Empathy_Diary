@@ -6,6 +6,7 @@ const Emotion = require("./emotion");
 const Sentiment = require("./sentiment");
 const Chatroom = require("./chatroom");
 const Chat = require("./chat");
+const PostEmotion = require("./postEmotion");
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config")[env];
 
@@ -22,6 +23,7 @@ db.Emotion = Emotion;
 db.Sentiment = Sentiment;
 db.Chatroom = Chatroom;
 db.Chat = Chat;
+db.PostEmotion = PostEmotion;
 
 User.initiate(sequelize);
 Advice.initiate(sequelize);
@@ -30,6 +32,7 @@ Emotion.initiate(sequelize);
 Sentiment.initiate(sequelize);
 Chatroom.initiate(sequelize);
 Chat.initiate(sequelize);
+PostEmotion.initiate(sequelize);
 
 User.associate(db);
 Advice.associate(db);
