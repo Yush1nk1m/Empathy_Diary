@@ -2,7 +2,7 @@ const Op = require("sequelize").Op;
 const { sequelize, Post, Sentiment } = require("../models");
 const db = require("../models");
 const PostEmotions = db.sequelize.models.PostEmotions;
-const { analysisDiary } = require("../services/openai");
+const { analysisDiary, analysisMainEmotion } = require("../services/openai");
 
 const dateOptions = {
     year: 'numeric', month: '2-digit', day: '2-digit',
@@ -47,6 +47,7 @@ exports.getAllDiaries = async (req, res, next) => {
 
         return res.status(200).json({ diaries });
     } catch (error) {
+        console.error(error);
         next(error);
     }
 };
@@ -118,11 +119,14 @@ exports.postDiary = async (req, res, next) => {
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         let LLMResponse = await analysisDiary(content);
+        let LLMResponse2 = await analysisMainEmotion(content);
+
         // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
         const retryCount = 0;
-        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
             if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
             LLMResponse = await analysisDiary(content);
+            LLMResponse2 = await analysisMainEmotion(content);
             retryCount++;
         }
 
@@ -130,8 +134,10 @@ exports.postDiary = async (req, res, next) => {
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
         LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
-            return emotionList.includes(emotion);
+            return emotionList.includes(emotion) && emotion !== LLMResponse2.emotion;
         });
+        // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
+        LLMResponse.emotions.unshift(LLMResponse2.emotion);
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
@@ -188,11 +194,14 @@ exports.postDiaryTest = async (req, res, next) => {
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         let LLMResponse = await analysisDiary(content);
+        let LLMResponse2 = await analysisMainEmotion(content);
+
         // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
         const retryCount = 0;
-        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
             if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
-            LLMResponse = await analysisDiary(content);킵
+            LLMResponse = await analysisDiary(content);
+            LLMResponse2 = await analysisMainEmotion(content);
             retryCount++;
         }
 
@@ -200,8 +209,10 @@ exports.postDiaryTest = async (req, res, next) => {
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
         LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
-            return emotionList.includes(emotion);
+            return emotionList.includes(emotion) && emotion !== LLMResponse2.emotion;
         });
+        // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
+        LLMResponse.emotions.unshift(LLMResponse2.emotion);
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
@@ -270,7 +281,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
             where: {
                 PostId: post.id,
             },
-        }, {
             transaction,
         });
 
@@ -279,17 +289,19 @@ exports.modifyDiaryContent = async (req, res, next) => {
             where: {
                 postId: post.id,
             },
-        }, {
             transaction,
         });
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         let LLMResponse = await analysisDiary(newContent);
+        let LLMResponse2 = await analysisMainEmotion(newContent);
+
         // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
         const retryCount = 0;
-        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
             if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
             LLMResponse = await analysisDiary(newContent);
+            LLMResponse2 = await analysisMainEmotion(newContent);
             retryCount++;
         }
 
@@ -297,8 +309,10 @@ exports.modifyDiaryContent = async (req, res, next) => {
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
         // 환각 현상으로 생성된 목록 외 감정을 제거한다.
         LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
-            return emotionList.includes(emotion);
+            return emotionList.includes(emotion) && emotion !== LLMResponse2.emotion;
         });
+        // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
+        LLMResponse.emotions.unshift(LLMResponse2.emotion);
 
         // 감정 정보 등록
         for (const emotion of LLMResponse.emotions) {

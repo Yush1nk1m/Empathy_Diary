@@ -19,9 +19,8 @@ exports.analysisDiary = async (content) => {
             "일기 내용에 ['기쁨', '사랑', '뿌듯함', '실망', '우울', '불안', '분노', '놀람', '외로움', '공포', '후회', '부끄러움'] 외의 다른 감정이 존재하더라도 절대로 이를 응답해선 안 됩니다.",
             "두 번째로, 당신은 사용자가 작성한 일기의 내용을 토대로 긍정 점수와 부정 점수를 평가합니다.",
             "긍정 점수와 부정 점수는 양의 정수로 나타내며, 두 점수의 합은 반드시 100이어야 합니다.",
-            `응답은 반드시 { "emotions": ["분류된 감정 1", "분류된 감정 2", ...], positiveScore: [긍정 점수], negativeScore: [부정 점수] }와 같은 JSON 형태여야 합니다.`,
+            `응답은 반드시 { "emotions": ["분류된 감정 1", "분류된 감정 2", ...], "positiveScore": [긍정 점수], "negativeScore": [부정 점수] }와 같은 JSON 형태여야 합니다.`,
             "사용자가 작성한 일기의 내용이 12가지의 감정 중 어떤 것으로도 분류될 수 없을 경우, 응답의 emotions 속성을 빈 배열로 응답해야 합니다.",
-            "응답의 emotions 속성의 분류된 감정들은 분류될 확률에 따라 내림차순으로 나열하세요.",
             "사용자가 작성한 일기의 내용으로 긍정 점수와 부정 점수를 평가할 수 없을 경우, 중립을 표현하는 의미에서 긍정 점수와 부정 점수는 각각 50으로 응답해야 합니다.",
         ];
 
@@ -34,18 +33,54 @@ exports.analysisDiary = async (content) => {
             model: "gpt-4o",
             messages,
             response_format: { "type": "json_object" },
-            temperature: 0.2,
+            temperature: 0.1,
             max_tokens: 1000,
         });
 
         const output = JSON.parse(response.choices[0].message.content);
 
-        // expect(output): { "emotions": [], "positiveScore": int, "negativeScore": int }
+        // expect(output): { "emotions": [], "mainEmotion": str, "positiveScore": int, "negativeScore": int }
         return output;
     } catch (error) {
         throw error;
     }
 };
+
+exports.analysisMainEmotion = async (content) => {
+    try {
+        const messages = [];
+
+        // 시스템 프롬프트로 AI의 동작을 명시한다.
+        const systemPrompts = [
+            "당신은 '공감 다이어리'라는 일기 작성 서비스의 AI 일기 분석 어시스턴트입니다.",
+            "지금부터 당신에게 사용자가 작성한 일기의 내용이 주어질 것입니다.",
+            "['기쁨', '사랑', '뿌듯함', '실망', '우울', '불안', '분노', '놀람', '외로움', '공포', '후회', '부끄러움']의 12가지 종류의 감정들 중에서 일기에 가장 강렬하게 나타난 감정을 분류하세요.",
+            "일기 내용에 ['기쁨', '사랑', '뿌듯함', '실망', '우울', '불안', '분노', '놀람', '외로움', '공포', '후회', '부끄러움'] 외의 다른 감정이 존재하더라도 절대로 이를 응답해선 안 됩니다.",
+            `응답은 반드시 { "emotion": [분류된 감정] }와 같은 JSON 형태여야 합니다.`,
+            "사용자가 작성한 일기의 내용이 12가지의 감정 중 어떤 것으로도 분류될 수 없을 경우, 응답의 emotion 속성을 ''로 응답해야 합니다.",
+        ];
+
+        for (const systemPrompt of systemPrompts) {
+            messages.push({ role: "system", content: systemPrompt });
+        }
+        messages.push({ role: "user", content });
+
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages,
+            response_format: { "type": "json_object" },
+            temperature: 0.1,
+            max_tokens: 1000,
+        });
+
+        const output = JSON.parse(response.choices[0].message.content);
+
+        // expect(output): { "emotion": str }
+        return output;
+    } catch (error) {
+        throw error;
+    }
+}
 
 // 채팅방의 첫 번째 채팅을 생성한다.
 exports.generateWelcomeMessage = async () => {
