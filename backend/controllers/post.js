@@ -120,17 +120,18 @@ exports.postDiary = async (req, res, next) => {
         const LLMResponse = await analysisDiary(content);
         // LLM의 환각 현상을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        LLMResponse.emotions.filter((emotion) => {
+            return emotionList.includes(emotion);
+        });
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
-            if (emotionList.includes(emotion)) {
-                await PostEmotions.create({
-                    PostId: post.id,
-                    EmotionType: emotion,
-                }, {
-                    transaction,
-                });
-            }
+            await PostEmotions.create({
+                PostId: post.id,
+                EmotionType: emotion,
+            }, {
+                transaction,
+            });
         }
         
         // 데이터베이스에 감성 정보 등록하는 프로미스 저장
@@ -180,17 +181,18 @@ exports.postDiaryTest = async (req, res, next) => {
         const LLMResponse = await analysisDiary(content);
         // LLM의 환각 현상을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        LLMResponse.emotions.filter((emotion) => {
+            return emotionList.includes(emotion);
+        });
 
         // 데이터베이스에 감정 정보 등록하는 프로미스 저장
         for (const emotion of LLMResponse.emotions) {
-            if (emotionList.includes(emotion)) {
-                await PostEmotions.create({
-                    PostId: post.id,
-                    EmotionType: emotion,
-                }, {
-                    transaction,
-                });
-            }
+            await PostEmotions.create({
+                PostId: post.id,
+                EmotionType: emotion,
+            }, {
+                transaction,
+            });
         }
         
         // 데이터베이스에 감성 정보 등록하는 프로미스 저장
