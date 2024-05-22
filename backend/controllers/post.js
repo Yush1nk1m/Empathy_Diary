@@ -189,8 +189,11 @@ exports.postDiaryTest = async (req, res, next) => {
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
         let LLMResponse = await analysisDiary(content);
         // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
+        const retryCount = 0;
         while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
-            LLMResponse = await analysisDiary(content);
+            if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
+            LLMResponse = await analysisDiary(content);킵
+            retryCount++;
         }
 
         // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
@@ -262,8 +265,6 @@ exports.modifyDiaryContent = async (req, res, next) => {
         // 변경된 일기 내용을 저장
         await post.save({ transaction });
 
-        // 기존 정보를 삭제하는 연산들은 동시 실행 가능하므로 저장한다.
-
         // 감정 정보 삭제
         await PostEmotions.destroy({
             where: {
@@ -283,7 +284,21 @@ exports.modifyDiaryContent = async (req, res, next) => {
         });
 
         // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
-        const LLMResponse = await analysisDiary(newContent);
+        let LLMResponse = await analysisDiary(content);
+        // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
+        const retryCount = 0;
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined) {
+            if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
+            LLMResponse = await analysisDiary(content);킵
+            retryCount++;
+        }
+
+        // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
+        const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        // 환각 현상으로 생성된 목록 외 감정을 제거한다.
+        LLMResponse.emotions.filter((emotion) => {
+            return emotionList.includes(emotion);
+        });
 
         // 감정 정보 등록
         for (const emotion of LLMResponse.emotions) {
