@@ -22,12 +22,12 @@ exports.getDailyAdvices = async (req, res, next) => {
         // 오늘 사용자가 느낀 감정 조회
         let emotions = new Set();
         const posts = await user.getPosts({
-    	    where: {
-    	        createdAt: {
-    		        [Op.between]: [startDate, endDate],
-		        },
-	        },
-	    });
+	    where: {
+	        createdAt: {
+		    [Op.between]: [startDate, endDate],
+		},
+	    },
+	});
         
         // 병렬적으로 실행 가능한 프로미스들을 담을 배열을 선언한다.
         const promises = [];
