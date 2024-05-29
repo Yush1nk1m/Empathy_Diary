@@ -17,7 +17,7 @@ exports.getDailyAdvices = async (req, res, next) => {
         const user = req.user;
 
         const startDate = new Date(new Date().setHours(0, 0, 0, 0));
-	    const endDate = new Date(new Date().setHours(24, 0, 0, 0));
+    	const endDate = new Date(new Date().setHours(24, 0, 0, 0));
 
         // 오늘 사용자가 느낀 감정 조회
         let emotions = new Set();
