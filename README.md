@@ -1,4 +1,4 @@
-# 공감 다이어리 (2024. 03. ~ 2024. 05.)
+# 공감 다이어리 (2024. 03. ~ 2024. 06.)
 
 최종 편집 일시: 2024년 6월 2일 오후 9:33</br>
 태그: Artillery, ChatGPT, EC2, Express, HTTPS, Javascript, Jest, MySQL, Node.JS, Redis, Sequelize, Supertest</br>
