@@ -274,22 +274,19 @@ Beyond 4–5 `describe` blocks per file, the process hung after all tests passed
 The backend requires the following values in a `.env` file.
 
 ```env
-PORT=<port>
-NODE_ENV=development
-DB_HOST=<mysql-host>
-DB_USER=<mysql-user>
-DB_PASSWORD=<mysql-password>
-DB_DATABASE=<mysql-database>
-REDIS_HOST=<redis-host>
-REDIS_PORT=<redis-port>
-REDIS_PASSWORD=<redis-password>
-SESSION_SECRET=<session-secret>
-OPENAI_API_KEY=<your-openai-key>
-COOKIE_SECRET=<cookie-secret>
-```
+PORT=
 
-> 실제 키 이름은 `backend/config` 및 `server.js` 설정에 맞춰 조정하세요.
-> Adjust the exact key names to match `backend/config` and `server.js`.
+COOKIE_SECRET=
+
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+```
 
 ---
 
