@@ -231,7 +231,7 @@ erDiagram
 With only the backend deployed, logging in from a local front-end failed because the session cookie was treated as third-party. I attached a domain to the EC2 server, applied HTTPS, and set the cookie to `Secure: true`, `SameSite: None` to resolve it.
 
 **2. 통합 테스트 중단 현상의 근본 원인 추적 / Root-causing integration-test hangs**
-한 테스트 파일에 `describe`가 4~5개를 넘으면 모든 테스트가 통과한 뒤 프로세스가 멈추는 현상이 있었습니다. 처음에는 라이브러리 결함을 의심해 [이슈](https://github.com/forwardemail/supertest/issues/839)까지 등록했으나, `--detectOpenHandles`로 재조사한 결과 실제 원인은 컨트롤러들이 트랜잭션을 `try` 최상단에서 열고 검증 실패 시 `commit`/`rollback` 없이 early-return하여 커넥션이 누수되고, **Sequelize 기본 커넥션 풀(5)이 고갈**된 것이었습니다. 트랜잭션 스코프를 실제 쓰기 직전으로 한정하여 해결했습니다.
+한 테스트 파일에 `describe`가 5개를 넘으면 모든 테스트가 통과한 뒤 프로세스가 멈추는 현상이 있었습니다. 처음에는 라이브러리 결함을 의심해 [이슈](https://github.com/forwardemail/supertest/issues/839)까지 등록했으나, `--detectOpenHandles`로 재조사한 결과 실제 원인은 컨트롤러들이 트랜잭션을 `try` 최상단에서 열고 검증 실패 시 `commit`/`rollback` 없이 early-return하여 커넥션이 누수되고, **Sequelize 기본 커넥션 풀(5)이 고갈**된 것이었습니다. 트랜잭션 스코프를 실제 쓰기 직전으로 한정하여 해결했습니다.
 Beyond 4–5 `describe` blocks per file, the process hung after all tests passed. I first suspected the library and even filed an [issue](https://github.com/forwardemail/supertest/issues/839), but `--detectOpenHandles` revealed the real cause: controllers opened a transaction at the top of the `try` block and early-returned on validation failure without `commit`/`rollback`, leaking connections until **Sequelize's default pool (5) was exhausted**. I resolved it by narrowing each transaction's scope to just before the actual writes.
 
 ---
