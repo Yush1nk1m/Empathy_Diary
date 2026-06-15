@@ -110,63 +110,40 @@ exports.getDiaryById = async (req, res, next) => {
 
 // [p-03] 일기 등록
 exports.postDiary = async (req, res, next) => {
-    const transaction = await sequelize.transaction();
-
+    let transaction;
     try {
         const { content } = req.body;
         if (content === '') {
             return res.status(400).send("일기 내용이 존재하지 않습니다.");
         }
-        
-        const post = await Post.create({
-            content,
-            image: null,
-            writer: req.user.id,
-        }, {
-            transaction,
-        });
 
-        // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
+        // ── LLM 처리는 트랜잭션 밖에서 (느린 외부 호출 동안 커넥션 미점유) ──
         let LLMResponse = await analysisDiary(content);
         let LLMResponse2 = await analysisMainEmotion(content);
-
-        // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
-        const retryCount = 0;
-        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
+        let retryCount = 0;   // ※ 원본의 const → let 로 수정 (아래 4절 참고)
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined
+            || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
             if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
             LLMResponse = await analysisDiary(content);
             LLMResponse2 = await analysisMainEmotion(content);
             retryCount++;
         }
 
-        // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
         const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
-        // 환각 현상으로 생성된 목록 외 감정을 제거한다.
-        LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
-            return emotionList.includes(emotion) && emotion !== LLMResponse2.emotion;
-        });
-        // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
+        LLMResponse.emotions = LLMResponse.emotions.filter((e) => emotionList.includes(e) && e !== LLMResponse2.emotion);
         LLMResponse.emotions.unshift(LLMResponse2.emotion);
 
-        // 데이터베이스에 감정 정보 등록하는 프로미스 저장
+        // ── 쓰기만 트랜잭션으로 ──
+        transaction = await sequelize.transaction();
+        const post = await Post.create({ content, image: null, writer: req.user.id }, { transaction });
         for (const emotion of LLMResponse.emotions) {
-            await PostEmotion.create({
-                PostId: post.id,
-                EmotionType: emotion,
-            }, {
-                transaction,
-            });
+            await PostEmotion.create({ PostId: post.id, EmotionType: emotion }, { transaction });
         }
-        
-        // 데이터베이스에 감성 정보 등록하는 프로미스 저장
         await Sentiment.create({
             positive: LLMResponse.positiveScore,
             negative: LLMResponse.negativeScore,
             postId: post.id,
-        }, {
-            transaction,
-        });
-        
+        }, { transaction });
         await transaction.commit();
 
         return res.status(200).json({
@@ -176,9 +153,93 @@ exports.postDiary = async (req, res, next) => {
             negativeScore: LLMResponse.negativeScore,
         });
     } catch (error) {
-        console.error(error);
-        await transaction.rollback();
-        next(error);
+        if (transaction) await transaction.rollback();
+        return next(error);
+    }
+};
+
+// [p-04] 일기 내용 수정
+exports.modifyDiaryContent = async (req, res, next) => {
+    let transaction;
+    try {
+        const { postId, newContent } = req.body;
+        if (!newContent) {
+            return res.status(400).send("일기 내용이 존재하지 않습니다.");
+        }
+
+        const post = await Post.findOne({ where: { id: postId } });
+        if (!post) {
+            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
+        }
+        if (post.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        // ── LLM 처리는 트랜잭션 밖 ──
+        let LLMResponse = await analysisDiary(newContent);
+        let LLMResponse2 = await analysisMainEmotion(newContent);
+        let retryCount = 0;
+        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined
+            || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
+            if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
+            LLMResponse = await analysisDiary(newContent);
+            LLMResponse2 = await analysisMainEmotion(newContent);
+            retryCount++;
+        }
+        const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
+        LLMResponse.emotions = LLMResponse.emotions.filter((e) => emotionList.includes(e) && e !== LLMResponse2.emotion);
+        LLMResponse.emotions.unshift(LLMResponse2.emotion);
+
+        // ── 쓰기만 트랜잭션으로 ──
+        transaction = await sequelize.transaction();
+        post.content = newContent;
+        await post.save({ transaction });
+        await PostEmotion.destroy({ where: { PostId: post.id }, transaction });
+        await Sentiment.destroy({ where: { postId: post.id }, transaction });
+        for (const emotion of LLMResponse.emotions) {
+            await PostEmotion.create({ PostId: post.id, EmotionType: emotion }, { transaction });
+        }
+        await Sentiment.create({
+            positive: LLMResponse.positiveScore,
+            negative: LLMResponse.negativeScore,
+            postId: post.id,
+        }, { transaction });
+        await transaction.commit();
+
+        return res.status(200).json({
+            postId: post.id,
+            emotions: LLMResponse.emotions,
+            positiveScore: LLMResponse.positiveScore,
+            negativeScore: LLMResponse.negativeScore,
+        });
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        return next(error);
+    }
+};
+
+// [p-05] 일기 삭제
+exports.deleteDiary = async (req, res, next) => {
+    let transaction;
+    try {
+        const postId = req.params.postId;
+
+        const post = await Post.findOne({ where: { id: postId } });
+        if (!post) {
+            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
+        }
+        if (post.writer !== req.user.id) {
+            return res.status(403).send("접근 권한이 없습니다.");
+        }
+
+        transaction = await sequelize.transaction();
+        await Post.destroy({ where: { id: postId }, transaction });
+        await transaction.commit();
+
+        return res.status(200).send("일기가 삭제되었습니다.");
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        return next(error);
     }
 };
 
@@ -252,143 +313,6 @@ exports.postDiaryTest = async (req, res, next) => {
         });
     } catch (error) {
         console.error(error);
-        await transaction.rollback();
-        next(error);
-    }
-};
-
-// [p-04] 일기 내용 수정
-exports.modifyDiaryContent = async (req, res, next) => {
-    const transaction = await sequelize.transaction();
-
-    try {
-        const { postId, newContent } = req.body;
-        if (!newContent) {
-            return res.status(400).send("일기 내용이 존재하지 않습니다.");
-        }
-
-        let post = await Post.findOne({
-            where: {
-                id: postId,
-            },
-        });
-        if (!post) {
-            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
-        }
-
-        if (post.writer !== req.user.id) {
-            return res.status(403).send("접근 권한이 없습니다.");
-        }
-
-        post.content = newContent;
-
-        // 변경된 일기 내용을 저장
-        await post.save({ transaction });
-
-        // 감정 정보 삭제
-        await PostEmotion.destroy({
-            where: {
-                PostId: post.id,
-            },
-            transaction,
-        });
-
-        // 감성 정보 삭제
-        await Sentiment.destroy({
-            where: {
-                postId: post.id,
-            },
-            transaction,
-        });
-
-        // chatGPT API를 통해 일기 내용을 분석하고 감정, 감성 정보를 데이터베이스에 등록한다.
-        let LLMResponse = await analysisDiary(newContent);
-        let LLMResponse2 = await analysisMainEmotion(newContent);
-
-        // 환각 현상으로 올바른 데이터가 응답되지 않을 경우 다시 요청을 발생시킨다.
-        const retryCount = 0;
-        while (LLMResponse.emotions === undefined || LLMResponse.positiveScore === undefined || LLMResponse.negativeScore === undefined || LLMResponse2.emotion === undefined) {
-            if (retryCount >= 3) throw new Error("반복적인 시도에도 환각 현상이 해결되지 않아 서버 에러를 발생시킵니다.");
-            LLMResponse = await analysisDiary(newContent);
-            LLMResponse2 = await analysisMainEmotion(newContent);
-            retryCount++;
-        }
-
-        // LLM의 환각 현상으로 잘못된 데이터가 추가되는 것을 방지하기 위해 데이터베이스에 저장된 감정 리스트를 가져온다.
-        const emotionList = ["기쁨", "사랑", "뿌듯함", "우울", "불안", "분노", "놀람", "외로움", "공포", "후회", "부끄러움"];
-        // 환각 현상으로 생성된 목록 외 감정을 제거한다.
-        LLMResponse.emotions = LLMResponse.emotions.filter((emotion) => {
-            return emotionList.includes(emotion) && emotion !== LLMResponse2.emotion;
-        });
-        // 가장 강렬하게 나타난 감정이 맨 앞에 오도록 한다.
-        LLMResponse.emotions.unshift(LLMResponse2.emotion);
-        console.log(LLMResponse.emotions);
-
-        // 감정 정보 등록
-        for (const emotion of LLMResponse.emotions) {
-            await PostEmotion.create({
-                PostId: post.id,
-                EmotionType: emotion,
-            }, {
-                transaction,
-            });
-        }
-
-        // 감성 정보 등록
-        await Sentiment.create({
-            positive: LLMResponse.positiveScore,
-            negative: LLMResponse.negativeScore,
-            postId: post.id,
-        }, {
-            transaction,
-        });
-
-        await transaction.commit();
-
-        return res.status(200).json({
-            postId: post.id,
-            emotions: LLMResponse.emotions,
-            positiveScore: LLMResponse.positiveScore,
-            negativeScore: LLMResponse.negativeScore,
-        });
-    } catch (error) {
-        await transaction.rollback();
-        next(error);
-    }
-};
-
-// [p-05] 일기 삭제
-exports.deleteDiary = async (req, res, next) => {
-    const transaction = await sequelize.transaction();
-
-    try {
-        const postId = req.params.postId;
-
-        const post = await Post.findOne({
-            where: {
-                id: postId,
-            },
-        });
-
-        if (!post) {
-            return res.status(404).send(`[ID: ${postId}] 일기가 존재하지 않습니다.`);
-        }
-
-        if (post.writer !== req.user.id) {
-            return res.status(403).send("접근 권한이 없습니다.");
-        }
-
-        await Post.destroy({
-            where: {
-                id: postId,
-            },
-            transaction,
-        });
-
-        await transaction.commit();
-
-        return res.status(200).send("일기가 삭제되었습니다.");
-    } catch (error) {
         await transaction.rollback();
         next(error);
     }

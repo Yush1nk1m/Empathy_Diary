@@ -1,4 +1,6 @@
-require("dotenv").config();
+const path = require("path");
+// 현재 config.js 파일 위치 기준으로 한 단계 위(..), 즉 backend/ 폴더 바로 아래의 .env를 명시적으로 지정
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
 module.exports = {
   "development": {

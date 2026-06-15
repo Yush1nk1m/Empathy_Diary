@@ -2,7 +2,7 @@ jest.mock("sequelize");
 jest.mock("../models");
 
 const Op = require("sequelize").Op;
-const { Post, Sentiment } = require("../models");
+const { sequelize, Post, Sentiment } = require("../models");
 const { getSentimentScoresForSpecificPeriod } = require("./sentiment");
 
 const dateOptions = {

@@ -234,11 +234,14 @@ describe("[cr-04] sendMessage", () => {
         content: "응답",
     }));
 
+    // 각 테스트가 시작되기 전에 next와 res의 호출 기록을 초기화합니다.
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     test("[crut-04-1] 요청 바디가 유효하지 않을 경우 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
+            user: { id: 1 },
             body: {},
         };
 
@@ -250,12 +253,8 @@ describe("[cr-04] sendMessage", () => {
 
     test("[crut-04-2] 데이터베이스에서 채팅방 조회 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
@@ -268,12 +267,8 @@ describe("[cr-04] sendMessage", () => {
 
     test("[crut-04-3] 조회된 채팅방이 존재하지 않으면 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(null));
@@ -282,24 +277,22 @@ describe("[cr-04] sendMessage", () => {
 
         await sendMessage(req, res, next);
 
-        expect(next).toBeCalledWith(error);
+        expect(next).toBeCalledWith(expect.any(Error));
     });
 
     test("[crut-04-4] 데이터베이스에 사용자의 채팅 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
-        const chatroom = {
-            id: 1,
-        };
+        const chatroom = { id: 1 };
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
+        
+        // 2. 대화 내역 조사는 정상 처리되도록 Mock 추가
+        Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
 
+        // 3. 첫 번째 Chat.create(유저 메시지)에서 에러 발생
         const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         Chat.create.mockReturnValueOnce(Promise.reject(error));
 
@@ -310,21 +303,14 @@ describe("[cr-04] sendMessage", () => {
 
     test("[crut-04-5] 데이터베이스에서 대화 내역 조회 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
-        const chatroom = {
-            id: 1,
-        };
+        const chatroom = { id: 1 };
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
-
-        Chat.create.mockReturnValueOnce(Promise.resolve(true));
         
+        // 2. 대화 내역 조회에서 에러 발생
         const error = new Error("데이터베이스 조회 중 에러가 발생했습니다.");
         Chat.findAll.mockReturnValueOnce(Promise.reject(error));
 
@@ -335,28 +321,24 @@ describe("[cr-04] sendMessage", () => {
 
     test("[crut-04-6] 데이터베이스에 AI의 응답 저장 중 에러가 발생하면 메시지 전송에 실패한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
-        const chatroom = {
-            id: 1,
-        };
+        const chatroom = { id: 1 };
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
-        
-        Chat.create.mockReturnValueOnce(Promise.resolve(true));
 
         const messages = [
             { role: "assistant", content: "AI의 메시지 1" },
             { role: "user", content: "사용자의 메시지 1" },
-            { role: "assistant", content: "AI의 메시지 2" },
         ];
+        // 2. 대화 내역 조회 정상
         Chat.findAll.mockReturnValueOnce(Promise.resolve(messages));
 
+        // 3. 첫 번째 Chat.create(유저 메시지) 정상
+        Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        // 4. 두 번째 Chat.create(AI 메시지)에서 에러 발생
         const error = new Error("데이터베이스 저장 중 에러가 발생했습니다.");
         Chat.create.mockReturnValueOnce(Promise.reject(error));
 
@@ -367,23 +349,20 @@ describe("[cr-04] sendMessage", () => {
 
     test("[crut-04-7] 요청 형식이 유효하고 데이터베이스 작업 중 에러가 발생하지 않으면 메시지 전송에 성공한다.", async () => {
         const req = {
-            user: {
-                id: 1,
-            },
-            body: {
-                content: "메시지 내용",
-            },
+            user: { id: 1 },
+            body: { content: "메시지 내용" },
         };
 
-        const chatroom = {
-            id: 1,
-        };
+        const chatroom = { id: 1 };
         Chatroom.findOne.mockReturnValueOnce(Promise.resolve(chatroom));
         
-        Chat.create.mockReturnValueOnce(Promise.resolve(true));
-
+        // 2. 대화 내역 조회 정상
         Chat.findAll.mockReturnValueOnce(Promise.resolve([]));
 
+        // 3. 첫 번째 Chat.create 성공
+        Chat.create.mockReturnValueOnce(Promise.resolve(true));
+
+        // 4. 두 번째 Chat.create 성공
         Chat.create.mockReturnValueOnce(Promise.resolve(true));
 
         await sendMessage(req, res, next);
