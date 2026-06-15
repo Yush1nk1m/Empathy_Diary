@@ -5,14 +5,14 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 module.exports = {
   "development": {
     "username": "root",
-    "password": process.env.SEQUELIZE_PASSWORD,
+    "password": process.env.DB_PASSWORD,
     "database": "empathy_diary",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": process.env.SEQUELIZE_PASSWORD,
+    "password": process.env.DB_PASSWORD,
     "database": "empathy_diary_test",
     "host": "127.0.0.1",
     "dialect": "mysql",
